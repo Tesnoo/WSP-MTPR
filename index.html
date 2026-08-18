@@ -58,7 +58,21 @@
     .seed-input-group input { flex: 1; padding: 12px; background: #0b0c10; border: 1px solid #45a29e; color: #fff; border-radius: 8px; }
     .seed-input-group button { padding: 12px 24px; background: #ffd700; color: #000; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; }
     .auto-update-btn { width: 100%; padding: 16px; font-size: 1.1rem; background: linear-gradient(135deg, #45a29e, #66fcf1); color: #0b0c10; border: none; border-radius: 50px; font-weight: bold; cursor: pointer; margin-bottom: 20px; }
-    .champ-badge { background: #ffd700; color: #000; padding: 2px 8px; border-radius: 12px; font-size: 0.8rem; font-weight: bold; }
+    
+    /* ▼▼ 変更点1: 優勝バッジの背景を白に ▼▼ */
+    .champ-badge { background: #ffffff; color: #000; padding: 2px 8px; border-radius: 12px; font-size: 0.8rem; font-weight: bold; margin-left: 6px; }
+    
+    /* ▼▼ 変更点3: startggのリンクテキスト（プレイヤー名）の装飾 ▼▼ */
+    .player-link { color: #ffffff; text-decoration: none; font-weight: bold; transition: color 0.2s; }
+    .player-link:hover { color: #66fcf1; text-decoration: underline; }
+    
+    /* ▼▼ 変更点2: ドラッグ＆ドロップ用のスタイル ▼▼ */
+    .draggable-row { cursor: grab; transition: background-color 0.2s; }
+    .draggable-row:active { cursor: grabbing; }
+    .draggable-row:hover { background-color: #161b22; }
+    .drag-over { border-top: 2px solid #66fcf1; background-color: #1f2833 !important; }
+    .drag-handle { color: #8892b0; font-weight: bold; font-size: 1.1rem; }
+    
     @media (max-width: 480px) { .top-controls { flex-direction: column; align-items: stretch; } .search-container { max-width: 100%; } }
   </style>
 </head>
@@ -98,9 +112,16 @@
     <div id="resultArea" style="display:none;">
       <h2 id="eventName" style="color:#66fcf1; text-align:center;"></h2>
       <button class="auto-update-btn" onclick="executeSeeding()">🚀 start.ggへシードを自動反映する</button>
+      
+      <p style="color:#8892b0; font-size:0.9rem; text-align:right; margin-bottom:5px;">※行をドラッグ＆ドロップで手動並び替えできます</p>
+      
       <table>
         <thead>
-          <tr><th width="10%">Seed</th><th width="45%">Player</th><th width="20%" style="text-align:center;">start.gg</th><th width="25%">Score</th></tr>
+          <tr>
+            <th width="15%">Seed</th>
+            <th width="60%">Player</th>
+            <th width="25%">Score</th>
+          </tr>
         </thead>
         <tbody id="seedListBody"></tbody>
       </table>
@@ -116,43 +137,30 @@
     let currentPage = 1;
     const itemsPerPage = 50;
 
-    // ▼▼ 10分間パスワードを記憶する魔法の機能 ▼▼
+    // パスワード機能
     function openModal() {
       const expiry = localStorage.getItem('wsp_auth_expiry');
-      // 現在時刻が期限(10分後)より前なら、パスワード入力をスキップして直接シード画面へ！
       if (expiry && Date.now() < parseInt(expiry)) {
         document.getElementById('view-ranking').classList.add('hidden');
         document.getElementById('view-seeding').classList.remove('hidden');
       } else {
-        // 期限切れ、または初めてのアクセスの場合はモーダルを表示
         document.getElementById('authPassword').value = '';
         document.getElementById('password-modal').classList.add('show');
         document.getElementById('authPassword').focus();
       }
     }
-
-    function closeModal() { 
-      document.getElementById('password-modal').classList.remove('show'); 
-    }
-
+    function closeModal() { document.getElementById('password-modal').classList.remove('show'); }
     function checkPassword() {
       if (document.getElementById('authPassword').value === SECRET_KEY) {
-        // パスワード正解時：現在時刻に 10分（10 * 60 * 1000 ミリ秒）足した期限を保存
-        localStorage.setItem('wsp_auth_expiry', Date.now() + 10 * 60 * 1000);
-        
-        closeModal(); 
-        document.getElementById('view-ranking').classList.add('hidden'); 
-        document.getElementById('view-seeding').classList.remove('hidden');
-      } else { 
-        alert("パスワードが違います"); 
-      }
+        localStorage.setItem('wsp_auth_expiry', Date.now() + 10 * 60 * 1000); // 10分記憶
+        closeModal(); document.getElementById('view-ranking').classList.add('hidden'); document.getElementById('view-seeding').classList.remove('hidden');
+      } else { alert("パスワードが違います"); }
     }
-    // ▲▲ ここまで ▲▲
-
     function showRanking() { document.getElementById('view-seeding').classList.add('hidden'); document.getElementById('view-ranking').classList.remove('hidden'); }
     function getOrdinal(n) { const s = ["th", "st", "nd", "rd"], v = n % 100; return n + (s[(v - 20) % 10] || s[v] || s[0]); }
     function toggleCard(element, event) { if (event.target.tagName.toLowerCase() === 'a' || event.target.closest('.disc-chip')) return; element.classList.toggle('expanded'); }
 
+    // ランキングの検索と描画
     function searchPlayer() {
       const query = document.getElementById('searchInput').value.trim().toLowerCase();
       if (!query) return;
@@ -214,8 +222,9 @@
     function changePage(newPage) { if (newPage >= 1 && newPage <= Math.ceil(allData.length / itemsPerPage)) { currentPage = newPage; renderPage(currentPage); } }
     function changePageWithScroll(newPage) { changePage(newPage); window.scrollTo({ top: 0, behavior: 'smooth' }); }
 
+    // APIからランキングデータ取得
     if (GAS_URL.includes("〜〜〜")) {
-      document.getElementById('loading').innerHTML = `<b style="color:#ff4b4b;">⚠️ エラー：GASのURLが設定されていません。</b><br>HTMLファイル内の GAS_URL を、ご自身のWebアプリURLに書き換えてください。`;
+      document.getElementById('loading').innerHTML = `<b style="color:#ff4b4b;">⚠️ エラー：GASのURLが設定されていません。</b>`;
     } else {
       fetch(GAS_URL + "?action=getRanking")
         .then(res => res.json())
@@ -226,11 +235,129 @@
           renderPage(1);
         })
         .catch(err => {
-          document.getElementById('loading').innerHTML = `<b style="color:#ff4b4b;">⚠️ データの取得に失敗しました</b><br>GASのURLが正しいか、デプロイが「全員」になっているか確認してください。<br>詳細: ${err.message}`;
+          document.getElementById('loading').innerHTML = `<b style="color:#ff4b4b;">⚠️ データの取得に失敗しました</b><br>詳細: ${err.message}`;
         });
     }
 
+    // ==========================================
+    // シード生成＆ドラッグ＆ドロップ機能
+    // ==========================================
     let gId = null, gList = null;
+
+    // ▼ドラッグ中の要素を記憶する変数
+    let dragSrcEl = null;
+
+    function handleDragStart(e) {
+      dragSrcEl = this;
+      e.dataTransfer.effectAllowed = 'move';
+      e.dataTransfer.setData('text/plain', this.dataset.index);
+      setTimeout(() => { this.style.opacity = '0.5'; }, 0); // 掴んでいる感を出す
+    }
+
+    function handleDragOver(e) {
+      if (e.preventDefault) e.preventDefault(); // ドロップを許可
+      e.dataTransfer.dropEffect = 'move';
+      return false;
+    }
+
+    function handleDragEnter(e) {
+      this.classList.add('drag-over');
+    }
+
+    function handleDragLeave(e) {
+      this.classList.remove('drag-over');
+    }
+
+    function handleDrop(e) {
+      if (e.stopPropagation) e.stopPropagation();
+      this.classList.remove('drag-over');
+      dragSrcEl.style.opacity = '1';
+
+      const fromIndex = parseInt(e.dataTransfer.getData('text/plain'));
+      const toIndex = parseInt(this.dataset.index);
+
+      if (fromIndex !== toIndex && !isNaN(fromIndex) && !isNaN(toIndex)) {
+        // 配列の要素を移動
+        const movedItem = gList.splice(fromIndex, 1)[0];
+        gList.splice(toIndex, 0, movedItem);
+        
+        // ローカルストレージに新しい順番を保存
+        saveSeedOrder();
+        
+        // 画面を再描画
+        renderSeedList();
+      }
+      return false;
+    }
+
+    function handleDragEnd(e) {
+      this.style.opacity = '1';
+      document.querySelectorAll('#seedListBody tr').forEach(row => { row.classList.remove('drag-over'); });
+    }
+
+    // シード順序をブラウザに保存
+    function saveSeedOrder() {
+      if (!gId) return;
+      const order = gList.map(p => p.entrantId);
+      localStorage.setItem('wsp_seed_order_' + gId, JSON.stringify(order));
+    }
+
+    // 保存されたシード順序を読み込んで適用
+    function applySavedSeedOrder() {
+      if (!gId) return;
+      const saved = localStorage.getItem('wsp_seed_order_' + gId);
+      if (saved) {
+        try {
+          const order = JSON.parse(saved);
+          // 保存された順序に基づいてソート（存在しない人は一番後ろへ）
+          gList.sort((a, b) => {
+            let indexA = order.indexOf(a.entrantId);
+            let indexB = order.indexOf(b.entrantId);
+            if (indexA === -1) indexA = 9999;
+            if (indexB === -1) indexB = 9999;
+            return indexA - indexB;
+          });
+        } catch(e) {}
+      }
+    }
+
+    // シードリストの描画
+    function renderSeedList() {
+      const tb = document.getElementById("seedListBody");
+      tb.innerHTML = "";
+      gList.forEach((p, i) => {
+        let badge = p.lastPlacement === 1 ? `<span class="champ-badge">👑 #${p.lastWspNum}優勝</span>` : "";
+        
+        // ▼ プレイヤー名をリンク化 (ドラッグ時にリンクが引っ張られないよう draggable="false" を付与)
+        let playerNameHtml = p.rawTag;
+        if (p.disc && p.disc !== "なし") {
+          const userSlug = p.disc.split('-')[0];
+          playerNameHtml = `<a href="https://www.start.gg/user/${userSlug}" target="_blank" class="player-link" draggable="false">${p.rawTag}</a>`;
+        }
+
+        const tr = document.createElement('tr');
+        tr.className = 'draggable-row';
+        tr.setAttribute('draggable', 'true');
+        tr.dataset.index = i;
+        
+        // イベントリスナーの登録
+        tr.addEventListener('dragstart', handleDragStart);
+        tr.addEventListener('dragover', handleDragOver);
+        tr.addEventListener('dragenter', handleDragEnter);
+        tr.addEventListener('dragleave', handleDragLeave);
+        tr.addEventListener('drop', handleDrop);
+        tr.addEventListener('dragend', handleDragEnd);
+
+        tr.innerHTML = `
+          <td class="drag-handle">↕️ ${i+1}</td>
+          <td>${playerNameHtml} ${badge}</td>
+          <td>${p.score !== -1 ? p.score.toLocaleString() + "pt" : "-"}</td>
+        `;
+        tb.appendChild(tr);
+      });
+    }
+
+    // APIからシード生成
     function genSeed() {
       document.getElementById("seed-loading").style.display = "block";
       document.getElementById("resultArea").style.display = "none";
@@ -241,15 +368,17 @@
         .then(res => {
           document.getElementById("seed-loading").style.display = "none";
           if (res.error) return alert(res.error);
-          gId = res.eventId; gList = res.list;
+          
+          gId = res.eventId; 
+          gList = res.list;
           document.getElementById("eventName").innerText = res.eventName + " (" + res.entrantsCount + "人)";
-          const tb = document.getElementById("seedListBody"); tb.innerHTML = "";
-          res.list.forEach((p, i) => {
-            let badge = p.lastPlacement === 1 ? `<span class="champ-badge">👑 #${p.lastWspNum}優勝</span>` : "";
-            let startGgLink = "-";
-            if (p.disc && p.disc !== "なし") startGgLink = `<a href="https://www.start.gg/user/${p.disc.split('-')[0]}" target="_blank" style="color:#66fcf1; text-decoration:underline; font-size:0.9rem;">Profile</a>`;
-            tb.innerHTML += `<tr><td>${i+1}</td><td>${p.rawTag} ${badge}</td><td style="text-align:center;">${startGgLink}</td><td>${p.score!=-1 ? p.score.toLocaleString()+"pt" : "-"}</td></tr>`;
-          });
+          
+          // ▼ 以前保存した順序があれば適用
+          applySavedSeedOrder();
+          
+          // ▼ リストを描画
+          renderSeedList();
+          
           document.getElementById("resultArea").style.display = "block";
         }).catch(err => {
           document.getElementById("seed-loading").style.display = "none";
@@ -257,6 +386,7 @@
         });
     }
 
+    // start.ggへの反映
     function executeSeeding() {
       if (!confirm("start.ggのシード順位を強制的に上書きします。よろしいですか？")) return;
       
