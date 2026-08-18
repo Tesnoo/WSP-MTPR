@@ -108,7 +108,7 @@
   </div>
 
   <script>
-    // ★★★★ ここに先ほどコピーしたGASのWebアプリURLを貼り付けてください ★★★★
+    // ★★★★ ここにGASのWebアプリURLを貼り付けてください ★★★★
     const GAS_URL = "https://script.google.com/macros/s/AKfycbwYNNpAlybjAVHCPjpdUOTXtuQKbetGZSBn2caxs_f6zSoPPA3Lo-sCVtO0kvh5fGcETg/exec";
 
     const SECRET_KEY = "SumapaPartyEveryday1919";
@@ -116,13 +116,39 @@
     let currentPage = 1;
     const itemsPerPage = 50;
 
-    function openModal() { document.getElementById('authPassword').value = ''; document.getElementById('password-modal').classList.add('show'); document.getElementById('authPassword').focus(); }
-    function closeModal() { document.getElementById('password-modal').classList.remove('show'); }
+    // ▼▼ 10分間パスワードを記憶する魔法の機能 ▼▼
+    function openModal() {
+      const expiry = localStorage.getItem('wsp_auth_expiry');
+      // 現在時刻が期限(10分後)より前なら、パスワード入力をスキップして直接シード画面へ！
+      if (expiry && Date.now() < parseInt(expiry)) {
+        document.getElementById('view-ranking').classList.add('hidden');
+        document.getElementById('view-seeding').classList.remove('hidden');
+      } else {
+        // 期限切れ、または初めてのアクセスの場合はモーダルを表示
+        document.getElementById('authPassword').value = '';
+        document.getElementById('password-modal').classList.add('show');
+        document.getElementById('authPassword').focus();
+      }
+    }
+
+    function closeModal() { 
+      document.getElementById('password-modal').classList.remove('show'); 
+    }
+
     function checkPassword() {
       if (document.getElementById('authPassword').value === SECRET_KEY) {
-        closeModal(); document.getElementById('view-ranking').classList.add('hidden'); document.getElementById('view-seeding').classList.remove('hidden');
-      } else { alert("パスワードが違います"); }
+        // パスワード正解時：現在時刻に 10分（10 * 60 * 1000 ミリ秒）足した期限を保存
+        localStorage.setItem('wsp_auth_expiry', Date.now() + 10 * 60 * 1000);
+        
+        closeModal(); 
+        document.getElementById('view-ranking').classList.add('hidden'); 
+        document.getElementById('view-seeding').classList.remove('hidden');
+      } else { 
+        alert("パスワードが違います"); 
+      }
     }
+    // ▲▲ ここまで ▲▲
+
     function showRanking() { document.getElementById('view-seeding').classList.add('hidden'); document.getElementById('view-ranking').classList.remove('hidden'); }
     function getOrdinal(n) { const s = ["th", "st", "nd", "rd"], v = n % 100; return n + (s[(v - 20) % 10] || s[v] || s[0]); }
     function toggleCard(element, event) { if (event.target.tagName.toLowerCase() === 'a' || event.target.closest('.disc-chip')) return; element.classList.toggle('expanded'); }
@@ -188,11 +214,9 @@
     function changePage(newPage) { if (newPage >= 1 && newPage <= Math.ceil(allData.length / itemsPerPage)) { currentPage = newPage; renderPage(currentPage); } }
     function changePageWithScroll(newPage) { changePage(newPage); window.scrollTo({ top: 0, behavior: 'smooth' }); }
 
-    // ▼ URLの書き換え忘れチェック
     if (GAS_URL.includes("〜〜〜")) {
       document.getElementById('loading').innerHTML = `<b style="color:#ff4b4b;">⚠️ エラー：GASのURLが設定されていません。</b><br>HTMLファイル内の GAS_URL を、ご自身のWebアプリURLに書き換えてください。`;
     } else {
-      // 🚀 APIからランキングデータを取得！Braveでもブロックされません
       fetch(GAS_URL + "?action=getRanking")
         .then(res => res.json())
         .then(data => {
@@ -206,7 +230,6 @@
         });
     }
 
-    // シード生成ツール
     let gId = null, gList = null;
     function genSeed() {
       document.getElementById("seed-loading").style.display = "block";
@@ -234,7 +257,6 @@
         });
     }
 
-    // シードのstart.ggへの反映
     function executeSeeding() {
       if (!confirm("start.ggのシード順位を強制的に上書きします。よろしいですか？")) return;
       
