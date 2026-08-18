@@ -38,12 +38,14 @@
     .score-pt { font-size: 1rem; color: #c5c6c7; }
     .links-row { display: flex; align-items: center; gap: 12px; margin-bottom: 4px;}
     
-    /* ▼▼ start.gg アイコン用のスタイル ▼▼ */
     .startgg-link { position: relative; z-index: 2; display: inline-flex; align-items: center; }
     .startgg-icon { height: 26px; width: auto; vertical-align: middle; border-radius: 4px; transition: transform 0.2s ease, opacity 0.2s ease; opacity: 0.9; }
     .startgg-icon:hover { transform: scale(1.1); opacity: 1; }
     
-    .disc-chip { background-color: #1f2833; border: 1px solid #333; padding: 4px 8px; border-radius: 6px; font-size: 0.85rem; color: #c5c6c7; position: relative; z-index: 2; }
+    /* ▼▼ コピー機能用のスタイル追加 ▼▼ */
+    .disc-chip { background-color: #1f2833; border: 1px solid #333; padding: 4px 8px; border-radius: 6px; font-size: 0.85rem; color: #c5c6c7; position: relative; z-index: 2; cursor: pointer; transition: all 0.2s; }
+    .disc-chip:hover { background-color: #45a29e; color: #0b0c10; border-color: #66fcf1; }
+    
     .history-wrapper { display: none; margin-top: 20px; }
     .player-card.expanded .history-wrapper { display: block; }
     table { width: 100%; border-collapse: collapse; border-top: 1px solid #333; }
@@ -130,11 +132,9 @@
   </div>
 
   <script>
-    // ★★★★ GASのURL ★★★★
-    const GAS_URL = "https://script.google.com/macros/s/AKfycbwYNNpAlybjAVHCPjpdUOTXtuQKbetGZSBn2caxs_f6zSoPPA3Lo-sCVtO0kvh5fGcETg/exec";
-
-    // ★★★★ start.ggのアイコン画像URL ★★★★
+    // ★★★★ imgurの画像URLとGASのURLを貼り付けてください ★★★★
     const STARTGG_ICON_URL = "https://i.imgur.com/fd8fScu.png"; 
+    const GAS_URL = "https://script.google.com/macros/s/AKfycbwYNNpAlybjAVHCPjpdUOTXtuQKbetGZSBn2caxs_f6zSoPPA3Lo-sCVtO0kvh5fGcETg/exec";
 
     const SECRET_KEY = "SumapaPartyEveryday1919";
     let allData = [];
@@ -162,6 +162,22 @@
     function showRanking() { document.getElementById('view-seeding').classList.add('hidden'); document.getElementById('view-ranking').classList.remove('hidden'); }
     function getOrdinal(n) { const s = ["th", "st", "nd", "rd"], v = n % 100; return n + (s[(v - 20) % 10] || s[v] || s[0]); }
     function toggleCard(element, event) { if (event.target.tagName.toLowerCase() === 'a' || event.target.closest('.disc-chip') || event.target.tagName.toLowerCase() === 'img') return; element.classList.toggle('expanded'); }
+
+    // ▼▼ コピー機能（クリップボードに保存＆演出） ▼▼
+    function copyDisc(event, text, el) {
+      event.stopPropagation(); // アコーディオンの開閉を防ぐ
+      navigator.clipboard.writeText(text).then(() => {
+        const originalHtml = el.innerHTML;
+        el.innerHTML = "✅ Copied!";
+        el.style.backgroundColor = "#45a29e";
+        el.style.color = "#0b0c10";
+        setTimeout(() => {
+          el.innerHTML = originalHtml;
+          el.style.backgroundColor = "";
+          el.style.color = "";
+        }, 1500);
+      });
+    }
 
     function searchPlayer() {
       const query = document.getElementById('searchInput').value.trim().toLowerCase();
@@ -193,7 +209,6 @@
         let historyHtml = '';
         player.history.forEach(h => { if (h.wsp && h.placement) historyHtml += `<tr><td>#${h.wsp} (${h.dateStr})</td><td class="place-col">${getOrdinal(h.placement)} / ${h.entrants}</td></tr>`; });
         
-        // ▼ もし画像URLが初期値のままなら、文字のリンクを表示させるフェイルセーフ
         let startGgHtml = `<a href="https://start.gg/user/${player.disc.split('-')[0]}" target="_blank" class="startgg-link" title="start.gg Profile">
                             <img src="${STARTGG_ICON_URL}" alt="start.gg" class="startgg-icon" onerror="this.outerHTML='start.gg'">
                            </a>`;
@@ -204,12 +219,14 @@
         const card = document.createElement('div');
         card.className = 'player-card';
         card.setAttribute('onclick', 'toggleCard(this, event)');
+        
+        // ▼ onclickイベントを追加 ▼
         card.innerHTML = `
           <div class="rank-text">${getOrdinal(player.rank)}</div>
           <div class="header-row"><h2 class="name-text">${player.name}</h2><div class="score-text">${player.score.toLocaleString()}<span class="score-pt">pt</span></div></div>
           <div class="links-row">
             ${startGgHtml}
-            <div class="disc-chip">📄 ${player.disc}</div>
+            <div class="disc-chip" onclick="copyDisc(event, '${player.disc}', this)" title="クリックしてコピー">📄 ${player.disc}</div>
           </div>
           <div class="history-wrapper"><table><thead><tr><th>Event</th><th class="place-col">Place</th></tr></thead><tbody>${historyHtml}</tbody></table></div>
         `;
@@ -236,18 +253,21 @@
     function changePage(newPage) { if (newPage >= 1 && newPage <= Math.ceil(allData.length / itemsPerPage)) { currentPage = newPage; renderPage(currentPage); } }
     function changePageWithScroll(newPage) { changePage(newPage); window.scrollTo({ top: 0, behavior: 'smooth' }); }
 
-    // APIからランキングデータ取得
-    fetch(GAS_URL + "?action=getRanking")
-      .then(res => res.json())
-      .then(data => {
-        if(data.error) throw new Error(data.error);
-        document.getElementById('loading').style.display = 'none';
-        allData = data;
-        renderPage(1);
-      })
-      .catch(err => {
-        document.getElementById('loading').innerHTML = `<b style="color:#ff4b4b;">⚠️ データの取得に失敗しました</b><br>詳細: ${err.message}`;
-      });
+    if (GAS_URL.includes("〜〜〜")) {
+      document.getElementById('loading').innerHTML = `<b style="color:#ff4b4b;">⚠️ エラー：GASのURLが設定されていません。</b>`;
+    } else {
+      fetch(GAS_URL + "?action=getRanking")
+        .then(res => res.json())
+        .then(data => {
+          if(data.error) throw new Error(data.error);
+          document.getElementById('loading').style.display = 'none';
+          allData = data;
+          renderPage(1);
+        })
+        .catch(err => {
+          document.getElementById('loading').innerHTML = `<b style="color:#ff4b4b;">⚠️ データの取得に失敗しました</b><br>詳細: ${err.message}`;
+        });
+    }
 
     // ==========================================
     // シード生成＆ドラッグ＆ドロップ機能
@@ -314,21 +334,19 @@
       gList.forEach((p, i) => {
         let badge = p.lastPlacement === 1 ? `<span class="champ-badge">👑 #${p.lastWspNum}優勝</span>` : "";
         
-        // ▼ プレイヤー名をstart.ggのリンク化
         let playerNameHtml = p.rawTag;
         if (p.disc && p.disc !== "なし") {
           const userSlug = p.disc.split('-')[0];
           playerNameHtml = `<a href="https://www.start.gg/user/${userSlug}" target="_blank" class="player-link" draggable="false">${p.rawTag}</a>`;
         }
 
-        // ▼ バックグラウンドで持っている全データ(allData)から直近3大会のResultを検索
         let historyText = "-";
         if (p.disc && p.disc !== "なし") {
           const prPlayer = allData.find(d => d.disc.toLowerCase() === p.disc.toLowerCase());
           if (prPlayer && prPlayer.history) {
             const results = prPlayer.history
               .filter(h => h.wsp && h.placement)
-              .slice(0, 3) // 直近3回分を取得
+              .slice(0, 3) 
               .map(h => `${getOrdinal(h.placement)}/${h.entrants}`)
               .join(", ");
             if (results) historyText = results;
