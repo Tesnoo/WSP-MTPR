@@ -2,9 +2,10 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>WSP-Main Tournament Power Ranking</title>
   
-  <!-- ▼▼ プレビュー(OGP)用の設定 ここから ▼▼ -->
+  <!-- ▼▼ プレビュー(OGP)用の設定 ▼▼ -->
   <meta property="og:title" content="WSP-Main Tournament Power Ranking">
   <meta property="og:description" content="スマパメイントーナメントのランキング＆シード作成システム">
   <meta property="og:url" content="https://tesnoo.github.io/WSP-MTPR/">
@@ -13,29 +14,241 @@
   <meta property="og:site_name" content="WSP-MTPR">
   <meta name="theme-color" content="#422c95">
   <meta name="twitter:card" content="summary">
-  <!-- ▲▲ プレビュー(OGP)用の設定 ここまで ▲▲ -->
-
   <link rel="icon" href="sumapa_newlogo.png">
   
   <style>
-    body, html {
-      margin: 0;
-      padding: 0;
-      height: 100%;
-      overflow: hidden; /* 全体のスクロールを固定 */
-      background-color: #05071D; /* 背景色を最新版に合わせました */
-    }
-    iframe {
-      width: 100vw;
-      /* ▼ 上に30pxズラして帯を隠し、高さを補う魔法のコード ▼ */
-      height: calc(100vh + 30px);
-      margin-top: -30px;
-      border: none;
-    }
+    body { background-color: #05071D; color: #c5c6c7; font-family: 'Helvetica Neue', Arial, sans-serif; margin: 0; padding: 40px 20px; }
+    .container { max-width: 600px; margin: 0 auto; }
+    .hidden { display: none !important; }
+    .top-controls { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; gap: 15px; }
+    .search-container { display: flex; gap: 8px; flex: 1; max-width: 350px; }
+    .search-container input { flex: 1; padding: 10px 12px; background: #0b0c10; border: 1px solid #45a29e; color: #fff; border-radius: 8px; font-size: 0.95rem; }
+    .search-container button { padding: 10px 16px; background: linear-gradient(135deg, #1f2833, #0b0c10); border: 1px solid #45a29e; color: #66fcf1; border-radius: 8px; font-weight: bold; cursor: pointer; }
+    .admin-btn { display: inline-flex; align-items: center; gap: 8px; background: linear-gradient(135deg, #1f2833, #0b0c10); border: 1px solid #45a29e; color: #66fcf1; padding: 10px 20px; border-radius: 8px; text-decoration: none; font-weight: bold; cursor: pointer; white-space: nowrap; }
+    .pagination { display: flex; justify-content: center; align-items: center; gap: 8px; margin-bottom: 24px; flex-wrap: wrap; }
+    .page-btn { background-color: #1f2833; border: 1px solid #ffd700; color: #ffd700; padding: 8px 12px; border-radius: 6px; cursor: pointer; font-weight: bold; }
+    .page-btn.active { background-color: #ffd700; color: #000; }
+    .page-btn:disabled { background-color: #111; border-color: #333; color: #555; cursor: not-allowed; }
+    .player-card { border: 1px solid #ffd700; border-radius: 12px; padding: 24px; margin-bottom: 24px; background-color: #05071D; box-shadow: 0 4px 10px rgba(0,0,0,0.5); cursor: pointer; transition: background-color 0.4s ease, box-shadow 0.4s ease; }
+    .player-card:hover { background-color: #161b22; }
+    .header-row { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 4px; }
+    .rank-text { color: #ffd700; font-size: 1.5rem; font-weight: bold; margin: 0 0 4px 0; }
+    .name-text { color: #ffffff; font-size: 2rem; font-weight: bold; margin: 0; word-break: break-all; }
+    .score-text { color: #ffd700; font-size: 1.8rem; font-weight: bold; }
+    .score-pt { font-size: 1rem; color: #c5c6c7; }
+    .links-row { display: flex; align-items: center; gap: 12px; margin-bottom: 4px;}
+    .startgg-link { color: #1a0dab; text-decoration: underline; font-size: 0.95rem; position: relative; z-index: 2; }
+    .disc-chip { background-color: #1f2833; border: 1px solid #333; padding: 4px 8px; border-radius: 6px; font-size: 0.85rem; color: #c5c6c7; position: relative; z-index: 2; }
+    .history-wrapper { display: none; margin-top: 20px; }
+    .player-card.expanded .history-wrapper { display: block; }
+    table { width: 100%; border-collapse: collapse; border-top: 1px solid #333; }
+    th { text-align: left; color: #8892b0; font-size: 0.9rem; padding: 12px 0 8px 0; border-bottom: 1px solid #333; }
+    td { padding: 12px 0; font-size: 0.95rem; border-bottom: 1px solid #333; }
+    .place-col { text-align: right; }
+    #loading { text-align: center; color: #ffd700; font-size: 1.1rem; margin-top: 50px; line-height: 1.6; }
+    #password-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(5, 7, 29, 0.9); display: flex; align-items: center; justify-content: center; z-index: 9999; opacity: 0; visibility: hidden; }
+    #password-modal.show { opacity: 1; visibility: visible; }
+    .modal-box { background: #1f2833; padding: 30px; border-radius: 12px; border: 1px solid #45a29e; text-align: center; max-width: 350px; width: 90%; }
+    .modal-box input { width: 100%; padding: 12px; margin: 15px 0; background: #0b0c10; border: 1px solid #45a29e; color: #fff; border-radius: 8px; box-sizing: border-box; text-align: center; }
+    .modal-box button { width: 100%; padding: 12px; background: linear-gradient(135deg, #45a29e, #66fcf1); color: #0b0c10; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; margin-bottom: 10px; }
+    .modal-box button.cancel { background: #333; color: #fff; }
+    #view-seeding { max-width: 800px; margin: 0 auto; }
+    .back-btn { display: inline-flex; align-items: center; gap: 8px; background: #1f2833; border: 1px solid #8892b0; color: #c5c6c7; padding: 10px 20px; border-radius: 8px; font-weight: bold; font-size: 0.95rem; cursor: pointer; margin-bottom: 24px; }
+    .seed-input-group { background: #1f2833; padding: 25px; border-radius: 12px; border: 1px solid #333; margin-bottom: 20px; display: flex; gap: 15px; }
+    .seed-input-group input { flex: 1; padding: 12px; background: #0b0c10; border: 1px solid #45a29e; color: #fff; border-radius: 8px; }
+    .seed-input-group button { padding: 12px 24px; background: #ffd700; color: #000; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; }
+    .auto-update-btn { width: 100%; padding: 16px; font-size: 1.1rem; background: linear-gradient(135deg, #45a29e, #66fcf1); color: #0b0c10; border: none; border-radius: 50px; font-weight: bold; cursor: pointer; margin-bottom: 20px; }
+    .champ-badge { background: #ffd700; color: #000; padding: 2px 8px; border-radius: 12px; font-size: 0.8rem; font-weight: bold; }
+    @media (max-width: 480px) { .top-controls { flex-direction: column; align-items: stretch; } .search-container { max-width: 100%; } }
   </style>
 </head>
 <body>
-  <!-- ↓ この src= の中に、GASで発行した最新のWebアプリURLを貼り付けてください ↓ -->
-  <iframe src="https://script.google.com/macros/s/AKfycbwYNNpAlybjAVHCPjpdUOTXtuQKbetGZSBn2caxs_f6zSoPPA3Lo-sCVtO0kvh5fGcETg/exec"></iframe>
+
+  <div id="password-modal">
+    <div class="modal-box">
+      <h3 style="color:#66fcf1; margin-top:0;">管理者認証</h3>
+      <input type="password" id="authPassword" placeholder="パスワードを入力" onkeypress="if(event.key==='Enter') checkPassword()">
+      <button onclick="checkPassword()">ログイン</button>
+      <button class="cancel" onclick="closeModal()">キャンセル</button>
+    </div>
+  </div>
+
+  <div id="view-ranking" class="container">
+    <div class="top-controls">
+      <div class="search-container">
+        <input type="text" id="searchInput" placeholder="プレイヤー名で検索..." onkeypress="if(event.key==='Enter') searchPlayer()">
+        <button onclick="searchPlayer()">🔍</button>
+      </div>
+      <button class="admin-btn" onclick="openModal()">⚙️シード設定</button>
+    </div>
+    <div class="pagination" id="pagination-top"></div>
+    <div id="loading">ランキングデータを読み込み中...</div>
+    <div id="ranking-list"></div>
+    <div class="pagination" id="pagination-bottom" style="margin-top: 24px;"></div>
+  </div>
+
+  <div id="view-seeding" class="hidden">
+    <button class="back-btn" onclick="showRanking()">↩️ ランキングに戻る</button>
+    <h1 style="color:#ffd700; text-align:center;">WSP Seeding Tool</h1>
+    <div class="seed-input-group">
+      <input type="text" id="tSlug" placeholder="大会番号 (例: 240) を入力" onkeypress="if(event.key==='Enter') genSeed()">
+      <button onclick="genSeed()">シード作成</button>
+    </div>
+    <div id="seed-loading" style="display:none; text-align:center; color:#ffd700;">処理中...</div>
+    <div id="resultArea" style="display:none;">
+      <h2 id="eventName" style="color:#66fcf1; text-align:center;"></h2>
+      <button class="auto-update-btn" onclick="executeSeeding()">🚀 start.ggへシードを自動反映する</button>
+      <table>
+        <thead>
+          <tr><th width="10%">Seed</th><th width="45%">Player</th><th width="20%" style="text-align:center;">start.gg</th><th width="25%">Score</th></tr>
+        </thead>
+        <tbody id="seedListBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <script>
+    // ★★★★ ここに先ほどコピーしたGASのWebアプリURLを貼り付けてください ★★★★
+    const GAS_URL = "https://script.google.com/macros/s/AKfycbwYNNpAlybjAVHCPjpdUOTXtuQKbetGZSBn2caxs_f6zSoPPA3Lo-sCVtO0kvh5fGcETg/exec";
+
+    const SECRET_KEY = "SumapaPartyEveryday1919";
+    let allData = [];
+    let currentPage = 1;
+    const itemsPerPage = 50;
+
+    function openModal() { document.getElementById('authPassword').value = ''; document.getElementById('password-modal').classList.add('show'); document.getElementById('authPassword').focus(); }
+    function closeModal() { document.getElementById('password-modal').classList.remove('show'); }
+    function checkPassword() {
+      if (document.getElementById('authPassword').value === SECRET_KEY) {
+        closeModal(); document.getElementById('view-ranking').classList.add('hidden'); document.getElementById('view-seeding').classList.remove('hidden');
+      } else { alert("パスワードが違います"); }
+    }
+    function showRanking() { document.getElementById('view-seeding').classList.add('hidden'); document.getElementById('view-ranking').classList.remove('hidden'); }
+    function getOrdinal(n) { const s = ["th", "st", "nd", "rd"], v = n % 100; return n + (s[(v - 20) % 10] || s[v] || s[0]); }
+    function toggleCard(element, event) { if (event.target.tagName.toLowerCase() === 'a' || event.target.closest('.disc-chip')) return; element.classList.toggle('expanded'); }
+
+    function searchPlayer() {
+      const query = document.getElementById('searchInput').value.trim().toLowerCase();
+      if (!query) return;
+      const index = allData.findIndex(p => p.name.toLowerCase().includes(query) || (p.disc && p.disc.toLowerCase().includes(query)));
+      if (index !== -1) {
+        const targetPage = Math.floor(index / itemsPerPage) + 1;
+        if (currentPage !== targetPage) changePage(targetPage);
+        setTimeout(() => {
+          const cards = document.querySelectorAll('.player-card');
+          const indexOnPage = index % itemsPerPage;
+          if (cards[indexOnPage]) {
+            cards[indexOnPage].scrollIntoView({ behavior: 'smooth', block: 'center' });
+            cards[indexOnPage].style.boxShadow = '0 0 25px #66fcf1';
+            cards[indexOnPage].style.backgroundColor = '#1f2833';
+            setTimeout(() => { cards[indexOnPage].style.boxShadow = ''; cards[indexOnPage].style.backgroundColor = ''; }, 2000);
+          }
+        }, 100);
+      } else { alert("該当するプレイヤーが見つかりませんでした。"); }
+    }
+
+    function renderPage(page) {
+      const container = document.getElementById('ranking-list');
+      container.innerHTML = '';
+      const startIndex = (page - 1) * itemsPerPage;
+      const pageData = allData.slice(startIndex, startIndex + itemsPerPage);
+
+      pageData.forEach(player => {
+        let historyHtml = '';
+        player.history.forEach(h => { if (h.wsp && h.placement) historyHtml += `<tr><td>#${h.wsp} (${h.dateStr})</td><td class="place-col">${getOrdinal(h.placement)} / ${h.entrants}</td></tr>`; });
+        const card = document.createElement('div');
+        card.className = 'player-card';
+        card.setAttribute('onclick', 'toggleCard(this, event)');
+        card.innerHTML = `
+          <div class="rank-text">${getOrdinal(player.rank)}</div>
+          <div class="header-row"><h2 class="name-text">${player.name}</h2><div class="score-text">${player.score.toLocaleString()}<span class="score-pt">pt</span></div></div>
+          <div class="links-row"><a href="https://start.gg/user/${player.disc.split('-')[0]}" target="_blank" class="startgg-link">start.gg</a><div class="disc-chip">📄 ${player.disc}</div></div>
+          <div class="history-wrapper"><table><thead><tr><th>Event</th><th class="place-col">Place</th></tr></thead><tbody>${historyHtml}</tbody></table></div>
+        `;
+        container.appendChild(card);
+      });
+      renderPaginationControls();
+    }
+
+    function renderPaginationControls() {
+      const totalPages = Math.ceil(allData.length / itemsPerPage);
+      let html = `<button class="page-btn" onclick="changePageWithScroll(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''}>&lt; Prev</button>`;
+      for (let i = 1; i <= totalPages; i++) {
+        if (i === 1 || i === totalPages || (i >= currentPage - 2 && i <= currentPage + 2)) {
+          html += `<button class="page-btn ${i === currentPage ? 'active' : ''}" onclick="changePageWithScroll(${i})">${i}</button>`;
+        } else if (i === currentPage - 3 || i === currentPage + 3) {
+          html += `<span style="color:#ffd700; padding:0 4px;">...</span>`;
+        }
+      }
+      html += `<button class="page-btn" onclick="changePageWithScroll(${currentPage + 1})" ${currentPage === totalPages ? 'disabled' : ''}>Next &gt;</button>`;
+      document.getElementById('pagination-top').innerHTML = html;
+      document.getElementById('pagination-bottom').innerHTML = html;
+    }
+
+    function changePage(newPage) { if (newPage >= 1 && newPage <= Math.ceil(allData.length / itemsPerPage)) { currentPage = newPage; renderPage(currentPage); } }
+    function changePageWithScroll(newPage) { changePage(newPage); window.scrollTo({ top: 0, behavior: 'smooth' }); }
+
+    // ▼ URLの書き換え忘れチェック
+    if (GAS_URL.includes("〜〜〜")) {
+      document.getElementById('loading').innerHTML = `<b style="color:#ff4b4b;">⚠️ エラー：GASのURLが設定されていません。</b><br>HTMLファイル内の GAS_URL を、ご自身のWebアプリURLに書き換えてください。`;
+    } else {
+      // 🚀 APIからランキングデータを取得！Braveでもブロックされません
+      fetch(GAS_URL + "?action=getRanking")
+        .then(res => res.json())
+        .then(data => {
+          if(data.error) throw new Error(data.error);
+          document.getElementById('loading').style.display = 'none';
+          allData = data;
+          renderPage(1);
+        })
+        .catch(err => {
+          document.getElementById('loading').innerHTML = `<b style="color:#ff4b4b;">⚠️ データの取得に失敗しました</b><br>GASのURLが正しいか、デプロイが「全員」になっているか確認してください。<br>詳細: ${err.message}`;
+        });
+    }
+
+    // シード生成ツール
+    let gId = null, gList = null;
+    function genSeed() {
+      document.getElementById("seed-loading").style.display = "block";
+      document.getElementById("resultArea").style.display = "none";
+      const slug = document.getElementById("tSlug").value;
+      
+      fetch(GAS_URL + "?action=generateSeed&slug=" + encodeURIComponent(slug))
+        .then(res => res.json())
+        .then(res => {
+          document.getElementById("seed-loading").style.display = "none";
+          if (res.error) return alert(res.error);
+          gId = res.eventId; gList = res.list;
+          document.getElementById("eventName").innerText = res.eventName + " (" + res.entrantsCount + "人)";
+          const tb = document.getElementById("seedListBody"); tb.innerHTML = "";
+          res.list.forEach((p, i) => {
+            let badge = p.lastPlacement === 1 ? `<span class="champ-badge">👑 #${p.lastWspNum}優勝</span>` : "";
+            let startGgLink = "-";
+            if (p.disc && p.disc !== "なし") startGgLink = `<a href="https://www.start.gg/user/${p.disc.split('-')[0]}" target="_blank" style="color:#66fcf1; text-decoration:underline; font-size:0.9rem;">Profile</a>`;
+            tb.innerHTML += `<tr><td>${i+1}</td><td>${p.rawTag} ${badge}</td><td style="text-align:center;">${startGgLink}</td><td>${p.score!=-1 ? p.score.toLocaleString()+"pt" : "-"}</td></tr>`;
+          });
+          document.getElementById("resultArea").style.display = "block";
+        }).catch(err => {
+          document.getElementById("seed-loading").style.display = "none";
+          alert("エラーが発生しました: " + err.message);
+        });
+    }
+
+    // シードのstart.ggへの反映
+    function executeSeeding() {
+      if (!confirm("start.ggのシード順位を強制的に上書きします。よろしいですか？")) return;
+      
+      fetch(GAS_URL, {
+        method: "POST",
+        headers: { "Content-Type": "text/plain" },
+        body: JSON.stringify({ action: "updateSeed", eventId: gId, seedingList: gList })
+      })
+      .then(res => res.json())
+      .then(res => {
+        if (res.error) alert(res.error); else alert("✅ start.gg へのシード反映が完了しました！");
+      })
+      .catch(err => alert("通信エラー: " + err.message));
+    }
+  </script>
 </body>
 </html>
