@@ -47,10 +47,13 @@
     
     .history-wrapper { display: none; margin-top: 20px; }
     .player-card.expanded .history-wrapper { display: block; }
+    
+    /* ▼▼ テーブルの余白（padding）を調整して窮屈さを解消 ▼▼ */
     table { width: 100%; border-collapse: collapse; border-top: 1px solid #333; }
-    th { text-align: left; color: #8892b0; font-size: 0.9rem; padding: 12px 0 8px 0; border-bottom: 1px solid #333; }
-    td { padding: 12px 0; font-size: 0.95rem; border-bottom: 1px solid #333; }
+    th { text-align: left; color: #8892b0; font-size: 0.9rem; padding: 12px 8px 8px 8px; border-bottom: 1px solid #333; }
+    td { padding: 12px 8px; font-size: 0.95rem; border-bottom: 1px solid #333; }
     .place-col { text-align: right; }
+    
     #loading { text-align: center; color: #ffd700; font-size: 1.1rem; margin-top: 50px; line-height: 1.6; }
     #password-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(5, 7, 29, 0.9); display: flex; align-items: center; justify-content: center; z-index: 9999; opacity: 0; visibility: hidden; }
     #password-modal.show { opacity: 1; visibility: visible; }
@@ -65,9 +68,7 @@
     .seed-input-group button { padding: 12px 24px; background: #ffd700; color: #000; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; }
     .auto-update-btn { width: 100%; padding: 16px; font-size: 1.1rem; background: linear-gradient(135deg, #45a29e, #66fcf1); color: #0b0c10; border: none; border-radius: 50px; font-weight: bold; cursor: pointer; margin-bottom: 20px; }
     
-    /* ▼▼ 変更点: 優勝バッジの背景を濃いピンク（マゼンタ）に変更し、文字色を白にしました ▼▼ */
     .champ-badge { background: #e91e63; color: #ffffff; padding: 2px 8px; border-radius: 12px; font-size: 0.8rem; font-weight: bold; margin-left: 6px; }
-    
     .player-link { color: #ffffff; text-decoration: none; font-weight: bold; transition: color 0.2s; }
     .player-link:hover { color: #66fcf1; text-decoration: underline; }
     
@@ -120,11 +121,12 @@
       
       <table>
         <thead>
+          <!-- ▼▼ カラムの幅を最適化し、Score列を右寄せにしました ▼▼ -->
           <tr>
             <th width="10%" style="text-align:center;">Seed</th>
-            <th width="35%">Player</th>
-            <th width="35%">Result <span style="font-size:0.75rem; font-weight:normal;">(直近3大会)</span></th>
-            <th width="20%">Score</th>
+            <th width="30%">Player</th>
+            <th width="45%">Result <span style="font-size:0.75rem; font-weight:normal;">(直近3大会)</span></th>
+            <th width="15%" style="text-align:right;">Score</th>
           </tr>
         </thead>
         <tbody id="seedListBody"></tbody>
@@ -133,7 +135,6 @@
   </div>
 
   <script>
-    // ★★★★ 自動記憶された設定URL ★★★★
     const GAS_URL = "https://script.google.com/macros/s/AKfycbwYNNpAlybjAVHCPjpdUOTXtuQKbetGZSBn2caxs_f6zSoPPA3Lo-sCVtO0kvh5fGcETg/exec";
     const STARTGG_ICON_URL = "https://i.imgur.com/fd8fScu.png"; 
 
@@ -164,7 +165,6 @@
     function getOrdinal(n) { const s = ["th", "st", "nd", "rd"], v = n % 100; return n + (s[(v - 20) % 10] || s[v] || s[0]); }
     function toggleCard(element, event) { if (event.target.tagName.toLowerCase() === 'a' || event.target.closest('.disc-chip') || event.target.tagName.toLowerCase() === 'img') return; element.classList.toggle('expanded'); }
 
-    // Discriminatorのコピー機能
     function copyDisc(event, text, el) {
       event.stopPropagation();
       navigator.clipboard.writeText(text).then(() => {
@@ -358,11 +358,12 @@
         tr.addEventListener('drop', handleDrop);
         tr.addEventListener('dragend', handleDragEnd);
 
+        // ▼▼ Score列を右寄せ（text-align: right;）にして、paddingを追加しました ▼▼
         tr.innerHTML = `
           <td style="text-align:center;">${i+1}</td>
           <td>${playerNameHtml} ${badge}</td>
-          <td style="font-size: 0.85rem; color: #8892b0;">${historyText}</td>
-          <td>${p.score !== -1 ? p.score.toLocaleString() + "pt" : "-"}</td>
+          <td style="font-size: 0.85rem; color: #8892b0; padding-right: 15px;">${historyText}</td>
+          <td style="text-align:right;">${p.score !== -1 ? p.score.toLocaleString() + "pt" : "-"}</td>
         `;
         tb.appendChild(tr);
       });
