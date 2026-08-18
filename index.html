@@ -65,7 +65,9 @@
     .seed-input-group button { padding: 12px 24px; background: #ffd700; color: #000; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; }
     .auto-update-btn { width: 100%; padding: 16px; font-size: 1.1rem; background: linear-gradient(135deg, #45a29e, #66fcf1); color: #0b0c10; border: none; border-radius: 50px; font-weight: bold; cursor: pointer; margin-bottom: 20px; }
     
-    .champ-badge { background: #ffffff; color: #000; padding: 2px 8px; border-radius: 12px; font-size: 0.8rem; font-weight: bold; margin-left: 6px; }
+    /* ▼▼ 変更点: 優勝バッジの背景を濃いピンク（マゼンタ）に変更し、文字色を白にしました ▼▼ */
+    .champ-badge { background: #e91e63; color: #ffffff; padding: 2px 8px; border-radius: 12px; font-size: 0.8rem; font-weight: bold; margin-left: 6px; }
+    
     .player-link { color: #ffffff; text-decoration: none; font-weight: bold; transition: color 0.2s; }
     .player-link:hover { color: #66fcf1; text-decoration: underline; }
     
@@ -335,7 +337,6 @@
         if (p.disc && p.disc !== "なし") {
           const prPlayer = allData.find(d => d.disc.toLowerCase() === p.disc.toLowerCase());
           if (prPlayer && prPlayer.history) {
-            // ★ ナンバリング (#○○) を追加したフォーマットに変更！
             const results = prPlayer.history
               .filter(h => h.wsp && h.placement)
               .slice(0, 3) 
