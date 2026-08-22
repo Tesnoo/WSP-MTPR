@@ -66,8 +66,8 @@
     
     .history-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 16px; }
     
-    .history-card { border: 1px solid #ffd700; border-radius: 12px; padding: 16px; background-color: #05071D; display: flex; flex-direction: column; transition: transform 0.2s; }
-    .history-card:hover { transform: translateY(-2px); }
+    /* ▼▼ ホバー時の動き（transition と :hover）を削除しました ▼▼ */
+    .history-card { border: 1px solid #ffd700; border-radius: 12px; padding: 16px; background-color: #05071D; display: flex; flex-direction: column; }
     .history-event { color: #ffffff; font-size: 1.3rem; font-weight: bold; margin-bottom: 4px; }
     .history-date { color: #c5c6c7; font-size: 0.85rem; margin-bottom: 20px; }
     .history-place { color: #ffffff; font-size: 2rem; font-weight: bold; text-align: center; margin-top: auto; }
@@ -109,29 +109,23 @@
       #mobile-log-area { display: block; }
     }
     
-    /* ▼▼ スマホ画面（幅600px以下）での調整 ▼▼ */
     @media (max-width: 600px) {
       .pagination { gap: 5px; }
       .page-btn { padding: 6px 8px; font-size: 0.8rem; }
       
-      /* ▼ 履歴カードを横スクロール（スワイプ）可能に変更 ▼ */
       .history-grid { 
         display: flex; 
         flex-wrap: nowrap; 
         overflow-x: auto; 
         gap: 12px; 
-        padding-bottom: 10px; /* スクロールバー用の余白 */
+        padding-bottom: 10px;
         -webkit-overflow-scrolling: touch; 
       }
-      /* カスタムスクロールバーのスタイル */
       .history-grid::-webkit-scrollbar { height: 4px; }
       .history-grid::-webkit-scrollbar-track { background: transparent; }
       .history-grid::-webkit-scrollbar-thumb { background: #45a29e; border-radius: 4px; }
       
-      .history-card { 
-        flex: 0 0 130px; /* カードの幅を固定 */
-        padding: 12px; 
-      }
+      .history-card { flex: 0 0 130px; padding: 12px; }
       .history-event { font-size: 1.1rem; margin-bottom: 2px; }
       .history-date { font-size: 0.75rem; margin-bottom: 12px; }
       .history-place { font-size: 1.5rem; }
