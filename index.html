@@ -18,8 +18,21 @@
   
   <style>
     body { background-color: #05071D; color: #c5c6c7; font-family: 'Helvetica Neue', Arial, sans-serif; margin: 0; padding: 40px 20px; }
-    .container { max-width: 600px; margin: 0 auto; }
     .hidden { display: none !important; }
+    
+    /* ▼▼ レイアウトを2列（サイドバー＋メイン）に変更 ▼▼ */
+    .ranking-layout { display: flex; gap: 30px; max-width: 950px; margin: 0 auto; align-items: flex-start; justify-content: center; }
+    
+    /* ▼▼ 変更点ログ（サイドバー）のスタイル ▼▼ */
+    .sidebar { flex: 0 0 260px; background: #1f2833; padding: 20px; border-radius: 12px; border: 1px solid #45a29e; position: sticky; top: 40px; box-sizing: border-box; }
+    .sidebar h3 { color:#66fcf1; margin-top:0; border-bottom:1px solid #45a29e; padding-bottom:10px; font-size: 1.1rem; }
+    .log-list { list-style: none; padding: 0; margin: 0; }
+    .log-list li { margin-bottom: 16px; font-size: 0.85rem; line-height: 1.5; color: #c5c6c7; }
+    .log-date { display: inline-block; background: #0b0c10; color: #ffd700; padding: 2px 6px; border-radius: 4px; font-size: 0.75rem; font-weight: bold; margin-bottom: 6px; border: 1px solid #333; }
+    
+    .ranking-main { flex: 1; max-width: 600px; min-width: 0; }
+    /* ▲▲ ここまで ▲▲ */
+
     .top-controls { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; gap: 15px; }
     .search-container { display: flex; gap: 8px; flex: 1; max-width: 350px; }
     .search-container input { flex: 1; padding: 10px 12px; background: #0b0c10; border: 1px solid #45a29e; color: #fff; border-radius: 8px; font-size: 0.95rem; }
@@ -76,7 +89,14 @@
     .draggable-row:hover { background-color: #161b22; }
     .drag-over { border-top: 2px solid #66fcf1; background-color: #1f2833 !important; }
     
-    @media (max-width: 480px) { .top-controls { flex-direction: column; align-items: stretch; } .search-container { max-width: 100%; } }
+    /* ▼▼ 画面幅が狭いときのレスポンシブ対応（ログを下に逃がす） ▼▼ */
+    @media (max-width: 850px) { 
+      .ranking-layout { flex-direction: column-reverse; align-items: center; }
+      .sidebar { position: static; width: 100%; max-width: 600px; margin-top: 20px; }
+      .ranking-main { width: 100%; }
+      .top-controls { flex-direction: column; align-items: stretch; } 
+      .search-container { max-width: 100%; } 
+    }
   </style>
 </head>
 <body>
@@ -90,25 +110,50 @@
     </div>
   </div>
 
-  <div id="view-ranking" class="container">
-    <div class="top-controls">
-      <div class="search-container">
-        <input type="text" id="searchInput" placeholder="プレイヤー名で検索..." onkeypress="if(event.key==='Enter') searchPlayer()">
-        <button onclick="searchPlayer()">🔍</button>
+  <div id="view-ranking">
+    <!-- ▼▼ 2列レイアウトのラッパー ▼▼ -->
+    <div class="ranking-layout">
+      
+      <!-- ▼▼ 左側の変更点ログ（サイドバー） ▼▼ -->
+      <aside class="sidebar">
+        <h3>🛠 Update Logs</h3>
+        <ul class="log-list">
+          <li>
+            <span class="log-date">2026.08.23</span><br>
+            ・WSP-MTPRシステムをAPI通信化<br>
+            ・シード作成画面のUI/UX向上<br>
+            ・start.ggアイコンの追加
+          </li>
+          <li>
+            <span class="log-date">2026.08.20</span><br>
+            ・ランキングシステムの運用再開<br>
+            ・シード自動反映ツールのテスト開始
+          </li>
+        </ul>
+      </aside>
+
+      <!-- ▼▼ 右側（中央）のランキングメイン画面 ▼▼ -->
+      <div class="ranking-main">
+        <div class="top-controls">
+          <div class="search-container">
+            <input type="text" id="searchInput" placeholder="プレイヤー名で検索..." onkeypress="if(event.key==='Enter') searchPlayer()">
+            <button onclick="searchPlayer()">🔍</button>
+          </div>
+          <button class="admin-btn" onclick="openModal()">⚙️シード設定</button>
+        </div>
+        <div class="pagination" id="pagination-top"></div>
+        <div id="loading">ランキングデータを読み込み中...</div>
+        <div id="ranking-list"></div>
+        <div class="pagination" id="pagination-bottom" style="margin-top: 24px;"></div>
       </div>
-      <button class="admin-btn" onclick="openModal()">⚙️シード設定</button>
+      
     </div>
-    <div class="pagination" id="pagination-top"></div>
-    <div id="loading">ランキングデータを読み込み中...</div>
-    <div id="ranking-list"></div>
-    <div class="pagination" id="pagination-bottom" style="margin-top: 24px;"></div>
   </div>
 
   <div id="view-seeding" class="hidden">
     <button class="back-btn" onclick="showRanking()">↩️ ランキングに戻る</button>
     <h1 style="color:#ffd700; text-align:center;">WSP Seeding Tool</h1>
     <div class="seed-input-group">
-      <!-- ▼ プレースホルダーに test も使えることを記載しました ▼ -->
       <input type="text" id="tSlug" placeholder="大会番号 (例: 240) または test を入力" onkeypress="if(event.key==='Enter') genSeed()">
       <button onclick="genSeed()">シード作成</button>
     </div>
@@ -368,12 +413,10 @@
       document.getElementById("seed-loading").style.display = "block";
       document.getElementById("resultArea").style.display = "none";
       
-      // ▼▼ ここが魔法のコード！ "test" と入力されたら自動でslugを差し替える ▼▼
       let slug = document.getElementById("tSlug").value.trim().toLowerCase();
       if (slug === "test") {
         slug = "weekly-smash-party-test";
       }
-      // ▲▲ ここまで ▲▲
       
       fetch(GAS_URL + "?action=generateSeed&slug=" + encodeURIComponent(slug))
         .then(res => res.json())
