@@ -48,7 +48,6 @@
     .history-wrapper { display: none; margin-top: 20px; }
     .player-card.expanded .history-wrapper { display: block; }
     
-    /* ▼▼ テーブルの余白（padding）を調整して窮屈さを解消 ▼▼ */
     table { width: 100%; border-collapse: collapse; border-top: 1px solid #333; }
     th { text-align: left; color: #8892b0; font-size: 0.9rem; padding: 12px 8px 8px 8px; border-bottom: 1px solid #333; }
     td { padding: 12px 8px; font-size: 0.95rem; border-bottom: 1px solid #333; }
@@ -109,7 +108,8 @@
     <button class="back-btn" onclick="showRanking()">↩️ ランキングに戻る</button>
     <h1 style="color:#ffd700; text-align:center;">WSP Seeding Tool</h1>
     <div class="seed-input-group">
-      <input type="text" id="tSlug" placeholder="大会番号 (例: 240) を入力" onkeypress="if(event.key==='Enter') genSeed()">
+      <!-- ▼ プレースホルダーに test も使えることを記載しました ▼ -->
+      <input type="text" id="tSlug" placeholder="大会番号 (例: 240) または test を入力" onkeypress="if(event.key==='Enter') genSeed()">
       <button onclick="genSeed()">シード作成</button>
     </div>
     <div id="seed-loading" style="display:none; text-align:center; color:#ffd700;">処理中...</div>
@@ -121,7 +121,6 @@
       
       <table>
         <thead>
-          <!-- ▼▼ カラムの幅を最適化し、Score列を右寄せにしました ▼▼ -->
           <tr>
             <th width="10%" style="text-align:center;">Seed</th>
             <th width="30%">Player</th>
@@ -262,9 +261,6 @@
         document.getElementById('loading').innerHTML = `<b style="color:#ff4b4b;">⚠️ データの取得に失敗しました</b><br>詳細: ${err.message}`;
       });
 
-    // ==========================================
-    // シード生成＆ドラッグ＆ドロップ機能
-    // ==========================================
     let gId = null, gList = null;
     let dragSrcEl = null;
 
@@ -358,7 +354,6 @@
         tr.addEventListener('drop', handleDrop);
         tr.addEventListener('dragend', handleDragEnd);
 
-        // ▼▼ Score列を右寄せ（text-align: right;）にして、paddingを追加しました ▼▼
         tr.innerHTML = `
           <td style="text-align:center;">${i+1}</td>
           <td>${playerNameHtml} ${badge}</td>
@@ -372,7 +367,13 @@
     function genSeed() {
       document.getElementById("seed-loading").style.display = "block";
       document.getElementById("resultArea").style.display = "none";
-      const slug = document.getElementById("tSlug").value;
+      
+      // ▼▼ ここが魔法のコード！ "test" と入力されたら自動でslugを差し替える ▼▼
+      let slug = document.getElementById("tSlug").value.trim().toLowerCase();
+      if (slug === "test") {
+        slug = "weekly-smash-party-test";
+      }
+      // ▲▲ ここまで ▲▲
       
       fetch(GAS_URL + "?action=generateSeed&slug=" + encodeURIComponent(slug))
         .then(res => res.json())
