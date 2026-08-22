@@ -20,17 +20,25 @@
     body { background-color: #05071D; color: #c5c6c7; font-family: 'Helvetica Neue', Arial, sans-serif; margin: 0; padding: 40px 20px; }
     .hidden { display: none !important; }
     
-    .ranking-layout { display: flex; gap: 40px; max-width: 1150px; margin: 0 auto; align-items: flex-start; justify-content: center; }
+    /* ▼▼ PC時のレイアウト幅を広げて「3列構成」に進化 ▼▼ */
+    .ranking-layout { display: flex; gap: 30px; max-width: 1450px; margin: 0 auto; align-items: flex-start; justify-content: center; flex-wrap: wrap; }
     
+    /* ▼▼ 左サイドバー（ログ）のスタイル ▼▼ */
     .log-container { background: #1f2833; padding: 20px; border-radius: 12px; border: 1px solid #45a29e; box-sizing: border-box; }
     .log-container h3 { color:#66fcf1; margin-top:0; border-bottom:1px solid #45a29e; padding-bottom:10px; font-size: 1rem; display: flex; align-items: center; gap: 8px;}
     .log-list { list-style: none; padding: 0; margin: 0; }
     .log-list li { margin-bottom: 16px; font-size: 0.9rem; line-height: 1.6; color: #c5c6c7; }
     .log-date { display: inline-block; background: #0b0c10; color: #ffd700; padding: 2px 6px; border-radius: 4px; font-size: 0.8rem; font-weight: bold; margin-bottom: 6px; border: 1px solid #333; }
     
-    .sidebar-area { flex: 0 0 320px; position: sticky; top: 40px; }
+    .sidebar-area { flex: 0 0 280px; position: sticky; top: 40px; }
     
-    .ranking-main { flex: 1; max-width: 720px; min-width: 0; display: flex; flex-direction: column; }
+    /* ▼▼ 中央（ランキング）のスタイル ▼▼ */
+    .ranking-main { flex: 1 1 auto; max-width: 720px; min-width: 320px; display: flex; flex-direction: column; }
+    
+    /* ▼▼ 右サイドバー（Twitter/X）のスタイル ▼▼ */
+    .right-sidebar { flex: 0 0 300px; position: sticky; top: 40px; width: 100%; }
+    .twitter-container { background: #1f2833; padding: 16px; border-radius: 12px; border: 1px solid #45a29e; box-sizing: border-box; }
+    .twitter-container h3 { color:#66fcf1; margin-top:0; border-bottom:1px solid #45a29e; padding-bottom:10px; font-size: 1rem; display: flex; align-items: center; gap: 8px;}
     
     .top-controls { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; gap: 15px; }
     .search-container { display: flex; gap: 8px; flex: 1; max-width: 400px; }
@@ -66,7 +74,6 @@
     
     .history-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 16px; }
     
-    /* ▼▼ ホバー時の動き（transition と :hover）を削除しました ▼▼ */
     .history-card { border: 1px solid #ffd700; border-radius: 12px; padding: 16px; background-color: #05071D; display: flex; flex-direction: column; }
     .history-event { color: #ffffff; font-size: 1.3rem; font-weight: bold; margin-bottom: 4px; }
     .history-date { color: #c5c6c7; font-size: 0.85rem; margin-bottom: 20px; }
@@ -100,6 +107,13 @@
     .draggable-row:hover { background-color: #161b22; }
     .drag-over { border-top: 2px solid #66fcf1; background-color: #1f2833 !important; }
     
+    /* ▼▼ レスポンシブ設定 ▼▼ */
+    /* ノートPCやタブレットなどで幅が足りない時はXを下に逃がす */
+    @media (max-width: 1400px) {
+      .right-sidebar { flex: 1 1 100%; max-width: 720px; position: static; margin-top: 0; }
+    }
+    
+    /* スマホ画面になった時は全て縦一列に */
     @media (max-width: 850px) { 
       .ranking-layout { flex-direction: column; align-items: center; gap: 0; }
       .ranking-main { width: 100%; }
@@ -107,6 +121,7 @@
       .search-container { max-width: 100%; } 
       .sidebar-area { display: none; }
       #mobile-log-area { display: block; }
+      .right-sidebar { width: 100%; margin-top: 24px; }
     }
     
     @media (max-width: 600px) {
@@ -161,10 +176,13 @@
   </div>
 
   <div id="view-ranking">
+    <!-- ▼▼ ここから3列レイアウト ▼▼ -->
     <div class="ranking-layout">
       
+      <!-- 1列目: ログ（PC用） -->
       <aside id="sidebar-area" class="sidebar-area"></aside>
 
+      <!-- 2列目: メイン（ランキング） -->
       <div class="ranking-main">
         <div class="top-controls">
           <div class="search-container">
@@ -181,6 +199,16 @@
         <div id="ranking-list"></div>
         <div class="pagination" id="pagination-bottom" style="margin-top: 24px;"></div>
       </div>
+
+      <!-- 3列目: Twitter/X (右サイドバー) -->
+      <aside class="right-sidebar">
+        <div class="twitter-container">
+          <h3>🐦 Official X</h3>
+          <!-- スマパ公式Xアカウントのタイムライン -->
+          <a class="twitter-timeline" data-theme="dark" data-height="700" data-chrome="nofooter noborders transparent" href="https://twitter.com/WSPsmapa?ref_src=twsrc%5Etfw">Tweets by @WSPsmapa</a>
+          <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+        </div>
+      </aside>
       
     </div>
   </div>
