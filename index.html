@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>WSP-Main Tournament Power Ranking</title>
   
+  <!-- ▼▼ プレビュー(OGP)用の設定 ▼▼ -->
   <meta property="og:title" content="WSP-Main Tournament Power Ranking">
   <meta property="og:description" content="スマパメイントーナメントのランキング＆シード作成システム">
   <meta property="og:url" content="https://tesnoo.github.io/WSP-MTPR/">
@@ -19,25 +20,29 @@
     body { background-color: #05071D; color: #c5c6c7; font-family: 'Helvetica Neue', Arial, sans-serif; margin: 0; padding: 40px 20px; }
     .hidden { display: none !important; }
     
-    /* ▼▼ PC時の2列レイアウト ▼▼ */
     .ranking-layout { display: flex; gap: 30px; max-width: 950px; margin: 0 auto; align-items: flex-start; justify-content: center; }
     
-    .sidebar { flex: 0 0 260px; background: #1f2833; padding: 20px; border-radius: 12px; border: 1px solid #45a29e; position: sticky; top: 40px; box-sizing: border-box; }
-    .sidebar h3 { color:#66fcf1; margin-top:0; border-bottom:1px solid #45a29e; padding-bottom:10px; font-size: 1.1rem; }
+    /* ▼▼ 変更点ログのスタイル（共有） ▼▼ */
+    .log-container { background: #1f2833; padding: 20px; border-radius: 12px; border: 1px solid #45a29e; box-sizing: border-box; }
+    .log-container h3 { color:#66fcf1; margin-top:0; border-bottom:1px solid #45a29e; padding-bottom:10px; font-size: 1.1rem; }
     .log-list { list-style: none; padding: 0; margin: 0; }
     .log-list li { margin-bottom: 16px; font-size: 0.85rem; line-height: 1.5; color: #c5c6c7; }
     .log-date { display: inline-block; background: #0b0c10; color: #ffd700; padding: 2px 6px; border-radius: 4px; font-size: 0.75rem; font-weight: bold; margin-bottom: 6px; border: 1px solid #333; }
     
-    .ranking-main { flex: 1; max-width: 600px; min-width: 0; display: flex; flex-direction: column; }
+    /* PC用のサイドバー指定 */
+    .sidebar-area { flex: 0 0 260px; position: sticky; top: 40px; }
     
-    /* ▼ 要素の並び替え用のラッパーを追加 ▼ */
-    .main-controls-wrapper { display: contents; }
-
+    .ranking-main { flex: 1; max-width: 600px; min-width: 0; }
+    
     .top-controls { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; gap: 15px; }
     .search-container { display: flex; gap: 8px; flex: 1; max-width: 350px; }
     .search-container input { flex: 1; padding: 10px 12px; background: #0b0c10; border: 1px solid #45a29e; color: #fff; border-radius: 8px; font-size: 0.95rem; }
     .search-container button { padding: 10px 16px; background: linear-gradient(135deg, #1f2833, #0b0c10); border: 1px solid #45a29e; color: #66fcf1; border-radius: 8px; font-weight: bold; cursor: pointer; }
     .admin-btn { display: inline-flex; align-items: center; gap: 8px; background: linear-gradient(135deg, #1f2833, #0b0c10); border: 1px solid #45a29e; color: #66fcf1; padding: 10px 20px; border-radius: 8px; text-decoration: none; font-weight: bold; cursor: pointer; white-space: nowrap; }
+    
+    /* ▼ スマホ用ログエリア（最初は非表示） ▼ */
+    #mobile-log-area { display: none; margin-bottom: 24px; width: 100%; }
+
     .pagination { display: flex; justify-content: center; align-items: center; gap: 8px; margin-bottom: 24px; flex-wrap: wrap; }
     .page-btn { background-color: #1f2833; border: 1px solid #ffd700; color: #ffd700; padding: 8px 12px; border-radius: 6px; cursor: pointer; font-weight: bold; }
     .page-btn.active { background-color: #ffd700; color: #000; }
@@ -89,25 +94,16 @@
     .draggable-row:hover { background-color: #161b22; }
     .drag-over { border-top: 2px solid #66fcf1; background-color: #1f2833 !important; }
     
-    /* ▼▼ 画面幅が狭いときのレスポンシブ対応（要素の表示順を魔法のように操作） ▼▼ */
+    /* ▼▼ レスポンシブ設定 ▼▼ */
     @media (max-width: 850px) { 
       .ranking-layout { flex-direction: column; align-items: center; gap: 0; }
-      
-      /* メインのコンテナをFlexboxにして、子要素の順番（order）を操作できるようにする */
-      .ranking-main { width: 100%; display: flex; flex-direction: column; }
-      
-      /* 1番上：検索とシード設定ボタン */
-      .top-controls { order: 1; flex-direction: column; align-items: stretch; margin-bottom: 16px; } 
+      .ranking-main { width: 100%; }
+      .top-controls { flex-direction: column; align-items: stretch; margin-bottom: 16px; } 
       .search-container { max-width: 100%; } 
       
-      /* 2番目：左から引っ越してきたアップデートログ */
-      .sidebar { order: 2; position: static; width: 100%; max-width: 100%; margin-bottom: 20px; padding: 15px; }
-      
-      /* 3番目以降：ページネーションとランキングリスト */
-      #pagination-top { order: 3; }
-      #loading { order: 4; }
-      #ranking-list { order: 5; }
-      #pagination-bottom { order: 6; }
+      /* PC用サイドバーは消して、スマホ用の場所に表示する */
+      .sidebar-area { display: none; }
+      #mobile-log-area { display: block; }
     }
   </style>
 </head>
@@ -122,25 +118,29 @@
     </div>
   </div>
 
+  <!-- ▼▼ ログの本体（JSで移動させる大元） ▼▼ -->
+  <div id="log-content" class="log-container">
+    <h3>🛠 Update Logs</h3>
+    <ul class="log-list">
+      <li>
+        <span class="log-date">2026.08.23</span><br>
+        ・WSP-MTPRシステムをAPI通信化<br>
+        ・シード作成画面のUI/UX向上<br>
+        ・start.ggアイコンの追加
+      </li>
+      <li>
+        <span class="log-date">2026.08.20</span><br>
+        ・ランキングシステムの運用再開<br>
+        ・シード自動反映ツールのテスト開始
+      </li>
+    </ul>
+  </div>
+
   <div id="view-ranking">
     <div class="ranking-layout">
       
-      <aside class="sidebar">
-        <h3>🛠 Update Logs</h3>
-        <ul class="log-list">
-          <li>
-            <span class="log-date">2026.08.23</span><br>
-            ・WSP-MTPRシステムをAPI通信化<br>
-            ・シード作成画面のUI/UX向上<br>
-            ・start.ggアイコンの追加
-          </li>
-          <li>
-            <span class="log-date">2026.08.20</span><br>
-            ・ランキングシステムの運用再開<br>
-            ・シード自動反映ツールのテスト開始
-          </li>
-        </ul>
-      </aside>
+      <!-- PC用サイドバー配置場所 -->
+      <aside id="sidebar-area" class="sidebar-area"></aside>
 
       <div class="ranking-main">
         <div class="top-controls">
@@ -150,6 +150,10 @@
           </div>
           <button class="admin-btn" onclick="openModal()">⚙️シード設定</button>
         </div>
+        
+        <!-- スマホ用ログ配置場所（検索バーとページボタンの間） -->
+        <div id="mobile-log-area"></div>
+        
         <div class="pagination" id="pagination-top"></div>
         <div id="loading">ランキングデータを読み込み中...</div>
         <div id="ranking-list"></div>
@@ -190,6 +194,23 @@
   <script>
     const GAS_URL = "https://script.google.com/macros/s/AKfycbwYNNpAlybjAVHCPjpdUOTXtuQKbetGZSBn2caxs_f6zSoPPA3Lo-sCVtO0kvh5fGcETg/exec";
     const STARTGG_ICON_URL = "https://i.imgur.com/fd8fScu.png"; 
+
+    // ▼▼ 画面幅に応じてログを物理的に移動させる魔法 ▼▼
+    function adjustLogPosition() {
+      const logContent = document.getElementById('log-content');
+      const sidebarArea = document.getElementById('sidebar-area');
+      const mobileArea = document.getElementById('mobile-log-area');
+      
+      if (window.innerWidth <= 850) {
+        if (!mobileArea.contains(logContent)) mobileArea.appendChild(logContent);
+      } else {
+        if (!sidebarArea.contains(logContent)) sidebarArea.appendChild(logContent);
+      }
+    }
+    // ロード時と画面リサイズ時に実行
+    window.addEventListener('load', adjustLogPosition);
+    window.addEventListener('resize', adjustLogPosition);
+    // ▲▲ ここまで ▲▲
 
     const SECRET_KEY = "SumapaPartyEveryday1919";
     let allData = [];
