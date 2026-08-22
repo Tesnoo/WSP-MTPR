@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>WSP-Main Tournament Power Ranking</title>
   
-  <!-- ▼▼ プレビュー(OGP)用の設定 ▼▼ -->
   <meta property="og:title" content="WSP-Main Tournament Power Ranking">
   <meta property="og:description" content="スマパメイントーナメントのランキング＆シード作成システム">
   <meta property="og:url" content="https://tesnoo.github.io/WSP-MTPR/">
@@ -20,18 +19,19 @@
     body { background-color: #05071D; color: #c5c6c7; font-family: 'Helvetica Neue', Arial, sans-serif; margin: 0; padding: 40px 20px; }
     .hidden { display: none !important; }
     
-    /* ▼▼ レイアウトを2列（サイドバー＋メイン）に変更 ▼▼ */
+    /* ▼▼ PC時の2列レイアウト ▼▼ */
     .ranking-layout { display: flex; gap: 30px; max-width: 950px; margin: 0 auto; align-items: flex-start; justify-content: center; }
     
-    /* ▼▼ 変更点ログ（サイドバー）のスタイル ▼▼ */
     .sidebar { flex: 0 0 260px; background: #1f2833; padding: 20px; border-radius: 12px; border: 1px solid #45a29e; position: sticky; top: 40px; box-sizing: border-box; }
     .sidebar h3 { color:#66fcf1; margin-top:0; border-bottom:1px solid #45a29e; padding-bottom:10px; font-size: 1.1rem; }
     .log-list { list-style: none; padding: 0; margin: 0; }
     .log-list li { margin-bottom: 16px; font-size: 0.85rem; line-height: 1.5; color: #c5c6c7; }
     .log-date { display: inline-block; background: #0b0c10; color: #ffd700; padding: 2px 6px; border-radius: 4px; font-size: 0.75rem; font-weight: bold; margin-bottom: 6px; border: 1px solid #333; }
     
-    .ranking-main { flex: 1; max-width: 600px; min-width: 0; }
-    /* ▲▲ ここまで ▲▲ */
+    .ranking-main { flex: 1; max-width: 600px; min-width: 0; display: flex; flex-direction: column; }
+    
+    /* ▼ 要素の並び替え用のラッパーを追加 ▼ */
+    .main-controls-wrapper { display: contents; }
 
     .top-controls { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; gap: 15px; }
     .search-container { display: flex; gap: 8px; flex: 1; max-width: 350px; }
@@ -89,13 +89,25 @@
     .draggable-row:hover { background-color: #161b22; }
     .drag-over { border-top: 2px solid #66fcf1; background-color: #1f2833 !important; }
     
-    /* ▼▼ 画面幅が狭いときのレスポンシブ対応（ログを下に逃がす） ▼▼ */
+    /* ▼▼ 画面幅が狭いときのレスポンシブ対応（要素の表示順を魔法のように操作） ▼▼ */
     @media (max-width: 850px) { 
-      .ranking-layout { flex-direction: column-reverse; align-items: center; }
-      .sidebar { position: static; width: 100%; max-width: 600px; margin-top: 20px; }
-      .ranking-main { width: 100%; }
-      .top-controls { flex-direction: column; align-items: stretch; } 
+      .ranking-layout { flex-direction: column; align-items: center; gap: 0; }
+      
+      /* メインのコンテナをFlexboxにして、子要素の順番（order）を操作できるようにする */
+      .ranking-main { width: 100%; display: flex; flex-direction: column; }
+      
+      /* 1番上：検索とシード設定ボタン */
+      .top-controls { order: 1; flex-direction: column; align-items: stretch; margin-bottom: 16px; } 
       .search-container { max-width: 100%; } 
+      
+      /* 2番目：左から引っ越してきたアップデートログ */
+      .sidebar { order: 2; position: static; width: 100%; max-width: 100%; margin-bottom: 20px; padding: 15px; }
+      
+      /* 3番目以降：ページネーションとランキングリスト */
+      #pagination-top { order: 3; }
+      #loading { order: 4; }
+      #ranking-list { order: 5; }
+      #pagination-bottom { order: 6; }
     }
   </style>
 </head>
@@ -111,10 +123,8 @@
   </div>
 
   <div id="view-ranking">
-    <!-- ▼▼ 2列レイアウトのラッパー ▼▼ -->
     <div class="ranking-layout">
       
-      <!-- ▼▼ 左側の変更点ログ（サイドバー） ▼▼ -->
       <aside class="sidebar">
         <h3>🛠 Update Logs</h3>
         <ul class="log-list">
@@ -132,7 +142,6 @@
         </ul>
       </aside>
 
-      <!-- ▼▼ 右側（中央）のランキングメイン画面 ▼▼ -->
       <div class="ranking-main">
         <div class="top-controls">
           <div class="search-container">
