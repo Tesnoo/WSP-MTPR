@@ -20,7 +20,6 @@
     body { background-color: #05071D; color: #c5c6c7; font-family: 'Helvetica Neue', Arial, sans-serif; margin: 0; padding: 40px 20px; }
     .hidden { display: none !important; }
     
-    /* ▼▼ サイト全体の幅を少し絞り、バランスを最適化 ▼▼ */
     .ranking-layout { display: flex; gap: 40px; max-width: 1150px; margin: 0 auto; align-items: flex-start; justify-content: center; }
     
     .log-container { background: #1f2833; padding: 20px; border-radius: 12px; border: 1px solid #45a29e; box-sizing: border-box; }
@@ -31,7 +30,6 @@
     
     .sidebar-area { flex: 0 0 320px; position: sticky; top: 40px; }
     
-    /* ▼▼ メインエリア（カード）の最大幅を720pxに絞ってデカすぎ問題を解消 ▼▼ */
     .ranking-main { flex: 1; max-width: 720px; min-width: 0; display: flex; flex-direction: column; }
     
     .top-controls { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; gap: 15px; }
@@ -66,15 +64,15 @@
     .history-wrapper { display: none; margin-top: 24px; }
     .player-card.expanded .history-wrapper { display: block; }
     
-    /* ▼▼ 新しい履歴（リザルト）カードのスタイル ▼▼ */
-    .history-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 16px; }
+    /* ▼▼ auto-fit から auto-fill に変更し、幅を揃えて左詰めに固定 ▼▼ */
+    .history-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 16px; }
+    
     .history-card { border: 1px solid #ffd700; border-radius: 12px; padding: 16px; background-color: #05071D; display: flex; flex-direction: column; transition: transform 0.2s; }
     .history-card:hover { transform: translateY(-2px); }
     .history-event { color: #ffffff; font-size: 1.3rem; font-weight: bold; margin-bottom: 4px; }
     .history-date { color: #c5c6c7; font-size: 0.85rem; margin-bottom: 20px; }
     .history-place { color: #ffffff; font-size: 2rem; font-weight: bold; text-align: center; margin-top: auto; }
     
-    /* シード設定ツールのテーブル用スタイル（維持） */
     table { width: 100%; border-collapse: collapse; border-top: 1px solid #333; }
     th { text-align: left; color: #8892b0; font-size: 0.9rem; padding: 12px 8px 8px 8px; border-bottom: 1px solid #333; }
     td { padding: 12px 8px; font-size: 0.95rem; border-bottom: 1px solid #333; }
@@ -286,7 +284,6 @@
       const pageData = allData.slice(startIndex, startIndex + itemsPerPage);
 
       pageData.forEach(player => {
-        // ▼▼ 表（テーブル）の代わりにカードデザインのHTMLを生成します ▼▼
         let historyHtml = '';
         player.history.forEach(h => { 
           if (h.wsp && h.placement) {
@@ -299,7 +296,6 @@
             `;
           } 
         });
-        // ▲▲ ここまで ▲▲
         
         let startGgHtml = `<a href="https://start.gg/user/${player.disc.split('-')[0]}" target="_blank" class="startgg-link" title="start.gg Profile">
                             <img src="${STARTGG_ICON_URL}" alt="start.gg" class="startgg-icon" onerror="this.outerHTML='start.gg'">
