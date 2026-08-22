@@ -20,31 +20,36 @@
     body { background-color: #05071D; color: #c5c6c7; font-family: 'Helvetica Neue', Arial, sans-serif; margin: 0; padding: 40px 20px; }
     .hidden { display: none !important; }
     
-    .ranking-layout { display: flex; gap: 30px; max-width: 950px; margin: 0 auto; align-items: flex-start; justify-content: center; }
+    /* ▼▼ PC時の2列レイアウト幅を約1.5倍に拡大 ▼▼ */
+    .ranking-layout { display: flex; gap: 40px; max-width: 1400px; margin: 0 auto; align-items: flex-start; justify-content: center; }
     
     /* ▼▼ 変更点ログのスタイル（共有） ▼▼ */
+    /* サイドバーの幅も少し拡大 */
     .log-container { background: #1f2833; padding: 20px; border-radius: 12px; border: 1px solid #45a29e; box-sizing: border-box; }
-    .log-container h3 { color:#66fcf1; margin-top:0; border-bottom:1px solid #45a29e; padding-bottom:10px; font-size: 1.1rem; }
+    /* ▼ 見出しのフォントサイズをシード設定ボタンに合わせる ▼ */
+    .log-container h3 { color:#66fcf1; margin-top:0; border-bottom:1px solid #45a29e; padding-bottom:10px; font-size: 1rem; display: flex; align-items: center; gap: 8px;}
     .log-list { list-style: none; padding: 0; margin: 0; }
-    .log-list li { margin-bottom: 16px; font-size: 0.85rem; line-height: 1.5; color: #c5c6c7; }
-    .log-date { display: inline-block; background: #0b0c10; color: #ffd700; padding: 2px 6px; border-radius: 4px; font-size: 0.75rem; font-weight: bold; margin-bottom: 6px; border: 1px solid #333; }
+    .log-list li { margin-bottom: 16px; font-size: 0.9rem; line-height: 1.6; color: #c5c6c7; }
+    .log-date { display: inline-block; background: #0b0c10; color: #ffd700; padding: 2px 6px; border-radius: 4px; font-size: 0.8rem; font-weight: bold; margin-bottom: 6px; border: 1px solid #333; }
     
     /* PC用のサイドバー指定 */
-    .sidebar-area { flex: 0 0 260px; position: sticky; top: 40px; }
+    .sidebar-area { flex: 0 0 320px; position: sticky; top: 40px; }
     
-    .ranking-main { flex: 1; max-width: 600px; min-width: 0; }
+    /* ▼▼ ランキングメイン画面の幅も拡大 ▼▼ */
+    .ranking-main { flex: 1; max-width: 800px; min-width: 0; }
     
     .top-controls { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; gap: 15px; }
-    .search-container { display: flex; gap: 8px; flex: 1; max-width: 350px; }
+    .search-container { display: flex; gap: 8px; flex: 1; max-width: 400px; }
     .search-container input { flex: 1; padding: 10px 12px; background: #0b0c10; border: 1px solid #45a29e; color: #fff; border-radius: 8px; font-size: 0.95rem; }
     .search-container button { padding: 10px 16px; background: linear-gradient(135deg, #1f2833, #0b0c10); border: 1px solid #45a29e; color: #66fcf1; border-radius: 8px; font-weight: bold; cursor: pointer; }
-    .admin-btn { display: inline-flex; align-items: center; gap: 8px; background: linear-gradient(135deg, #1f2833, #0b0c10); border: 1px solid #45a29e; color: #66fcf1; padding: 10px 20px; border-radius: 8px; text-decoration: none; font-weight: bold; cursor: pointer; white-space: nowrap; }
+    /* ▼ シード設定ボタンのフォントサイズを明示的に指定 ▼ */
+    .admin-btn { display: inline-flex; align-items: center; gap: 8px; background: linear-gradient(135deg, #1f2833, #0b0c10); border: 1px solid #45a29e; color: #66fcf1; padding: 10px 20px; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 1rem; cursor: pointer; white-space: nowrap; }
     
     /* ▼ スマホ用ログエリア（最初は非表示） ▼ */
     #mobile-log-area { display: none; margin-bottom: 24px; width: 100%; }
 
     .pagination { display: flex; justify-content: center; align-items: center; gap: 8px; margin-bottom: 24px; flex-wrap: wrap; }
-    .page-btn { background-color: #1f2833; border: 1px solid #ffd700; color: #ffd700; padding: 8px 12px; border-radius: 6px; cursor: pointer; font-weight: bold; }
+    .page-btn { background-color: #1f2833; border: 1px solid #ffd700; color: #ffd700; padding: 8px 12px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 0.95rem;}
     .page-btn.active { background-color: #ffd700; color: #000; }
     .page-btn:disabled { background-color: #111; border-color: #333; color: #555; cursor: not-allowed; }
     .player-card { border: 1px solid #ffd700; border-radius: 12px; padding: 24px; margin-bottom: 24px; background-color: #05071D; box-shadow: 0 4px 10px rgba(0,0,0,0.5); cursor: pointer; transition: background-color 0.4s ease, box-shadow 0.4s ease; }
@@ -78,7 +83,7 @@
     .modal-box input { width: 100%; padding: 12px; margin: 15px 0; background: #0b0c10; border: 1px solid #45a29e; color: #fff; border-radius: 8px; box-sizing: border-box; text-align: center; }
     .modal-box button { width: 100%; padding: 12px; background: linear-gradient(135deg, #45a29e, #66fcf1); color: #0b0c10; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; margin-bottom: 10px; }
     .modal-box button.cancel { background: #333; color: #fff; }
-    #view-seeding { max-width: 800px; margin: 0 auto; }
+    #view-seeding { max-width: 1000px; margin: 0 auto; }
     .back-btn { display: inline-flex; align-items: center; gap: 8px; background: #1f2833; border: 1px solid #8892b0; color: #c5c6c7; padding: 10px 20px; border-radius: 8px; font-weight: bold; font-size: 0.95rem; cursor: pointer; margin-bottom: 24px; }
     .seed-input-group { background: #1f2833; padding: 25px; border-radius: 12px; border: 1px solid #333; margin-bottom: 20px; display: flex; gap: 15px; }
     .seed-input-group input { flex: 1; padding: 12px; background: #0b0c10; border: 1px solid #45a29e; color: #fff; border-radius: 8px; }
@@ -120,7 +125,7 @@
 
   <!-- ▼▼ ログの本体（JSで移動させる大元） ▼▼ -->
   <div id="log-content" class="log-container">
-    <h3>🛠 Update Logs</h3>
+    <h3>🛠 アップデート情報</h3>
     <ul class="log-list">
       <li>
         <span class="log-date">2026.08.23</span><br>
@@ -148,7 +153,7 @@
             <input type="text" id="searchInput" placeholder="プレイヤー名で検索..." onkeypress="if(event.key==='Enter') searchPlayer()">
             <button onclick="searchPlayer()">🔍</button>
           </div>
-          <button class="admin-btn" onclick="openModal()">⚙️シード設定</button>
+          <button class="admin-btn" onclick="openModal()">⚙️ シード設定</button>
         </div>
         
         <!-- スマホ用ログ配置場所（検索バーとページボタンの間） -->
