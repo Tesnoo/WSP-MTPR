@@ -20,7 +20,8 @@
     body { background-color: #05071D; color: #c5c6c7; font-family: 'Helvetica Neue', Arial, sans-serif; margin: 0; padding: 40px 20px; }
     .hidden { display: none !important; }
     
-    .ranking-layout { display: flex; gap: 40px; max-width: 1400px; margin: 0 auto; align-items: flex-start; justify-content: center; }
+    /* ▼▼ サイト全体の幅を少し絞り、バランスを最適化 ▼▼ */
+    .ranking-layout { display: flex; gap: 40px; max-width: 1150px; margin: 0 auto; align-items: flex-start; justify-content: center; }
     
     .log-container { background: #1f2833; padding: 20px; border-radius: 12px; border: 1px solid #45a29e; box-sizing: border-box; }
     .log-container h3 { color:#66fcf1; margin-top:0; border-bottom:1px solid #45a29e; padding-bottom:10px; font-size: 1rem; display: flex; align-items: center; gap: 8px;}
@@ -30,7 +31,8 @@
     
     .sidebar-area { flex: 0 0 320px; position: sticky; top: 40px; }
     
-    .ranking-main { flex: 1; max-width: 800px; min-width: 0; }
+    /* ▼▼ メインエリア（カード）の最大幅を720pxに絞ってデカすぎ問題を解消 ▼▼ */
+    .ranking-main { flex: 1; max-width: 720px; min-width: 0; display: flex; flex-direction: column; }
     
     .top-controls { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; gap: 15px; }
     .search-container { display: flex; gap: 8px; flex: 1; max-width: 400px; }
@@ -44,6 +46,7 @@
     .page-btn { background-color: #1f2833; border: 1px solid #ffd700; color: #ffd700; padding: 8px 12px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 0.95rem;}
     .page-btn.active { background-color: #ffd700; color: #000; }
     .page-btn:disabled { background-color: #111; border-color: #333; color: #555; cursor: not-allowed; }
+    
     .player-card { border: 1px solid #ffd700; border-radius: 12px; padding: 24px; margin-bottom: 24px; background-color: #05071D; box-shadow: 0 4px 10px rgba(0,0,0,0.5); cursor: pointer; transition: background-color 0.4s ease, box-shadow 0.4s ease; }
     .player-card:hover { background-color: #161b22; }
     .header-row { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 4px; }
@@ -60,9 +63,18 @@
     .disc-chip { background-color: #1f2833; border: 1px solid #333; padding: 4px 8px; border-radius: 6px; font-size: 0.85rem; color: #c5c6c7; position: relative; z-index: 2; cursor: pointer; transition: all 0.2s; }
     .disc-chip:hover { background-color: #45a29e; color: #0b0c10; border-color: #66fcf1; }
     
-    .history-wrapper { display: none; margin-top: 20px; }
+    .history-wrapper { display: none; margin-top: 24px; }
     .player-card.expanded .history-wrapper { display: block; }
     
+    /* ▼▼ 新しい履歴（リザルト）カードのスタイル ▼▼ */
+    .history-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 16px; }
+    .history-card { border: 1px solid #ffd700; border-radius: 12px; padding: 16px; background-color: #05071D; display: flex; flex-direction: column; transition: transform 0.2s; }
+    .history-card:hover { transform: translateY(-2px); }
+    .history-event { color: #ffffff; font-size: 1.3rem; font-weight: bold; margin-bottom: 4px; }
+    .history-date { color: #c5c6c7; font-size: 0.85rem; margin-bottom: 20px; }
+    .history-place { color: #ffffff; font-size: 2rem; font-weight: bold; text-align: center; margin-top: auto; }
+    
+    /* シード設定ツールのテーブル用スタイル（維持） */
     table { width: 100%; border-collapse: collapse; border-top: 1px solid #333; }
     th { text-align: left; color: #8892b0; font-size: 0.9rem; padding: 12px 8px 8px 8px; border-bottom: 1px solid #333; }
     td { padding: 12px 8px; font-size: 0.95rem; border-bottom: 1px solid #333; }
@@ -91,7 +103,6 @@
     .draggable-row:hover { background-color: #161b22; }
     .drag-over { border-top: 2px solid #66fcf1; background-color: #1f2833 !important; }
     
-    /* ▼▼ レスポンシブ設定 ▼▼ */
     @media (max-width: 850px) { 
       .ranking-layout { flex-direction: column; align-items: center; gap: 0; }
       .ranking-main { width: 100%; }
@@ -101,7 +112,6 @@
       #mobile-log-area { display: block; }
     }
     
-    /* ▼▼ スマホ画面（幅500px以下）でのページボタンの微調整（1行に収める魔法） ▼▼ */
     @media (max-width: 500px) {
       .pagination { gap: 5px; }
       .page-btn { padding: 6px 8px; font-size: 0.8rem; }
@@ -276,8 +286,20 @@
       const pageData = allData.slice(startIndex, startIndex + itemsPerPage);
 
       pageData.forEach(player => {
+        // ▼▼ 表（テーブル）の代わりにカードデザインのHTMLを生成します ▼▼
         let historyHtml = '';
-        player.history.forEach(h => { if (h.wsp && h.placement) historyHtml += `<tr><td>#${h.wsp} (${h.dateStr})</td><td class="place-col">${getOrdinal(h.placement)} / ${h.entrants}</td></tr>`; });
+        player.history.forEach(h => { 
+          if (h.wsp && h.placement) {
+            historyHtml += `
+              <div class="history-card">
+                <div class="history-event">#${h.wsp}</div>
+                <div class="history-date">${h.dateStr}</div>
+                <div class="history-place">${getOrdinal(h.placement)}/${h.entrants}</div>
+              </div>
+            `;
+          } 
+        });
+        // ▲▲ ここまで ▲▲
         
         let startGgHtml = `<a href="https://start.gg/user/${player.disc.split('-')[0]}" target="_blank" class="startgg-link" title="start.gg Profile">
                             <img src="${STARTGG_ICON_URL}" alt="start.gg" class="startgg-icon" onerror="this.outerHTML='start.gg'">
@@ -294,7 +316,9 @@
             ${startGgHtml}
             <div class="disc-chip" onclick="copyDisc(event, '${player.disc}', this)" title="クリックしてコピー">📄 ${player.disc}</div>
           </div>
-          <div class="history-wrapper"><table><thead><tr><th>Event</th><th class="place-col">Place</th></tr></thead><tbody>${historyHtml}</tbody></table></div>
+          <div class="history-wrapper">
+            <div class="history-grid">${historyHtml}</div>
+          </div>
         `;
         container.appendChild(card);
       });
