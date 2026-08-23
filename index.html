@@ -20,7 +20,6 @@
     body { background-color: #05071D; color: #c5c6c7; font-family: 'Helvetica Neue', Arial, sans-serif; margin: 0; padding: 40px 20px; }
     .hidden { display: none !important; }
     
-    /* ▼▼ シンプルで美しい1列レイアウト ▼▼ */
     .container { max-width: 720px; margin: 0 auto; display: flex; flex-direction: column; }
     
     .top-controls { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; gap: 15px; }
@@ -29,7 +28,6 @@
     .search-container button { padding: 10px 16px; background: linear-gradient(135deg, #1f2833, #0b0c10); border: 1px solid #45a29e; color: #66fcf1; border-radius: 8px; font-weight: bold; cursor: pointer; }
     .admin-btn { display: inline-flex; align-items: center; gap: 8px; background: linear-gradient(135deg, #1f2833, #0b0c10); border: 1px solid #45a29e; color: #66fcf1; padding: 10px 20px; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 1rem; cursor: pointer; white-space: nowrap; }
     
-    /* ▼▼ アップデート情報（ページボタンの上に配置） ▼▼ */
     .log-container { background: #1f2833; padding: 20px; border-radius: 12px; border: 1px solid #45a29e; box-sizing: border-box; margin-bottom: 24px; }
     .log-container h3 { color:#66fcf1; margin-top:0; border-bottom:1px solid #45a29e; padding-bottom:10px; font-size: 1rem; display: flex; align-items: center; gap: 8px;}
     .log-list { list-style: none; padding: 0; margin: 0; }
@@ -62,7 +60,12 @@
     .player-card.expanded .history-wrapper { display: block; }
     
     .history-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 16px; }
-    .history-card { border: 1px solid #ffd700; border-radius: 12px; padding: 16px; background-color: #05071D; display: flex; flex-direction: column; }
+    
+    /* ▼▼ リザルトカードにもホバー時の背景色変化を追加 ▼▼ */
+    .history-card { border: 1px solid #ffd700; border-radius: 12px; padding: 16px; background-color: #05071D; display: flex; flex-direction: column; transition: background-color 0.4s ease; }
+    .history-card:hover { background-color: #161b22; }
+    /* ▲▲ ここまで ▲▲ */
+
     .history-event { color: #ffffff; font-size: 1.3rem; font-weight: bold; margin-bottom: 4px; }
     .history-date { color: #c5c6c7; font-size: 0.85rem; margin-bottom: 20px; }
     .history-place { color: #ffffff; font-size: 2rem; font-weight: bold; text-align: center; margin-top: auto; }
@@ -94,7 +97,6 @@
     .draggable-row:hover { background-color: #161b22; }
     .drag-over { border-top: 2px solid #66fcf1; background-color: #1f2833 !important; }
     
-    /* スマホ画面での調整 */
     @media (max-width: 600px) {
       .top-controls { flex-direction: column; align-items: stretch; margin-bottom: 16px; } 
       .search-container { max-width: 100%; } 
@@ -125,7 +127,6 @@
 
   <div id="view-ranking" class="container">
     
-    <!-- 1. 検索バー＆シード設定ボタン -->
     <div class="top-controls">
       <div class="search-container">
         <input type="text" id="searchInput" placeholder="プレイヤー名で検索..." onkeypress="if(event.key==='Enter') searchPlayer()">
@@ -134,7 +135,6 @@
       <button class="admin-btn" onclick="openModal()">⚙️ シード設定</button>
     </div>
     
-    <!-- 2. アップデート情報 -->
     <div class="log-container">
       <h3>🛠 アップデート情報</h3>
       <ul class="log-list">
@@ -152,7 +152,6 @@
       </ul>
     </div>
     
-    <!-- 3. ランキングコンテンツ -->
     <div class="pagination" id="pagination-top"></div>
     <div id="loading">ランキングデータを読み込み中...</div>
     <div id="ranking-list"></div>
