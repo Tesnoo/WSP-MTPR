@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>WSP-Main Tournament Power Ranking</title>
   
+  <!-- ▼▼ プレビュー(OGP)用の設定 ▼▼ -->
   <meta property="og:title" content="WSP-Main Tournament Power Ranking">
   <meta property="og:description" content="スマパメイントーナメントのランキング＆シード作成システム">
   <meta property="og:url" content="https://tesnoo.github.io/WSP-MTPR/">
@@ -19,33 +20,8 @@
     body { background-color: #05071D; color: #c5c6c7; font-family: 'Helvetica Neue', Arial, sans-serif; margin: 0; padding: 40px 20px; }
     .hidden { display: none !important; }
     
-    .ranking-layout { display: flex; gap: 30px; max-width: 1450px; margin: 0 auto; align-items: flex-start; justify-content: center; flex-wrap: wrap; }
-    
-    /* ▼ サイドバー（ログ） */
-    .log-container { background: #1f2833; padding: 20px; border-radius: 12px; border: 1px solid #45a29e; box-sizing: border-box; }
-    .log-container h3 { color:#66fcf1; margin-top:0; border-bottom:1px solid #45a29e; padding-bottom:10px; font-size: 1rem; display: flex; align-items: center; gap: 8px;}
-    .log-list { list-style: none; padding: 0; margin: 0; }
-    .log-list li { margin-bottom: 16px; font-size: 0.9rem; line-height: 1.6; color: #c5c6c7; }
-    .log-date { display: inline-block; background: #0b0c10; color: #ffd700; padding: 2px 6px; border-radius: 4px; font-size: 0.8rem; font-weight: bold; margin-bottom: 6px; border: 1px solid #333; }
-    .sidebar-area { flex: 0 0 280px; position: sticky; top: 40px; }
-    
-    /* ▼ 中央（ランキングメイン） */
-    .ranking-main { flex: 1 1 auto; max-width: 720px; min-width: 320px; display: flex; flex-direction: column; }
-    
-    /* ▼ 右サイドバー（X） */
-    .right-sidebar { flex: 0 0 300px; position: sticky; top: 40px; width: 100%; }
-    .twitter-container { background: #1f2833; padding: 16px; border-radius: 12px; border: 1px solid #45a29e; box-sizing: border-box; }
-    .twitter-container h3 { color:#66fcf1; margin-top:0; border-bottom:1px solid #45a29e; padding-bottom:10px; font-size: 1rem; display: flex; align-items: center; gap: 8px;}
-    
-    /* ▼ 新設：絶対にブロックされない自作のXプロフィールカード ▼ */
-    .x-card { background: #0b0c10; border: 1px solid #333; border-radius: 8px; overflow: hidden; text-align: center; padding-bottom: 20px; margin-top: 10px; }
-    .x-banner { height: 80px; background: linear-gradient(135deg, #1f2833, #45a29e); }
-    .x-avatar { width: 64px; height: 64px; border-radius: 50%; background: #05071D; border: 3px solid #0b0c10; margin: -32px auto 10px; display: flex; align-items: center; justify-content: center; font-weight: bold; color: #66fcf1; font-size: 1.2rem; }
-    .x-name { color: #fff; font-size: 1.1rem; margin: 0; font-weight: bold; }
-    .x-id { color: #8892b0; font-size: 0.85rem; margin: 2px 0 12px; }
-    .x-bio { color: #c5c6c7; font-size: 0.85rem; padding: 0 15px; line-height: 1.5; margin-bottom: 20px; text-align: left; }
-    .x-btn { display: inline-flex; align-items: center; gap: 8px; background: #fff; color: #000; padding: 10px 24px; border-radius: 50px; text-decoration: none; font-weight: bold; font-size: 0.95rem; transition: opacity 0.2s; }
-    .x-btn:hover { opacity: 0.8; }
+    /* ▼▼ シンプルで美しい1列レイアウト ▼▼ */
+    .container { max-width: 720px; margin: 0 auto; display: flex; flex-direction: column; }
     
     .top-controls { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; gap: 15px; }
     .search-container { display: flex; gap: 8px; flex: 1; max-width: 400px; }
@@ -53,8 +29,14 @@
     .search-container button { padding: 10px 16px; background: linear-gradient(135deg, #1f2833, #0b0c10); border: 1px solid #45a29e; color: #66fcf1; border-radius: 8px; font-weight: bold; cursor: pointer; }
     .admin-btn { display: inline-flex; align-items: center; gap: 8px; background: linear-gradient(135deg, #1f2833, #0b0c10); border: 1px solid #45a29e; color: #66fcf1; padding: 10px 20px; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 1rem; cursor: pointer; white-space: nowrap; }
     
-    #mobile-log-area { display: none; margin-bottom: 24px; width: 100%; }
-
+    /* ▼▼ アップデート情報（ページボタンの上に配置） ▼▼ */
+    .log-container { background: #1f2833; padding: 20px; border-radius: 12px; border: 1px solid #45a29e; box-sizing: border-box; margin-bottom: 24px; }
+    .log-container h3 { color:#66fcf1; margin-top:0; border-bottom:1px solid #45a29e; padding-bottom:10px; font-size: 1rem; display: flex; align-items: center; gap: 8px;}
+    .log-list { list-style: none; padding: 0; margin: 0; }
+    .log-list li { margin-bottom: 16px; font-size: 0.9rem; line-height: 1.6; color: #c5c6c7; }
+    .log-list li:last-child { margin-bottom: 0; }
+    .log-date { display: inline-block; background: #0b0c10; color: #ffd700; padding: 2px 6px; border-radius: 4px; font-size: 0.8rem; font-weight: bold; margin-bottom: 6px; border: 1px solid #333; }
+    
     .pagination { display: flex; justify-content: center; align-items: center; gap: 8px; margin-bottom: 24px; flex-wrap: wrap; }
     .page-btn { background-color: #1f2833; border: 1px solid #ffd700; color: #ffd700; padding: 8px 12px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 0.95rem;}
     .page-btn.active { background-color: #ffd700; color: #000; }
@@ -97,12 +79,12 @@
     .modal-box input { width: 100%; padding: 12px; margin: 15px 0; background: #0b0c10; border: 1px solid #45a29e; color: #fff; border-radius: 8px; box-sizing: border-box; text-align: center; }
     .modal-box button { width: 100%; padding: 12px; background: linear-gradient(135deg, #45a29e, #66fcf1); color: #0b0c10; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; margin-bottom: 10px; }
     .modal-box button.cancel { background: #333; color: #fff; }
-    #view-seeding { max-width: 1000px; margin: 0 auto; }
     .back-btn { display: inline-flex; align-items: center; gap: 8px; background: #1f2833; border: 1px solid #8892b0; color: #c5c6c7; padding: 10px 20px; border-radius: 8px; font-weight: bold; font-size: 0.95rem; cursor: pointer; margin-bottom: 24px; }
     .seed-input-group { background: #1f2833; padding: 25px; border-radius: 12px; border: 1px solid #333; margin-bottom: 20px; display: flex; gap: 15px; }
     .seed-input-group input { flex: 1; padding: 12px; background: #0b0c10; border: 1px solid #45a29e; color: #fff; border-radius: 8px; }
     .seed-input-group button { padding: 12px 24px; background: #ffd700; color: #000; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; }
     .auto-update-btn { width: 100%; padding: 16px; font-size: 1.1rem; background: linear-gradient(135deg, #45a29e, #66fcf1); color: #0b0c10; border: none; border-radius: 50px; font-weight: bold; cursor: pointer; margin-bottom: 20px; }
+    
     .champ-badge { background: #e91e63; color: #ffffff; padding: 2px 8px; border-radius: 12px; font-size: 0.8rem; font-weight: bold; margin-left: 6px; }
     .player-link { color: #ffffff; text-decoration: none; font-weight: bold; transition: color 0.2s; }
     .player-link:hover { color: #66fcf1; text-decoration: underline; }
@@ -112,23 +94,13 @@
     .draggable-row:hover { background-color: #161b22; }
     .drag-over { border-top: 2px solid #66fcf1; background-color: #1f2833 !important; }
     
-    @media (max-width: 1400px) {
-      .right-sidebar { flex: 1 1 100%; max-width: 720px; position: static; margin-top: 0; }
-    }
-    
-    @media (max-width: 850px) { 
-      .ranking-layout { flex-direction: column; align-items: center; gap: 0; }
-      .ranking-main { width: 100%; }
+    /* スマホ画面での調整 */
+    @media (max-width: 600px) {
       .top-controls { flex-direction: column; align-items: stretch; margin-bottom: 16px; } 
       .search-container { max-width: 100%; } 
-      .sidebar-area { display: none; }
-      #mobile-log-area { display: block; }
-      .right-sidebar { width: 100%; margin-top: 24px; }
-    }
-    
-    @media (max-width: 600px) {
       .pagination { gap: 5px; }
       .page-btn { padding: 6px 8px; font-size: 0.8rem; }
+      
       .history-grid { display: flex; flex-wrap: nowrap; overflow-x: auto; gap: 12px; padding-bottom: 10px; -webkit-overflow-scrolling: touch; }
       .history-grid::-webkit-scrollbar { height: 4px; }
       .history-grid::-webkit-scrollbar-track { background: transparent; }
@@ -151,73 +123,44 @@
     </div>
   </div>
 
-  <div id="log-content" class="log-container">
-    <h3>🛠 アップデート情報</h3>
-    <ul class="log-list">
-      <li>
-        <span class="log-date">2026.08.23</span><br>
-        ・WSP-MTPRシステムをAPI通信化<br>
-        ・シード作成画面のUI/UX向上<br>
-        ・start.ggアイコンの追加
-      </li>
-      <li>
-        <span class="log-date">2026.08.20</span><br>
-        ・ランキングシステムの運用再開<br>
-        ・シード自動反映ツールのテスト開始
-      </li>
-    </ul>
-  </div>
-
-  <div id="view-ranking">
-    <div class="ranking-layout">
-      
-      <!-- 1列目: ログ（PC用） -->
-      <aside id="sidebar-area" class="sidebar-area"></aside>
-
-      <!-- 2列目: メイン（ランキング） -->
-      <div class="ranking-main">
-        <div class="top-controls">
-          <div class="search-container">
-            <input type="text" id="searchInput" placeholder="プレイヤー名で検索..." onkeypress="if(event.key==='Enter') searchPlayer()">
-            <button onclick="searchPlayer()">🔍</button>
-          </div>
-          <button class="admin-btn" onclick="openModal()">⚙️ シード設定</button>
-        </div>
-        
-        <div id="mobile-log-area"></div>
-        
-        <div class="pagination" id="pagination-top"></div>
-        <div id="loading">ランキングデータを読み込み中...</div>
-        <div id="ranking-list"></div>
-        <div class="pagination" id="pagination-bottom" style="margin-top: 24px;"></div>
+  <div id="view-ranking" class="container">
+    
+    <!-- 1. 検索バー＆シード設定ボタン -->
+    <div class="top-controls">
+      <div class="search-container">
+        <input type="text" id="searchInput" placeholder="プレイヤー名で検索..." onkeypress="if(event.key==='Enter') searchPlayer()">
+        <button onclick="searchPlayer()">🔍</button>
       </div>
-
-      <!-- 3列目: Twitter/X プロフィールカード -->
-      <aside class="right-sidebar">
-        <div class="twitter-container">
-          <h3>🐦 Official X</h3>
-          
-          <!-- ▼ ブロックされない自作のXカード ▼ -->
-          <div class="x-card">
-            <div class="x-banner"></div>
-            <div class="x-avatar">WSP</div>
-            <h4 class="x-name">Weekly Smash Party</h4>
-            <p class="x-id">@WSPsmapa</p>
-            <p class="x-bio">東京で開催しているスマブラSPのオフライン対戦会「スマパ」の公式アカウントです！大会の最新情報やエントリー告知を配信しています。</p>
-            <a href="https://x.com/WSPsmapa" target="_blank" class="x-btn">
-              <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 24.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
-              最新のポストを見る
-            </a>
-          </div>
-          <!-- ▲ ここまで ▲ -->
-          
-        </div>
-      </aside>
-      
+      <button class="admin-btn" onclick="openModal()">⚙️ シード設定</button>
     </div>
+    
+    <!-- 2. アップデート情報 -->
+    <div class="log-container">
+      <h3>🛠 アップデート情報</h3>
+      <ul class="log-list">
+        <li>
+          <span class="log-date">2026.08.23</span><br>
+          ・WSP-MTPRシステムをAPI通信化<br>
+          ・シード作成画面のUI/UX向上<br>
+          ・start.ggアイコンの追加
+        </li>
+        <li>
+          <span class="log-date">2026.08.20</span><br>
+          ・ランキングシステムの運用再開<br>
+          ・シード自動反映ツールのテスト開始
+        </li>
+      </ul>
+    </div>
+    
+    <!-- 3. ランキングコンテンツ -->
+    <div class="pagination" id="pagination-top"></div>
+    <div id="loading">ランキングデータを読み込み中...</div>
+    <div id="ranking-list"></div>
+    <div class="pagination" id="pagination-bottom" style="margin-top: 24px;"></div>
+    
   </div>
 
-  <div id="view-seeding" class="hidden">
+  <div id="view-seeding" class="container hidden">
     <button class="back-btn" onclick="showRanking()">↩️ ランキングに戻る</button>
     <h1 style="color:#ffd700; text-align:center;">WSP Seeding Tool</h1>
     <div class="seed-input-group">
@@ -248,20 +191,6 @@
   <script>
     const GAS_URL = "https://script.google.com/macros/s/AKfycbwYNNpAlybjAVHCPjpdUOTXtuQKbetGZSBn2caxs_f6zSoPPA3Lo-sCVtO0kvh5fGcETg/exec";
     const STARTGG_ICON_URL = "https://i.imgur.com/fd8fScu.png"; 
-
-    function adjustLogPosition() {
-      const logContent = document.getElementById('log-content');
-      const sidebarArea = document.getElementById('sidebar-area');
-      const mobileArea = document.getElementById('mobile-log-area');
-      
-      if (window.innerWidth <= 850) {
-        if (!mobileArea.contains(logContent)) mobileArea.appendChild(logContent);
-      } else {
-        if (!sidebarArea.contains(logContent)) sidebarArea.appendChild(logContent);
-      }
-    }
-    window.addEventListener('load', adjustLogPosition);
-    window.addEventListener('resize', adjustLogPosition);
 
     const SECRET_KEY = "SumapaPartyEveryday1919";
     let allData = [];
