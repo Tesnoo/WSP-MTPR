@@ -5,14 +5,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>WSP-Main Tournament Power Ranking</title>
   
-  <!-- ▼▼ プレビュー(OGP)用の設定 ▼▼ -->
   <meta property="og:title" content="WSP-Main Tournament Power Ranking">
   <meta property="og:description" content="スマパメイントーナメントのランキング＆シード作成システム">
   <meta property="og:url" content="https://tesnoo.github.io/WSP-MTPR/">
   <meta property="og:image" content="https://tesnoo.github.io/WSP-MTPR/sumapa_newlogo.png">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="WSP-MTPR">
-  <meta name="theme-color" content="#422c95">
+  <meta name="theme-color" content="#45a29e">
   <meta name="twitter:card" content="summary">
   <link rel="icon" href="sumapa_newlogo.png">
   
@@ -21,32 +20,44 @@
     .hidden { display: none !important; }
     
     .container { max-width: 720px; margin: 0 auto; display: flex; flex-direction: column; }
-    
+
     .top-controls { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; gap: 15px; }
     .search-container { display: flex; gap: 8px; flex: 1; max-width: 400px; }
     .search-container input { flex: 1; padding: 10px 12px; background: #0b0c10; border: 1px solid #45a29e; color: #fff; border-radius: 8px; font-size: 0.95rem; }
-    .search-container button { padding: 10px 16px; background: linear-gradient(135deg, #1f2833, #0b0c10); border: 1px solid #45a29e; color: #66fcf1; border-radius: 8px; font-weight: bold; cursor: pointer; }
-    .admin-btn { display: inline-flex; align-items: center; gap: 8px; background: linear-gradient(135deg, #1f2833, #0b0c10); border: 1px solid #45a29e; color: #66fcf1; padding: 10px 20px; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 1rem; cursor: pointer; white-space: nowrap; }
     
-    .log-container { background: #1f2833; padding: 20px; border-radius: 12px; border: 1px solid #45a29e; box-sizing: border-box; margin-bottom: 24px; }
-    .log-container h3 { color:#66fcf1; margin-top:0; border-bottom:1px solid #45a29e; padding-bottom:10px; font-size: 1rem; display: flex; align-items: center; gap: 8px;}
+    /* ▼ 美しい水色近似色グラデーション（MTPR用） ▼ */
+    .search-container button { padding: 10px 16px; background: linear-gradient(to right, #45a29e, #66fcf1); border: none; color: #0b0c10; border-radius: 8px; font-weight: bold; cursor: pointer; }
+    .admin-btn { display: inline-flex; align-items: center; gap: 8px; background: linear-gradient(to right, #45a29e, #66fcf1); border: none; color: #0b0c10; padding: 10px 20px; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 1rem; cursor: pointer; white-space: nowrap; }
+    
+    .log-details { background: #1f2833; border-radius: 12px; border: 1px solid transparent; background-clip: padding-box; background: linear-gradient(#1f2833, #1f2833) padding-box, linear-gradient(to right, #45a29e, #66fcf1) border-box; box-sizing: border-box; margin-bottom: 24px; }
+    .log-summary { cursor: pointer; padding: 15px 20px; font-weight: bold; color: #66fcf1; display: flex; align-items: center; justify-content: space-between; font-size: 1rem; list-style: none; outline: none; }
+    .log-summary::-webkit-details-marker { display: none; }
+    .log-summary::after { content: "▼"; font-size: 0.8rem; transition: transform 0.3s; color: #66fcf1; }
+    details[open] .log-summary::after { transform: rotate(180deg); }
+    .log-content { padding: 0 20px 20px 20px; border-top: 1px solid #333; margin-top: 0; padding-top: 15px; }
+    
     .log-list { list-style: none; padding: 0; margin: 0; }
     .log-list li { margin-bottom: 16px; font-size: 0.9rem; line-height: 1.6; color: #c5c6c7; }
     .log-list li:last-child { margin-bottom: 0; }
-    .log-date { display: inline-block; background: #0b0c10; color: #ffd700; padding: 2px 6px; border-radius: 4px; font-size: 0.8rem; font-weight: bold; margin-bottom: 6px; border: 1px solid #333; }
+    .log-date { display: inline-block; background: #0b0c10; color: #66fcf1; padding: 2px 6px; border-radius: 4px; font-size: 0.8rem; font-weight: bold; margin-bottom: 6px; border: 1px solid #333; }
     
     .pagination { display: flex; justify-content: center; align-items: center; gap: 8px; margin-bottom: 24px; flex-wrap: wrap; }
-    .page-btn { background-color: #1f2833; border: 1px solid #ffd700; color: #ffd700; padding: 8px 12px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 0.95rem;}
-    .page-btn.active { background-color: #ffd700; color: #000; }
+    .page-btn { background-color: #1f2833; border: 1px solid #45a29e; color: #66fcf1; padding: 8px 12px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 0.95rem; }
+    .page-btn.active { background: linear-gradient(to right, #45a29e, #66fcf1); color: #0b0c10; border: none; }
     .page-btn:disabled { background-color: #111; border-color: #333; color: #555; cursor: not-allowed; }
     
-    .player-card { border: 1px solid #ffd700; border-radius: 12px; padding: 24px; margin-bottom: 24px; background-color: #05071D; box-shadow: 0 4px 10px rgba(0,0,0,0.5); cursor: pointer; transition: background-color 0.4s ease, box-shadow 0.4s ease; }
-    .player-card:hover { background-color: #161b22; }
-    .header-row { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 4px; }
-    .rank-text { color: #ffd700; font-size: 1.5rem; font-weight: bold; margin: 0 0 4px 0; }
+    .player-card { border: 1px solid transparent; border-radius: 12px; padding: 24px; margin-bottom: 24px; background: linear-gradient(#05071D, #05071D) padding-box, linear-gradient(to right, #45a29e, #66fcf1) border-box; box-shadow: 0 4px 10px rgba(0,0,0,0.5); cursor: pointer; }
+    .player-card:hover { background: linear-gradient(#161b22, #161b22) padding-box, linear-gradient(to right, #45a29e, #66fcf1) border-box; }
+    
+    .header-row { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 4px; }
+    
+    .rank-text { color: #66fcf1; font-size: 1.5rem; font-weight: bold; margin: 0 0 4px 0; }
     .name-text { color: #ffffff; font-size: 2rem; font-weight: bold; margin: 0; word-break: break-all; }
-    .score-text { color: #ffd700; font-size: 1.8rem; font-weight: bold; }
-    .score-pt { font-size: 1rem; color: #c5c6c7; }
+    
+    .score-box { display: flex; flex-direction: column; align-items: flex-end; text-align: right; }
+    .score-label { font-size: 0.85rem; color: #8892b0; margin-bottom: -4px; letter-spacing: 0.5px; }
+    .score-text { color: #66fcf1; font-size: 2rem; font-weight: bold; } 
+    
     .links-row { display: flex; align-items: center; gap: 12px; margin-bottom: 4px;}
     
     .startgg-link { position: relative; z-index: 2; display: inline-flex; align-items: center; }
@@ -60,35 +71,33 @@
     .player-card.expanded .history-wrapper { display: block; }
     
     .history-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 16px; }
-    
-    /* ▼▼ リザルトカードにもホバー時の背景色変化を追加 ▼▼ */
-    .history-card { border: 1px solid #ffd700; border-radius: 12px; padding: 16px; background-color: #05071D; display: flex; flex-direction: column; transition: background-color 0.4s ease; }
-    .history-card:hover { background-color: #161b22; }
-    /* ▲▲ ここまで ▲▲ */
-
+    .history-card { border: 1px solid transparent; border-radius: 12px; padding: 16px; background: linear-gradient(#05071D, #05071D) padding-box, linear-gradient(to right, #45a29e, #66fcf1) border-box; display: flex; flex-direction: column; transition: background-color 0.4s ease; }
+    .history-card:hover { background: linear-gradient(#161b22, #161b22) padding-box, linear-gradient(to right, #45a29e, #66fcf1) border-box; }
     .history-event { color: #ffffff; font-size: 1.3rem; font-weight: bold; margin-bottom: 4px; }
     .history-date { color: #c5c6c7; font-size: 0.85rem; margin-bottom: 20px; }
-    .history-place { color: #ffffff; font-size: 2rem; font-weight: bold; text-align: center; margin-top: auto; }
+    .history-place { color: #66fcf1; font-size: 2rem; font-weight: bold; text-align: center; margin-top: auto; }
     
     table { width: 100%; border-collapse: collapse; border-top: 1px solid #333; }
     th { text-align: left; color: #8892b0; font-size: 0.9rem; padding: 12px 8px 8px 8px; border-bottom: 1px solid #333; }
     td { padding: 12px 8px; font-size: 0.95rem; border-bottom: 1px solid #333; }
     .place-col { text-align: right; }
     
-    #loading { text-align: center; color: #ffd700; font-size: 1.1rem; margin-top: 50px; line-height: 1.6; }
+    #loading { text-align: center; color: #66fcf1; font-size: 1.1rem; margin-top: 50px; line-height: 1.6; }
+    
     #password-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(5, 7, 29, 0.9); display: flex; align-items: center; justify-content: center; z-index: 9999; opacity: 0; visibility: hidden; }
     #password-modal.show { opacity: 1; visibility: visible; }
-    .modal-box { background: #1f2833; padding: 30px; border-radius: 12px; border: 1px solid #45a29e; text-align: center; max-width: 350px; width: 90%; }
+    .modal-box { background: #1f2833; padding: 30px; border-radius: 12px; border: 1px solid transparent; background: linear-gradient(#1f2833, #1f2833) padding-box, linear-gradient(to right, #45a29e, #66fcf1) border-box; text-align: center; max-width: 350px; width: 90%; }
     .modal-box input { width: 100%; padding: 12px; margin: 15px 0; background: #0b0c10; border: 1px solid #45a29e; color: #fff; border-radius: 8px; box-sizing: border-box; text-align: center; }
-    .modal-box button { width: 100%; padding: 12px; background: linear-gradient(135deg, #45a29e, #66fcf1); color: #0b0c10; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; margin-bottom: 10px; }
+    .modal-box button { width: 100%; padding: 12px; background: linear-gradient(to right, #45a29e, #66fcf1); color: #0b0c10; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; margin-bottom: 10px; }
     .modal-box button.cancel { background: #333; color: #fff; }
+    
     .back-btn { display: inline-flex; align-items: center; gap: 8px; background: #1f2833; border: 1px solid #8892b0; color: #c5c6c7; padding: 10px 20px; border-radius: 8px; font-weight: bold; font-size: 0.95rem; cursor: pointer; margin-bottom: 24px; }
     .seed-input-group { background: #1f2833; padding: 25px; border-radius: 12px; border: 1px solid #333; margin-bottom: 20px; display: flex; gap: 15px; }
     .seed-input-group input { flex: 1; padding: 12px; background: #0b0c10; border: 1px solid #45a29e; color: #fff; border-radius: 8px; }
-    .seed-input-group button { padding: 12px 24px; background: #ffd700; color: #000; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; }
-    .auto-update-btn { width: 100%; padding: 16px; font-size: 1.1rem; background: linear-gradient(135deg, #45a29e, #66fcf1); color: #0b0c10; border: none; border-radius: 50px; font-weight: bold; cursor: pointer; margin-bottom: 20px; }
+    .seed-input-group button { background: linear-gradient(to right, #45a29e, #66fcf1); color: #0b0c10; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; padding: 12px 24px; }
+    .auto-update-btn { width: 100%; padding: 16px; font-size: 1.1rem; background: linear-gradient(to right, #45a29e, #66fcf1); color: #0b0c10; border: none; border-radius: 50px; font-weight: bold; cursor: pointer; margin-bottom: 20px; }
     
-    .champ-badge { background: #e91e63; color: #ffffff; padding: 2px 8px; border-radius: 12px; font-size: 0.8rem; font-weight: bold; margin-left: 6px; }
+    .champ-badge { background: linear-gradient(to right, #45a29e, #66fcf1); color: #0b0c10; padding: 2px 8px; border-radius: 12px; font-size: 0.8rem; font-weight: bold; margin-left: 6px; border: none; }
     .player-link { color: #ffffff; text-decoration: none; font-weight: bold; transition: color 0.2s; }
     .player-link:hover { color: #66fcf1; text-decoration: underline; }
     
@@ -135,22 +144,32 @@
       <button class="admin-btn" onclick="openModal()">⚙️ シード設定</button>
     </div>
     
-    <div class="log-container">
-      <h3>🛠 アップデート情報</h3>
-      <ul class="log-list">
-        <li>
-          <span class="log-date">2026.08.23</span><br>
-          ・WSP-MTPRシステムをAPI通信化<br>
-          ・シード作成画面のUI/UX向上<br>
-          ・start.ggアイコンの追加
-        </li>
-        <li>
-          <span class="log-date">2026.08.20</span><br>
-          ・ランキングシステムの運用再開<br>
-          ・シード自動反映ツールのテスト開始
-        </li>
-      </ul>
-    </div>
+    <details class="log-details">
+      <summary class="log-summary">
+        <span>🛠 アップデート情報</span>
+      </summary>
+      <div class="log-content">
+        <ul class="log-list">
+          <li>
+            <span class="log-date">2026.09.09</span><br>
+            ・インフレしたポイント表示を撤廃し、100.00点満点の「100段階スコア制（対数圧縮）」に移行<br>
+            ・テーマカラーを水色ベースのグラデーションに洗練化<br>
+            ・アップデート情報をアコーディオン（開閉式）に刷新
+          </li>
+          <li>
+            <span class="log-date">2026.08.23</span><br>
+            ・WSP-MTPRシステムをAPI通信化<br>
+            ・シード作成画面のUI/UX向上<br>
+            ・start.ggアイコンの追加
+          </li>
+          <li>
+            <span class="log-date">2026.08.20</span><br>
+            ・ランキングシステムの運用再開<br>
+            ・シード自動反映ツールのテスト開始
+          </li>
+        </ul>
+      </div>
+    </details>
     
     <div class="pagination" id="pagination-top"></div>
     <div id="loading">ランキングデータを読み込み中...</div>
@@ -161,12 +180,12 @@
 
   <div id="view-seeding" class="container hidden">
     <button class="back-btn" onclick="showRanking()">↩️ ランキングに戻る</button>
-    <h1 style="color:#ffd700; text-align:center;">WSP Seeding Tool</h1>
+    <h1 style="color:#66fcf1; text-align:center;">MTPR Seeding Tool</h1>
     <div class="seed-input-group">
       <input type="text" id="tSlug" placeholder="大会番号 (例: 240) または test を入力" onkeypress="if(event.key==='Enter') genSeed()">
       <button onclick="genSeed()">シード作成</button>
     </div>
-    <div id="seed-loading" style="display:none; text-align:center; color:#ffd700;">処理中...</div>
+    <div id="seed-loading" style="display:none; text-align:center; color:#66fcf1;">処理中...</div>
     <div id="resultArea" style="display:none;">
       <h2 id="eventName" style="color:#66fcf1; text-align:center;"></h2>
       <button class="auto-update-btn" onclick="executeSeeding()">🚀 start.ggへシードを自動反映する</button>
@@ -188,6 +207,7 @@
   </div>
 
   <script>
+    // ▼ MTPR用のGAS URL ▼
     const GAS_URL = "https://script.google.com/macros/s/AKfycbwYNNpAlybjAVHCPjpdUOTXtuQKbetGZSBn2caxs_f6zSoPPA3Lo-sCVtO0kvh5fGcETg/exec";
     const STARTGG_ICON_URL = "https://i.imgur.com/fd8fScu.png"; 
 
@@ -223,11 +243,11 @@
       navigator.clipboard.writeText(text).then(() => {
         const originalHtml = el.innerHTML;
         el.innerHTML = "✅ Copied!";
-        el.style.backgroundColor = "#45a29e";
+        el.style.background = "linear-gradient(to right, #45a29e, #66fcf1)";
         el.style.color = "#0b0c10";
         setTimeout(() => {
           el.innerHTML = originalHtml;
-          el.style.backgroundColor = "";
+          el.style.background = "";
           el.style.color = "";
         }, 1500);
       });
@@ -246,8 +266,11 @@
           if (cards[indexOnPage]) {
             cards[indexOnPage].scrollIntoView({ behavior: 'smooth', block: 'center' });
             cards[indexOnPage].style.boxShadow = '0 0 25px #66fcf1';
-            cards[indexOnPage].style.backgroundColor = '#1f2833';
-            setTimeout(() => { cards[indexOnPage].style.boxShadow = ''; cards[indexOnPage].style.backgroundColor = ''; }, 2000);
+            cards[indexOnPage].style.background = 'linear-gradient(#1f2833, #1f2833) padding-box, linear-gradient(to right, #45a29e, #66fcf1) border-box';
+            setTimeout(() => { 
+              cards[indexOnPage].style.boxShadow = ''; 
+              cards[indexOnPage].style.background = ''; 
+            }, 2000);
           }
         }, 100);
       } else { alert("該当するプレイヤーが見つかりませんでした。"); }
@@ -258,6 +281,8 @@
       container.innerHTML = '';
       const startIndex = (page - 1) * itemsPerPage;
       const pageData = allData.slice(startIndex, startIndex + itemsPerPage);
+
+      const maxScore = allData.length > 0 ? allData[0].score : 1;
 
       pageData.forEach(player => {
         let historyHtml = '';
@@ -277,13 +302,27 @@
                             <img src="${STARTGG_ICON_URL}" alt="start.gg" class="startgg-icon" onerror="this.outerHTML='start.gg'">
                            </a>`;
 
+        let displayScore = 0;
+        if (player.score > 0) {
+           const logScore = Math.log10(player.score + 1);
+           const logMax = Math.log10(maxScore + 1);
+           displayScore = (logScore / logMax) * 100;
+        }
+        const formattedScore = displayScore.toFixed(2);
+
         const card = document.createElement('div');
         card.className = 'player-card';
         card.setAttribute('onclick', 'toggleCard(this, event)');
         
         card.innerHTML = `
           <div class="rank-text">${getOrdinal(player.rank)}</div>
-          <div class="header-row"><h2 class="name-text">${player.name}</h2><div class="score-text">${player.score.toLocaleString()}<span class="score-pt">pt</span></div></div>
+          <div class="header-row">
+            <h2 class="name-text">${player.name}</h2>
+            <div class="score-box">
+              <div class="score-label">Score</div>
+              <div class="score-text">${formattedScore}</div>
+            </div>
+          </div>
           <div class="links-row">
             ${startGgHtml}
             <div class="disc-chip" onclick="copyDisc(event, '${player.disc}', this)" title="クリックしてコピー">📄 ${player.disc}</div>
@@ -304,7 +343,7 @@
         if (i === 1 || i === totalPages || (i >= currentPage - 2 && i <= currentPage + 2)) {
           html += `<button class="page-btn ${i === currentPage ? 'active' : ''}" onclick="changePageWithScroll(${i})">${i}</button>`;
         } else if (i === currentPage - 3 || i === currentPage + 3) {
-          html += `<span style="color:#ffd700; padding:0 4px;">...</span>`;
+          html += `<span style="color:#BDC3C7; padding:0 4px;">...</span>`;
         }
       }
       html += `<button class="page-btn" onclick="changePageWithScroll(${currentPage + 1})" ${currentPage === totalPages ? 'disabled' : ''}>Next &gt;</button>`;
@@ -386,6 +425,9 @@
     function renderSeedList() {
       const tb = document.getElementById("seedListBody");
       tb.innerHTML = "";
+      
+      const maxScore = allData.length > 0 ? allData[0].score : 1;
+
       gList.forEach((p, i) => {
         let badge = p.lastPlacement === 1 ? `<span class="champ-badge">👑 #${p.lastWspNum}優勝</span>` : "";
         
@@ -408,6 +450,15 @@
           }
         }
 
+        let formattedScore = "-";
+        if (p.score !== -1) {
+            if (p.score > 0) {
+                formattedScore = ((Math.log10(p.score + 1) / Math.log10(maxScore + 1)) * 100).toFixed(2);
+            } else {
+                formattedScore = "0.00";
+            }
+        }
+
         const tr = document.createElement('tr');
         tr.className = 'draggable-row';
         tr.setAttribute('draggable', 'true');
@@ -424,7 +475,7 @@
           <td style="text-align:center;">${i+1}</td>
           <td>${playerNameHtml} ${badge}</td>
           <td style="font-size: 0.85rem; color: #8892b0; padding-right: 15px;">${historyText}</td>
-          <td style="text-align:right;">${p.score !== -1 ? p.score.toLocaleString() + "pt" : "-"}</td>
+          <td style="text-align:right; font-weight:bold;">${formattedScore}</td>
         `;
         tb.appendChild(tr);
       });
@@ -436,7 +487,7 @@
       
       let slug = document.getElementById("tSlug").value.trim().toLowerCase();
       if (slug === "test") {
-        slug = "weekly-smash-party-test";
+        slug = "weekly-smash-party-test"; 
       }
       
       fetch(GAS_URL + "?action=generateSeed&slug=" + encodeURIComponent(slug))
