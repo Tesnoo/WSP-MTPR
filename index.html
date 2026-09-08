@@ -95,23 +95,24 @@
     .seed-input-group button { background: linear-gradient(to right, #45a29e, #66fcf1); color: #0b0c10; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; padding: 12px 24px; }
     .auto-update-btn { width: 100%; padding: 16px; font-size: 1.1rem; background: linear-gradient(to right, #45a29e, #66fcf1); color: #0b0c10; border: none; border-radius: 50px; font-weight: bold; cursor: pointer; margin-bottom: 15px; }
     
-    /* ▼ ステーション自動割り振りパネル用スタイル ▼ */
+    /* ▼ ステーション自動割り振りパネル用スタイル（スイッチ視認性大幅アップ） ▼ */
     .station-panel { background: #1f2833; padding: 20px; border-radius: 12px; border: 1px solid #45a29e; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; gap: 15px; flex-wrap: wrap; }
     .station-panel-left { display: flex; flex-direction: column; gap: 4px; }
     .station-panel-title { color: #66fcf1; font-weight: bold; font-size: 1rem; display: flex; align-items: center; gap: 6px; }
     .station-panel-desc { color: #8892b0; font-size: 0.85rem; }
     .station-panel-right { display: flex; align-items: center; gap: 15px; }
     
-    /* トグルスイッチのデザイン */
-    .switch { position: relative; display: inline-block; width: 50px; height: 26px; }
+    /* 改善されたトグルスイッチ */
+    .switch { position: relative; display: inline-block; width: 56px; height: 30px; }
     .switch input { opacity: 0; width: 0; height: 0; }
-    .slider { position: cursor; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #111; border: 1px solid #45a29e; transition: .4s; border-radius: 26px; }
-    .slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: #8892b0; transition: .4s; border-radius: 50%; }
+    .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #0b0c10; border: 2px solid #66fcf1; transition: .3s; border-radius: 30px; }
+    .slider:before { position: absolute; content: ""; height: 22px; width: 22px; left: 2px; bottom: 2px; background-color: #8892b0; transition: .3s; border-radius: 50%; }
     input:checked + .slider { background: linear-gradient(to right, #45a29e, #66fcf1); border-color: #66fcf1; }
-    input:checked + .slider:before { transform: translateX(24px); background-color: #0b0c10; }
+    input:checked + .slider:before { transform: translateX(26px); background-color: #0b0c10; }
     
     .station-assign-btn { padding: 10px 20px; background: linear-gradient(to right, #45a29e, #66fcf1); color: #0b0c10; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; transition: opacity 0.2s; white-space: nowrap; }
-    .station-assign-btn:disabled { background: #333; color: #555; cursor: not-allowed; opacity: 0.6; }
+    .station-assign-btn:disabled { background: #222; color: #555; cursor: not-allowed; opacity: 0.5; }
+    /* ▲▲ ここまで ▲▲ */
     
     .champ-badge { background: linear-gradient(to right, #45a29e, #66fcf1); color: #0b0c10; padding: 2px 8px; border-radius: 12px; font-size: 0.8rem; font-weight: bold; margin-left: 6px; border: none; }
     .player-link { color: #ffffff; text-decoration: none; font-weight: bold; transition: color 0.2s; }
@@ -168,20 +169,14 @@
         <ul class="log-list">
           <li>
             <span class="log-date">2026.09.09</span><br>
-            ・シード設定画面に「ステーション自動割り振り機能（Losers Top 8〜16対象）」を実装<br>
-            ・100段階スコア制（対数圧縮）への移行とUIのグラデーション統一化<br>
-            ・アップデート情報のアコーディオン（開閉式）化
+            ・シード設定画面のStation自動割り振りに、ラウンド別指定番号（Top16/12: 3,6,4,5 / Top8: 3,4）の優先ルールを実装<br>
+            ・UIテキストとスイッチの視認性を改善
           </li>
           <li>
             <span class="log-date">2026.08.23</span><br>
             ・WSP-MTPRシステムをAPI通信化<br>
             ・シード作成画面のUI/UX向上<br>
             ・start.ggアイコンの追加
-          </li>
-          <li>
-            <span class="log-date">2026.08.20</span><br>
-            ・ランキングシステムの運用再開<br>
-            ・シード自動反映ツールのテスト開始
           </li>
         </ul>
       </div>
@@ -206,21 +201,20 @@
     <div id="resultArea" style="display:none;">
       <h2 id="eventName" style="color:#66fcf1; text-align:center;"></h2>
       
-      <!-- start.ggへシード反映 -->
       <button class="auto-update-btn" onclick="executeSeeding()">🚀 start.ggへシードを自動反映する</button>
       
-      <!-- ▼▼ ステーション自動割り振りコントロールパネル ▼▼ -->
+      <!-- ▼▼ 修正されたステーション自動割り振りパネル ▼▼ -->
       <div class="station-panel">
         <div class="station-panel-left">
-          <div class="station-panel-title">🎛️ スタッフ用：台自動アサイン機能</div>
-          <div class="station-panel-desc">対象: Losers Top 8 〜 Top 16 の進行待ち試合</div>
+          <div class="station-panel-title">🎛️ Stationを自動で割り振る</div>
+          <div class="station-panel-desc">対象: Losers Top 8 〜 Top 16</div>
         </div>
         <div class="station-panel-right">
           <label class="switch" title="自動割り振りの有効/無効">
             <input type="checkbox" id="stationToggle" onchange="toggleStationSwitch()">
             <span class="slider"></span>
           </label>
-          <button id="stationAssignBtn" class="station-assign-btn" disabled onclick="executeStationAssignment()">⚡ 台を今すぐ割り振る</button>
+          <button id="stationAssignBtn" class="station-assign-btn" disabled onclick="executeStationAssignment()">⚡ Stationを今すぐ割り振る</button>
         </div>
       </div>
       <!-- ▲▲ ここまで ▲▲ -->
@@ -515,7 +509,6 @@
       });
     }
 
-    // ▼▼ ステーション自動割り振りのスイッチ＆実行用スクリプト ▼▼
     function toggleStationSwitch() {
       const isChecked = document.getElementById('stationToggle').checked;
       const assignBtn = document.getElementById('stationAssignBtn');
@@ -524,7 +517,7 @@
 
     function executeStationAssignment() {
       if (!gId) return alert("イベントIDが取得できていません。先にシード作成を実行してください。");
-      if (!confirm("Losers Top 8〜16 の進行待ち試合に対し、空き台の自動割り振りを実行します。よろしいですか？")) return;
+      if (!confirm("Losers Top 8〜16 の試合に対し、指定されたステーション番号（Top16/12: 3,6,4,5 / Top8: 3,4）の優先ルールで割り振りを実行します。よろしいですか？")) return;
 
       const assignBtn = document.getElementById('stationAssignBtn');
       assignBtn.disabled = true;
@@ -538,20 +531,19 @@
       .then(res => res.json())
       .then(res => {
         assignBtn.disabled = false;
-        assignBtn.innerText = "⚡ 台を今すぐ割り振る";
+        assignBtn.innerText = "⚡ Stationを今すぐ割り振る";
         if (res.error) {
           alert("エラー: " + res.error);
         } else {
-          alert(`✅ 成功しました！ ${res.assignedCount || 0} 試合に対目を割り振りました。`);
+          alert(`✅ 成功しました！ ${res.assignedCount || 0} 試合にStationを割り振りました。`);
         }
       })
       .catch(err => {
         assignBtn.disabled = false;
-        assignBtn.innerText = "⚡ 台を今すぐ割り振る";
+        assignBtn.innerText = "⚡ Stationを今すぐ割り振る";
         alert("通信エラー: " + err.message);
       });
     }
-    // ▲▲ ここまで ▲▲
 
     function genSeed() {
       document.getElementById("seed-loading").style.display = "block";
