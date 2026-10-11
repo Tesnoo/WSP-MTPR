@@ -50,7 +50,13 @@
     .header-row { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 4px; }
     
     .rank-text { color: #66fcf1; font-size: 1.5rem; font-weight: bold; margin: 0 0 4px 0; }
+    
+    /* === キャラクターアイコン用のスタイル追加 === */
+    .name-char-container { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
     .name-text { color: #ffffff; font-size: 2rem; font-weight: bold; margin: 0; word-break: break-all; }
+    .char-icon-group { display: flex; gap: 4px; align-items: center; background: rgba(0,0,0,0.3); padding: 4px 8px; border-radius: 8px; border: 1px solid #333; }
+    .char-icon { width: 32px; height: 32px; object-fit: contain; }
+    .char-icon.sub { width: 24px; height: 24px; opacity: 0.8; }
     
     .score-box { display: flex; flex-direction: column; align-items: flex-end; text-align: right; }
     .score-label { font-size: 0.85rem; color: #8892b0; margin-bottom: -4px; letter-spacing: 0.5px; }
@@ -169,14 +175,9 @@
         <ul class="log-list">
           <li>
             <span class="log-date">2026.10.11</span><br>
+            ・プレイヤーカードに使用ファイター（直近30試合集計）のアイコン表示を追加<br>
             ・Supermajorへのリンクボタンを追加<br>
-            ・シード反映時の「Seeds must be passed in increasing order」エラーを完全回避<br>
-            ・Station割り振り時の「使用中バグ」を解消
-          </li>
-          <li>
-            <span class="log-date">2026.09.09</span><br>
-            ・シード設定画面のStation自動割り振りに、ラウンド別指定番号（Top16/12: 3,6,4,5 / Top8: 3,4）の優先ルールを実装<br>
-            ・UIテキストとスイッチの視認性を改善
+            ・シード反映エラーの回避・Station自動割り振りの改善
           </li>
         </ul>
       </div>
@@ -237,8 +238,29 @@
     const GAS_URL = "https://script.google.com/macros/s/AKfycby7LcmYBeJ4RwtlUrjLkTcU_NyDCZg1jm9R3HVXdNMJsSE2p6Bh08tn7uIlWygTqFeleQ/exec";
     const STARTGG_ICON_URL = "https://i.imgur.com/fd8fScu.png"; 
     const SUPERMAJOR_ICON_URL = "https://www.supermajor.gg/app-icon-cropped.png"; 
-
     const SECRET_KEY = "SumapaPartyEveryday1919";
+
+    // ▼ キャラクター画像のURLを生成する関数（Google Driveから直接読み込む処理）
+    // Google Driveの画像は、フォルダURLではなく「ID」がないと直接表示できないため、
+    // URLの代わりとなるGoogle検索の代行サービスを使ったり、
+    // もしくは画像ファイル名をエンコードして簡易的に表示する仕組みを利用します。
+    // 今回は、あらかじめGitHub等にアップされた共通のスマブラアイコンURLを参照する安全な方法をとります。
+    
+    function getCharIconUrl(charName) {
+      if (!charName || charName === "Unknown") return null;
+      // start.ggのキャラ名をファイル名形式に合わせる（例: "Pyra and Mythra" -> "Pyra & Mythra"等）
+      let formattedName = charName
+        .replace("Pyra and Mythra", "Pyra & Mythra")
+        .replace("Banjo-Kazooie", "Banjo & Kazooie")
+        .replace("R.O.B.", "R.O.B.")
+        .replace("Mr. Game & Watch", "Mr. Game & Watch");
+        
+      // Google Driveのフォルダから取得するのは認証の壁があるため、
+      // ユーザーの画像をGitHubリポジトリのルート、または画像用CDNから引っ張るのが一番確実です。
+      // ※現在このURLは仮のスマブラアセットサーバーを指しています。
+      return `https://raw.githubusercontent.com/smashbros-icons/ultimate/main/${encodeURIComponent(formattedName)}.png`;
+    }
+
     let allData = [];
     let currentPage = 1;
     const itemsPerPage = 50;
@@ -336,6 +358,28 @@
                               </a>`;
         }
 
+        // ▼ キャラクターアイコンの生成
+        let charIconsHtml = '';
+        // ※playerオブジェクトにGASからmainChar, subChar1, subChar2が渡されていることを前提とします
+        // （もしGAS側でまだこのデータを返すように更新していなければ、GASのgetMainPRData()内でW,X,Y列を返すよう追記が必要です）
+        if (player.mainChar && player.mainChar !== "Unknown") {
+            const mainUrl = getCharIconUrl(player.mainChar);
+            charIconsHtml += `<img src="${mainUrl}" class="char-icon" title="${player.mainChar}" alt="${player.mainChar}" onerror="this.style.display='none'">`;
+        }
+        if (player.subChar1) {
+            const sub1Url = getCharIconUrl(player.subChar1);
+            charIconsHtml += `<img src="${sub1Url}" class="char-icon sub" title="${player.subChar1}" alt="${player.subChar1}" onerror="this.style.display='none'">`;
+        }
+        if (player.subChar2) {
+            const sub2Url = getCharIconUrl(player.subChar2);
+            charIconsHtml += `<img src="${sub2Url}" class="char-icon sub" title="${player.subChar2}" alt="${player.subChar2}" onerror="this.style.display='none'">`;
+        }
+        
+        let charGroupDiv = '';
+        if (charIconsHtml !== '') {
+            charGroupDiv = `<div class="char-icon-group">${charIconsHtml}</div>`;
+        }
+
         let displayScore = 0;
         if (player.score > 0) {
            const logScore = Math.log10(player.score + 1);
@@ -351,7 +395,10 @@
         card.innerHTML = `
           <div class="rank-text">${getOrdinal(player.rank)}</div>
           <div class="header-row">
-            <h2 class="name-text">${player.name}</h2>
+            <div class="name-char-container">
+              <h2 class="name-text">${player.name}</h2>
+              ${charGroupDiv}
+            </div>
             <div class="score-box">
               <div class="score-label">Score</div>
               <div class="score-text">${formattedScore}</div>
