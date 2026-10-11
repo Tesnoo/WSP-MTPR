@@ -248,16 +248,14 @@
     
     function getCharIconUrl(charName) {
       if (!charName || charName === "Unknown") return null;
-      // start.ggのキャラ名をファイル名形式に合わせる（例: "Pyra and Mythra" -> "Pyra & Mythra"等）
+      // start.ggのキャラ名をファイル名形式に合わせる
       let formattedName = charName
         .replace("Pyra and Mythra", "Pyra & Mythra")
         .replace("Banjo-Kazooie", "Banjo & Kazooie")
         .replace("R.O.B.", "R.O.B.")
         .replace("Mr. Game & Watch", "Mr. Game & Watch");
         
-      // Google Driveのフォルダから取得するのは認証の壁があるため、
-      // ユーザーの画像をGitHubリポジトリのルート、または画像用CDNから引っ張るのが一番確実です。
-      // ※現在このURLは仮のスマブラアセットサーバーを指しています。
+      // ▼ここをGitHubの直接参照（./〜.png）に変更しました！
       return `./${encodeURIComponent(formattedName)}.png`;
     }
 
