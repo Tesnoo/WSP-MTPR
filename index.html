@@ -19,6 +19,10 @@
     body { background-color: #05071D; color: #c5c6c7; font-family: 'Helvetica Neue', Arial, sans-serif; margin: 0; padding: 40px 20px; }
     .hidden { display: none !important; }
     
+    /* ▼ 追加されたバッジのCSS（完璧です！） */
+    .official-rank-badge { background: linear-gradient(135deg, #f6d365 0%, #fda085 100%); color: #05071D; padding: 3px 10px; border-radius: 12px; font-size: 0.85rem; font-weight: bold; box-shadow: 0 2px 5px rgba(253, 160, 133, 0.4); display: inline-flex; align-items: center; white-space: nowrap; margin-left: auto; }
+    .seed-rank-badge { background: linear-gradient(135deg, #f6d365 0%, #fda085 100%); color: #05071D; padding: 2px 6px; border-radius: 8px; font-size: 0.75rem; font-weight: bold; margin-left: 8px; display: inline-block; }
+    
     .container { max-width: 720px; margin: 0 auto; display: flex; flex-direction: column; }
 
     .top-controls { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; gap: 15px; }
@@ -51,7 +55,6 @@
     
     .rank-text { color: #66fcf1; font-size: 1.5rem; font-weight: bold; margin: 0 0 4px 0; }
     
-    /* === キャラクターアイコン用のスタイル追加 === */
     .name-char-container { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
     .name-text { color: #ffffff; font-size: 2rem; font-weight: bold; margin: 0; word-break: break-all; }
     .char-icon-group { display: flex; gap: 4px; align-items: center; background: rgba(0,0,0,0.3); padding: 4px 8px; border-radius: 8px; border: 1px solid #333; }
@@ -175,9 +178,9 @@
         <ul class="log-list">
           <li>
             <span class="log-date">2026.10.11</span><br>
-            ・プレイヤーカードに使用ファイター（直近30試合集計）のアイコン表示を追加<br>
-            ・Supermajorへのリンクボタンを追加<br>
-            ・シード反映エラーの回避・Station自動割り振りの改善
+            ・プレイヤーカードに使用ファイターのアイコン表示を追加<br>
+            ・LumiRank等公式ランキングバッジの表示を追加<br>
+            ・Supermajorへのリンクボタンを追加
           </li>
         </ul>
       </div>
@@ -240,25 +243,12 @@
     const SUPERMAJOR_ICON_URL = "https://www.supermajor.gg/app-icon-cropped.png"; 
     const SECRET_KEY = "SumapaPartyEveryday1919";
 
-    // ▼ キャラクター画像のURLを生成する関数（Google Driveから直接読み込む処理）
-    // Google Driveの画像は、フォルダURLではなく「ID」がないと直接表示できないため、
-    // URLの代わりとなるGoogle検索の代行サービスを使ったり、
-    // もしくは画像ファイル名をエンコードして簡易的に表示する仕組みを利用します。
-    // 今回は、あらかじめGitHub等にアップされた共通のスマブラアイコンURLを参照する安全な方法をとります。
-    
     function getCharIconUrl(charName) {
-      // 空欄や無効なデータを弾く
       if (!charName || charName === "Unknown" || charName === "Random Character" || charName === "NoData") return null;
-      
-      // スプシの文字列の前後のスペースを念のため削除
       let formattedName = String(charName).trim();
-      
-      // ▼ バンジョーの余計な変換を完全に削除しました！
-      // （※ホムヒカだけはstart.ggと画像名が違うことが多いので残しています）
       if (formattedName === "Pyra and Mythra") {
         formattedName = "Pyra & Mythra";
       }
-        
       return `./${encodeURIComponent(formattedName)}.png`;
     }
 
@@ -359,10 +349,7 @@
                               </a>`;
         }
 
-        // ▼ キャラクターアイコンの生成
         let charIconsHtml = '';
-        // ※playerオブジェクトにGASからmainChar, subChar1, subChar2が渡されていることを前提とします
-        // （もしGAS側でまだこのデータを返すように更新していなければ、GASのgetMainPRData()内でW,X,Y列を返すよう追記が必要です）
         if (player.mainChar && player.mainChar !== "Unknown") {
             const mainUrl = getCharIconUrl(player.mainChar);
             charIconsHtml += `<img src="${mainUrl}" class="char-icon" title="${player.mainChar}" alt="${player.mainChar}" onerror="this.style.display='none'">`;
@@ -380,6 +367,12 @@
         if (charIconsHtml !== '') {
             charGroupDiv = `<div class="char-icon-group">${charIconsHtml}</div>`;
         }
+        
+        // ▼ 追記: 公式ランキングバッジの生成（抜けていた部分）
+        let officialRankHtml = '';
+        if (player.officialRank) {
+            officialRankHtml = `<div class="official-rank-badge" title="公式ランキング実績">🌍 ${player.officialRank}</div>`;
+        }
 
         let displayScore = 0;
         if (player.score > 0) {
@@ -396,14 +389,16 @@
         card.innerHTML = `
           <div class="rank-text">${getOrdinal(player.rank)}</div>
           <div class="header-row">
-            <div class="name-char-container">
+            <!-- ▼ style="width: 100%;" を追加して、バッジを右端に寄せるようにしています -->
+            <div class="name-char-container" style="width: 100%;">
               <h2 class="name-text">${player.name}</h2>
               ${charGroupDiv}
+              ${officialRankHtml} <!-- ▼ バッジを表示 -->
             </div>
-            <div class="score-box">
-              <div class="score-label">Score</div>
-              <div class="score-text">${formattedScore}</div>
-            </div>
+          </div>
+          <div class="score-box" style="margin-top: -30px; margin-bottom: 10px;"> <!-- スコアの表示位置を微調整 -->
+            <div class="score-label">Score</div>
+            <div class="score-text">${formattedScore}</div>
           </div>
           <div class="links-row">
             ${startGgHtml}
@@ -520,6 +515,9 @@
           playerNameHtml = `<a href="https://www.start.gg/user/${userSlug}" target="_blank" class="player-link" draggable="false">${p.rawTag}</a>`;
         }
 
+        // ▼ 追記: シード画面用の小さな公式ランキングバッジ（抜けていた部分）
+        let officialRankBadge = p.officialRank ? `<span class="seed-rank-badge" title="公式ランキング">🌍 ${p.officialRank}</span>` : "";
+
         let historyText = "-";
         if (p.disc && p.disc !== "なし") {
           const prPlayer = allData.find(d => d.disc.toLowerCase() === p.disc.toLowerCase());
@@ -556,7 +554,8 @@
 
         tr.innerHTML = `
           <td style="text-align:center;">${i+1}</td>
-          <td>${playerNameHtml} ${badge}</td>
+          <!-- ▼ playerNameHtml の後ろに officialRankBadge を表示 -->
+          <td>${playerNameHtml} ${badge} ${officialRankBadge}</td>
           <td style="font-size: 0.85rem; color: #8892b0; padding-right: 15px;">${historyText}</td>
           <td style="text-align:right; font-weight:bold;">${formattedScore}</td>
         `;
