@@ -58,9 +58,9 @@
     
     .links-row { display: flex; align-items: center; gap: 12px; margin-bottom: 4px;}
     
-    .startgg-link { position: relative; z-index: 2; display: inline-flex; align-items: center; }
-    .startgg-icon { height: 26px; width: auto; vertical-align: middle; border-radius: 4px; transition: transform 0.2s ease, opacity 0.2s ease; opacity: 0.9; }
-    .startgg-icon:hover { transform: scale(1.1); opacity: 1; }
+    .startgg-link, .supermajor-link { position: relative; z-index: 2; display: inline-flex; align-items: center; }
+    .startgg-icon, .supermajor-icon { height: 26px; width: auto; vertical-align: middle; border-radius: 4px; transition: transform 0.2s ease, opacity 0.2s ease; opacity: 0.9; }
+    .startgg-icon:hover, .supermajor-icon:hover { transform: scale(1.1); opacity: 1; }
     
     .disc-chip { background-color: #1f2833; border: 1px solid #333; padding: 4px 8px; border-radius: 6px; font-size: 0.85rem; color: #c5c6c7; position: relative; z-index: 2; cursor: pointer; transition: all 0.2s; }
     .disc-chip:hover { background-color: #45a29e; color: #0b0c10; border-color: #66fcf1; }
@@ -95,14 +95,12 @@
     .seed-input-group button { background: linear-gradient(to right, #45a29e, #66fcf1); color: #0b0c10; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; padding: 12px 24px; }
     .auto-update-btn { width: 100%; padding: 16px; font-size: 1.1rem; background: linear-gradient(to right, #45a29e, #66fcf1); color: #0b0c10; border: none; border-radius: 50px; font-weight: bold; cursor: pointer; margin-bottom: 15px; }
     
-    /* ▼ ステーション自動割り振りパネル用スタイル（スイッチ視認性大幅アップ） ▼ */
     .station-panel { background: #1f2833; padding: 20px; border-radius: 12px; border: 1px solid #45a29e; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; gap: 15px; flex-wrap: wrap; }
     .station-panel-left { display: flex; flex-direction: column; gap: 4px; }
     .station-panel-title { color: #66fcf1; font-weight: bold; font-size: 1rem; display: flex; align-items: center; gap: 6px; }
     .station-panel-desc { color: #8892b0; font-size: 0.85rem; }
     .station-panel-right { display: flex; align-items: center; gap: 15px; }
     
-    /* 改善されたトグルスイッチ */
     .switch { position: relative; display: inline-block; width: 56px; height: 30px; }
     .switch input { opacity: 0; width: 0; height: 0; }
     .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #0b0c10; border: 2px solid #66fcf1; transition: .3s; border-radius: 30px; }
@@ -112,7 +110,6 @@
     
     .station-assign-btn { padding: 10px 20px; background: linear-gradient(to right, #45a29e, #66fcf1); color: #0b0c10; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; transition: opacity 0.2s; white-space: nowrap; }
     .station-assign-btn:disabled { background: #222; color: #555; cursor: not-allowed; opacity: 0.5; }
-    /* ▲▲ ここまで ▲▲ */
     
     .champ-badge { background: linear-gradient(to right, #45a29e, #66fcf1); color: #0b0c10; padding: 2px 8px; border-radius: 12px; font-size: 0.8rem; font-weight: bold; margin-left: 6px; border: none; }
     .player-link { color: #ffffff; text-decoration: none; font-weight: bold; transition: color 0.2s; }
@@ -168,15 +165,15 @@
       <div class="log-content">
         <ul class="log-list">
           <li>
+            <span class="log-date">2026.10.11</span><br>
+            ・Supermajorへのリンクボタンを追加<br>
+            ・シード反映時の「Seeds must be passed in increasing order」エラーを完全回避<br>
+            ・Station割り振り時の「使用中バグ」を解消
+          </li>
+          <li>
             <span class="log-date">2026.09.09</span><br>
             ・シード設定画面のStation自動割り振りに、ラウンド別指定番号（Top16/12: 3,6,4,5 / Top8: 3,4）の優先ルールを実装<br>
             ・UIテキストとスイッチの視認性を改善
-          </li>
-          <li>
-            <span class="log-date">2026.08.23</span><br>
-            ・WSP-MTPRシステムをAPI通信化<br>
-            ・シード作成画面のUI/UX向上<br>
-            ・start.ggアイコンの追加
           </li>
         </ul>
       </div>
@@ -203,7 +200,6 @@
       
       <button class="auto-update-btn" onclick="executeSeeding()">🚀 start.ggへシードを自動反映する</button>
       
-      <!-- ▼▼ 修正されたステーション自動割り振りパネル ▼▼ -->
       <div class="station-panel">
         <div class="station-panel-left">
           <div class="station-panel-title">🎛️ Stationを自動で割り振る</div>
@@ -217,7 +213,6 @@
           <button id="stationAssignBtn" class="station-assign-btn" disabled onclick="executeStationAssignment()">⚡ Stationを今すぐ割り振る</button>
         </div>
       </div>
-      <!-- ▲▲ ここまで ▲▲ -->
       
       <p style="color:#8892b0; font-size:0.9rem; text-align:right; margin-bottom:5px;">※行をドラッグ＆ドロップで手動並び替えできます</p>
       
@@ -238,6 +233,8 @@
   <script>
     const GAS_URL = "https://script.google.com/macros/s/AKfycbwYNNpAlybjAVHCPjpdUOTXtuQKbetGZSBn2caxs_f6zSoPPA3Lo-sCVtO0kvh5fGcETg/exec";
     const STARTGG_ICON_URL = "https://i.imgur.com/fd8fScu.png"; 
+    // ▼Supermajorのアイコン画像のURL（仮のものを設定しています。正しいものに差し替えてください）
+    const SUPERMAJOR_ICON_URL = "https://play-lh.googleusercontent.com/xO4iWfH9D1j92nC6Q_X3k0wI23Y_u8Xg72J2rM31hN1yVzH7Q1XyM71W0X1jZ0w1B0=w240-h480-rw"; 
 
     const SECRET_KEY = "SumapaPartyEveryday1919";
     let allData = [];
@@ -329,6 +326,14 @@
         let startGgHtml = `<a href="https://start.gg/user/${player.disc.split('-')[0]}" target="_blank" class="startgg-link" title="start.gg Profile">
                             <img src="${STARTGG_ICON_URL}" alt="start.gg" class="startgg-icon" onerror="this.outerHTML='start.gg'">
                            </a>`;
+                           
+        // ▼ Supermajorリンクボタンの生成（player.playerId が存在する場合のみ）
+        let supermajorHtml = '';
+        if (player.playerId) {
+            supermajorHtml = `<a href="https://www.supermajor.gg/ultimate/player/${encodeURIComponent(player.name)}?id=S${player.playerId}" target="_blank" class="supermajor-link" title="Supermajor Profile">
+                                <img src="${SUPERMAJOR_ICON_URL}" alt="Supermajor" class="supermajor-icon" onerror="this.outerHTML='Supermajor'">
+                              </a>`;
+        }
 
         let displayScore = 0;
         if (player.score > 0) {
@@ -353,6 +358,7 @@
           </div>
           <div class="links-row">
             ${startGgHtml}
+            ${supermajorHtml}
             <div class="disc-chip" onclick="copyDisc(event, '${player.disc}', this)" title="クリックしてコピー">📄 ${player.disc}</div>
           </div>
           <div class="history-wrapper">
