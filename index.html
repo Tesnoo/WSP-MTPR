@@ -247,15 +247,18 @@
     // 今回は、あらかじめGitHub等にアップされた共通のスマブラアイコンURLを参照する安全な方法をとります。
     
     function getCharIconUrl(charName) {
-      if (!charName || charName === "Unknown") return null;
-      // start.ggのキャラ名をファイル名形式に合わせる
-      let formattedName = charName
-        .replace("Pyra and Mythra", "Pyra & Mythra")
-        .replace("Banjo-Kazooie", "Banjo & Kazooie")
-        .replace("R.O.B.", "R.O.B.")
-        .replace("Mr. Game & Watch", "Mr. Game & Watch");
+      // 空欄や無効なデータを弾く
+      if (!charName || charName === "Unknown" || charName === "Random Character" || charName === "NoData") return null;
+      
+      // スプシの文字列の前後のスペースを念のため削除
+      let formattedName = String(charName).trim();
+      
+      // ▼ バンジョーの余計な変換を完全に削除しました！
+      // （※ホムヒカだけはstart.ggと画像名が違うことが多いので残しています）
+      if (formattedName === "Pyra and Mythra") {
+        formattedName = "Pyra & Mythra";
+      }
         
-      // ▼ここをGitHubの直接参照（./〜.png）に変更しました！
       return `./${encodeURIComponent(formattedName)}.png`;
     }
 
