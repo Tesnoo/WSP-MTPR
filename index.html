@@ -258,7 +258,7 @@
       // Google Driveのフォルダから取得するのは認証の壁があるため、
       // ユーザーの画像をGitHubリポジトリのルート、または画像用CDNから引っ張るのが一番確実です。
       // ※現在このURLは仮のスマブラアセットサーバーを指しています。
-      return `https://raw.githubusercontent.com/smashbros-icons/ultimate/main/${encodeURIComponent(formattedName)}.png`;
+      return `./${encodeURIComponent(formattedName)}.png`;
     }
 
     let allData = [];
