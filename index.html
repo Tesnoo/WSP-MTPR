@@ -19,15 +19,14 @@
     body { background-color: #05071D; color: #c5c6c7; font-family: 'Helvetica Neue', Arial, sans-serif; margin: 0; padding: 40px 20px; }
     .hidden { display: none !important; }
     
-    /* ▼ スマホ向け横スクロール用ユーティリティ（スクロールバーを非表示にしつつスワイプ可能にする） */
     .scrollable-x {
       overflow-x: auto;
       white-space: nowrap;
-      -ms-overflow-style: none; /* IE, Edge */
-      scrollbar-width: none; /* Firefox */
+      -ms-overflow-style: none;
+      scrollbar-width: none;
     }
     .scrollable-x::-webkit-scrollbar {
-      display: none; /* Chrome, Safari */
+      display: none;
     }
 
     .official-rank-badge { background: linear-gradient(135deg, #f6d365 0%, #fda085 100%); color: #05071D; padding: 3px 10px; border-radius: 12px; font-size: 0.85rem; font-weight: bold; box-shadow: 0 2px 5px rgba(253, 160, 133, 0.4); display: inline-flex; align-items: center; white-space: nowrap; }
@@ -63,10 +62,7 @@
     
     .rank-text { color: #66fcf1; font-size: 1.5rem; font-weight: bold; margin: 0 0 4px 0; }
     
-    /* ▼ 名前とキャラアイコンをスワイプ可能にし、改行を禁止 */
     .name-char-container { display: flex; align-items: center; gap: 10px; flex-wrap: nowrap; }
-    
-    /* ▼ 名前を clamp() で画面幅に合わせて自動縮小化し、改行禁止 */
     .name-text { color: #ffffff; font-size: clamp(1.2rem, 5vw, 2rem); font-weight: bold; margin: 0; white-space: nowrap; }
     
     .char-icon-group { display: flex; gap: 4px; align-items: center; background: rgba(0,0,0,0.3); padding: 4px 8px; border-radius: 8px; border: 1px solid #333; flex-shrink: 0; }
@@ -135,6 +131,10 @@
     .station-assign-btn { padding: 10px 20px; background: linear-gradient(to right, #45a29e, #66fcf1); color: #0b0c10; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; transition: opacity 0.2s; white-space: nowrap; }
     .station-assign-btn:disabled { background: #222; color: #555; cursor: not-allowed; opacity: 0.5; }
     
+    /* ▼ 新設：手動並び替えリセットボタン */
+    .reset-order-btn { background: #1f2833; border: 1px solid #45a29e; color: #66fcf1; padding: 6px 12px; border-radius: 6px; font-size: 0.85rem; font-weight: bold; cursor: pointer; transition: all 0.2s; }
+    .reset-order-btn:hover { background: #45a29e; color: #0b0c10; }
+
     .champ-badge { background: linear-gradient(to right, #45a29e, #66fcf1); color: #0b0c10; padding: 2px 8px; border-radius: 12px; font-size: 0.8rem; font-weight: bold; margin-left: 6px; border: none; }
     .player-link { color: #ffffff; text-decoration: none; font-weight: bold; transition: color 0.2s; }
     .player-link:hover { color: #66fcf1; text-decoration: underline; }
@@ -144,16 +144,14 @@
     .draggable-row:hover { background-color: #161b22; }
     .drag-over { border-top: 2px solid #66fcf1; background-color: #1f2833 !important; }
     
-    /* ▼ スマホ向けレスポンシブ最適化 */
     @media (max-width: 600px) {
       .top-controls { flex-direction: column; align-items: stretch; margin-bottom: 16px; } 
       .search-container { max-width: 100%; } 
       .pagination { gap: 5px; }
       .page-btn { padding: 6px 8px; font-size: 0.8rem; }
       
-      /* ▼ Scoreのはみ出しを防ぐため、カードの余白を少し削って横幅を確保 */
       .player-card { padding: 16px; margin-bottom: 16px; }
-      .score-text { font-size: 1.6rem; } /* スコアのフォントサイズも少し縮小 */
+      .score-text { font-size: 1.6rem; }
       .rank-text { font-size: 1.3rem; margin-bottom: 2px; }
       
       .history-grid { display: flex; flex-wrap: nowrap; overflow-x: auto; gap: 12px; padding-bottom: 10px; -webkit-overflow-scrolling: touch; }
@@ -239,7 +237,11 @@
         </div>
       </div>
       
-      <p style="color:#8892b0; font-size:0.9rem; text-align:right; margin-bottom:5px;">※行をドラッグ＆ドロップで手動並び替えできます</p>
+      <!-- ▼ 新設：手動並び替えのリセット機能 -->
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; flex-wrap:wrap; gap:8px;">
+        <button class="reset-order-btn" onclick="resetSeedOrderToScore()">🔄 手動並び替えをリセット（純粋なスコア順に戻す）</button>
+        <span style="color:#8892b0; font-size:0.9rem;">※行をドラッグ＆ドロップで手動並び替えできます</span>
+      </div>
       
       <table>
         <thead>
@@ -260,6 +262,7 @@
     const STARTGG_ICON_URL = "https://i.imgur.com/fd8fScu.png"; 
     const SUPERMAJOR_ICON_URL = "https://www.supermajor.gg/app-icon-cropped.png"; 
     const SECRET_KEY = "SumapaPartyEveryday1919";
+    const SEED_STORAGE_PREFIX = "wsp_seed_order_v2_";
 
     function getCharIconUrl(charName) {
       if (!charName || charName === "Unknown" || charName === "Random Character" || charName === "NoData") return null;
@@ -407,12 +410,10 @@
         card.className = 'player-card';
         card.setAttribute('onclick', 'toggleCard(this, event)');
         
-        // ▼ 修正: レイアウトを完全に制御し、Scoreはみ出しや文字重なりを防ぐ
         card.innerHTML = `
           <div class="rank-text">${getOrdinal(player.rank)}</div>
           
           <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; margin-bottom: 12px; width: 100%;">
-            <!-- 左側: min-width: 0 を入れることで右側のScoreを押し出さないようにする -->
             <div style="display: flex; flex-direction: column; gap: 8px; min-width: 0; flex: 1;">
               <div class="name-char-container scrollable-x">
                 <h2 class="name-text">${player.name}</h2>
@@ -421,7 +422,6 @@
               <div class="scrollable-x">${officialRankHtml}</div>
             </div>
             
-            <!-- 右側: flex-shrink: 0 でScoreの幅を死守する -->
             <div class="score-box" style="margin: 0; flex-shrink: 0;">
               <div class="score-label">Score</div>
               <div class="score-text">${formattedScore}</div>
@@ -475,6 +475,19 @@
     let gId = null, gList = null;
     let dragSrcEl = null;
 
+    // ▼ 新設：純粋なスコアでの比較ロジック
+    function compareSeedPlayers(a, b) {
+      const aIsChamp = (a.lastPlacement === 1);
+      const bIsChamp = (b.lastPlacement === 1);
+      if (aIsChamp && !bIsChamp) return -1;
+      if (!aIsChamp && bIsChamp) return 1;
+      if (aIsChamp && bIsChamp) {
+        if (a.lastWspNum !== b.lastWspNum) return b.lastWspNum - a.lastWspNum;
+      }
+      if (b.score !== a.score) return b.score - a.score;
+      return String(a.rawTag || "").localeCompare(String(b.rawTag || ""));
+    }
+
     function handleDragStart(e) {
       dragSrcEl = this;
       e.dataTransfer.effectAllowed = 'move';
@@ -505,27 +518,123 @@
       document.querySelectorAll('#seedListBody tr').forEach(row => { row.classList.remove('drag-over'); });
     }
 
+    // ▼ 新設：ローカルとGASサーバーの両方に現在の並び順を保存
     function saveSeedOrder() {
-      if (!gId) return;
-      const order = gList.map(p => p.entrantId);
-      localStorage.setItem('wsp_seed_order_' + gId, JSON.stringify(order));
+      if (!gId || !gList) return;
+      const order = gList.map(p => String(p.entrantId));
+      localStorage.setItem(SEED_STORAGE_PREFIX + gId, JSON.stringify(order));
+
+      fetch(GAS_URL, {
+        method: "POST",
+        headers: { "Content-Type": "text/plain" },
+        body: JSON.stringify({ action: "saveSeedOrder", eventId: gId, order: order })
+      }).catch(() => {});
     }
 
-    function applySavedSeedOrder() {
-      if (!gId) return;
-      const saved = localStorage.getItem('wsp_seed_order_' + gId);
-      if (saved) {
-        try {
-          const order = JSON.parse(saved);
-          gList.sort((a, b) => {
-            let indexA = order.indexOf(a.entrantId);
-            let indexB = order.indexOf(b.entrantId);
-            if (indexA === -1) indexA = 9999;
-            if (indexB === -1) indexB = 9999;
-            return indexA - indexB;
-          });
-        } catch(e) {}
+    // ▼ 新設：手動並び替えをリセットし、全員を純粋なスコア順に戻す機能
+    function resetSeedOrderToScore() {
+      if (!gId || !gList) return;
+      if (!confirm("手動で並び替えた順序をリセットし、純粋なスコア順に戻しますか？")) return;
+      localStorage.removeItem(SEED_STORAGE_PREFIX + gId);
+      localStorage.removeItem("wsp_seed_order_" + gId); // 古いキャッシュも削除
+      gList.sort(compareSeedPlayers);
+      saveSeedOrder();
+      renderSeedList();
+    }
+
+    // ▼ 修正：既存メンバーの手動順序を維持しつつ、新規メンバーをスコア順の適切な位置へ自動挿入
+    function applySavedSeedOrder(serverSavedOrder) {
+      if (!gId || !gList) return;
+
+      // 旧バージョンのキャッシュキーは即座に削除
+      localStorage.removeItem("wsp_seed_order_" + gId);
+
+      let order = null;
+      if (Array.isArray(serverSavedOrder) && serverSavedOrder.length > 0) {
+        order = serverSavedOrder.map(id => String(id));
+      } else {
+        const localSaved = localStorage.getItem(SEED_STORAGE_PREFIX + gId);
+        if (localSaved) {
+          try {
+            order = JSON.parse(localSaved).map(id => String(id));
+          } catch (e) {}
+        }
       }
+
+      // まず全員を純粋なスコア順にソートした基準リストを作成
+      const defaultSorted = [...gList].sort(compareSeedPlayers);
+
+      if (!order || order.length === 0) {
+        gList = defaultSorted;
+        saveSeedOrder();
+        return;
+      }
+
+      const uniqueSaved = [...new Set(order)];
+      const savedSet = new Set(uniqueSaved);
+      const playerMap = {};
+      defaultSorted.forEach(p => {
+        playerMap[String(p.entrantId)] = p;
+      });
+
+      const result = [];
+      uniqueSaved.forEach(id => {
+        if (playerMap[id]) {
+          result.push(playerMap[id]);
+        }
+      });
+
+      if (result.length === 0) {
+        gList = defaultSorted;
+        saveSeedOrder();
+        return;
+      }
+
+      const newPlayers = defaultSorted.filter(p => !savedSet.has(String(p.entrantId)));
+
+      newPlayers.forEach(newP => {
+        const n = result.length;
+        const dp = new Array(n).fill(1);
+        const parent = new Array(n).fill(-1);
+
+        for (let i = 0; i < n; i++) {
+          for (let j = 0; j < i; j++) {
+            if (compareSeedPlayers(result[j], result[i]) <= 0 && dp[j] + 1 > dp[i]) {
+              dp[i] = dp[j] + 1;
+              parent[i] = j;
+            }
+          }
+        }
+
+        let maxLen = 0;
+        let idx = -1;
+        for (let i = 0; i < n; i++) {
+          if (dp[i] > maxLen) {
+            maxLen = dp[i];
+            idx = i;
+          }
+        }
+
+        const backbone = new Set();
+        while (idx !== -1) {
+          backbone.add(idx);
+          idx = parent[idx];
+        }
+
+        let insertIdx = n;
+        for (let i = 0; i < n; i++) {
+          if (backbone.has(i)) {
+            if (compareSeedPlayers(newP, result[i]) < 0) {
+              insertIdx = i;
+              break;
+            }
+          }
+        }
+        result.splice(insertIdx, 0, newP);
+      });
+
+      gList = result;
+      saveSeedOrder();
     }
 
     function renderSeedList() {
@@ -644,7 +753,7 @@
           gList = res.list;
           document.getElementById("eventName").innerText = res.eventName + " (" + res.entrantsCount + "人)";
           
-          applySavedSeedOrder();
+          applySavedSeedOrder(res.savedOrder);
           renderSeedList();
           
           document.getElementById("resultArea").style.display = "block";
