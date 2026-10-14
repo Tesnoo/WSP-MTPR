@@ -19,8 +19,8 @@
     body { background-color: #05071D; color: #c5c6c7; font-family: 'Helvetica Neue', Arial, sans-serif; margin: 0; padding: 40px 20px; }
     .hidden { display: none !important; }
     
-    /* ▼ 追加されたバッジのCSS（完璧です！） */
-    .official-rank-badge { background: linear-gradient(135deg, #f6d365 0%, #fda085 100%); color: #05071D; padding: 3px 10px; border-radius: 12px; font-size: 0.85rem; font-weight: bold; box-shadow: 0 2px 5px rgba(253, 160, 133, 0.4); display: inline-flex; align-items: center; white-space: nowrap; margin-left: auto; }
+    /* ▼ 修正: margin-left: auto; を削除し、レイアウト衝突を防ぐ */
+    .official-rank-badge { background: linear-gradient(135deg, #f6d365 0%, #fda085 100%); color: #05071D; padding: 3px 10px; border-radius: 12px; font-size: 0.85rem; font-weight: bold; box-shadow: 0 2px 5px rgba(253, 160, 133, 0.4); display: inline-flex; align-items: center; white-space: nowrap; }
     .seed-rank-badge { background: linear-gradient(135deg, #f6d365 0%, #fda085 100%); color: #05071D; padding: 2px 6px; border-radius: 8px; font-size: 0.75rem; font-weight: bold; margin-left: 8px; display: inline-block; }
     
     .container { max-width: 720px; margin: 0 auto; display: flex; flex-direction: column; }
@@ -342,11 +342,16 @@
                             <img src="${STARTGG_ICON_URL}" alt="start.gg" class="startgg-icon" onerror="this.outerHTML='start.gg'">
                            </a>`;
                            
+        // ▼ 修正: IDがない（更新待ち）場合は半透明＆クリック不可にする
         let supermajorHtml = '';
         if (player.playerId) {
             supermajorHtml = `<a href="https://www.supermajor.gg/ultimate/player/${encodeURIComponent(player.name)}?id=S${player.playerId}" target="_blank" class="supermajor-link" title="Supermajor Profile">
                                 <img src="${SUPERMAJOR_ICON_URL}" alt="Supermajor" class="supermajor-icon" onerror="this.outerHTML='Supermajor'">
                               </a>`;
+        } else {
+            supermajorHtml = `<span class="supermajor-link" title="Player ID 更新待ち" style="opacity: 0.3; filter: grayscale(100%); cursor: not-allowed;">
+                                <img src="${SUPERMAJOR_ICON_URL}" alt="Supermajor" class="supermajor-icon">
+                              </span>`;
         }
 
         let charIconsHtml = '';
@@ -368,7 +373,6 @@
             charGroupDiv = `<div class="char-icon-group">${charIconsHtml}</div>`;
         }
         
-        // ▼ 追記: 公式ランキングバッジの生成（抜けていた部分）
         let officialRankHtml = '';
         if (player.officialRank) {
             officialRankHtml = `<div class="official-rank-badge" title="公式ランキング実績">🌍 ${player.officialRank}</div>`;
@@ -386,20 +390,25 @@
         card.className = 'player-card';
         card.setAttribute('onclick', 'toggleCard(this, event)');
         
+        // ▼ 修正: スコアと実績バッジの衝突を完全回避した美しいレイアウトに変更
         card.innerHTML = `
           <div class="rank-text">${getOrdinal(player.rank)}</div>
-          <div class="header-row">
-            <!-- ▼ style="width: 100%;" を追加して、バッジを右端に寄せるようにしています -->
-            <div class="name-char-container" style="width: 100%;">
-              <h2 class="name-text">${player.name}</h2>
-              ${charGroupDiv}
-              ${officialRankHtml} <!-- ▼ バッジを表示 -->
+          
+          <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 15px; margin-bottom: 12px;">
+            <div style="display: flex; flex-direction: column; gap: 8px;">
+              <div class="name-char-container" style="margin: 0; width: auto;">
+                <h2 class="name-text">${player.name}</h2>
+                ${charGroupDiv}
+              </div>
+              <div>${officialRankHtml}</div>
+            </div>
+            
+            <div class="score-box" style="margin: 0; flex-shrink: 0;">
+              <div class="score-label">Score</div>
+              <div class="score-text">${formattedScore}</div>
             </div>
           </div>
-          <div class="score-box" style="margin-top: -30px; margin-bottom: 10px;"> <!-- スコアの表示位置を微調整 -->
-            <div class="score-label">Score</div>
-            <div class="score-text">${formattedScore}</div>
-          </div>
+          
           <div class="links-row">
             ${startGgHtml}
             ${supermajorHtml}
@@ -515,7 +524,6 @@
           playerNameHtml = `<a href="https://www.start.gg/user/${userSlug}" target="_blank" class="player-link" draggable="false">${p.rawTag}</a>`;
         }
 
-        // ▼ 追記: シード画面用の小さな公式ランキングバッジ（抜けていた部分）
         let officialRankBadge = p.officialRank ? `<span class="seed-rank-badge" title="公式ランキング">🌍 ${p.officialRank}</span>` : "";
 
         let historyText = "-";
@@ -554,7 +562,6 @@
 
         tr.innerHTML = `
           <td style="text-align:center;">${i+1}</td>
-          <!-- ▼ playerNameHtml の後ろに officialRankBadge を表示 -->
           <td>${playerNameHtml} ${badge} ${officialRankBadge}</td>
           <td style="font-size: 0.85rem; color: #8892b0; padding-right: 15px;">${historyText}</td>
           <td style="text-align:right; font-weight:bold;">${formattedScore}</td>
