@@ -19,7 +19,17 @@
     body { background-color: #05071D; color: #c5c6c7; font-family: 'Helvetica Neue', Arial, sans-serif; margin: 0; padding: 40px 20px; }
     .hidden { display: none !important; }
     
-    /* ▼ 修正: margin-left: auto; を削除し、レイアウト衝突を防ぐ */
+    /* ▼ スマホ向け横スクロール用ユーティリティ（スクロールバーを非表示にしつつスワイプ可能にする） */
+    .scrollable-x {
+      overflow-x: auto;
+      white-space: nowrap;
+      -ms-overflow-style: none; /* IE, Edge */
+      scrollbar-width: none; /* Firefox */
+    }
+    .scrollable-x::-webkit-scrollbar {
+      display: none; /* Chrome, Safari */
+    }
+
     .official-rank-badge { background: linear-gradient(135deg, #f6d365 0%, #fda085 100%); color: #05071D; padding: 3px 10px; border-radius: 12px; font-size: 0.85rem; font-weight: bold; box-shadow: 0 2px 5px rgba(253, 160, 133, 0.4); display: inline-flex; align-items: center; white-space: nowrap; }
     .seed-rank-badge { background: linear-gradient(135deg, #f6d365 0%, #fda085 100%); color: #05071D; padding: 2px 6px; border-radius: 8px; font-size: 0.75rem; font-weight: bold; margin-left: 8px; display: inline-block; }
     
@@ -51,13 +61,15 @@
     .player-card { border: 1px solid transparent; border-radius: 12px; padding: 24px; margin-bottom: 24px; background: linear-gradient(#05071D, #05071D) padding-box, linear-gradient(to right, #45a29e, #66fcf1) border-box; box-shadow: 0 4px 10px rgba(0,0,0,0.5); cursor: pointer; }
     .player-card:hover { background: linear-gradient(#161b22, #161b22) padding-box, linear-gradient(to right, #45a29e, #66fcf1) border-box; }
     
-    .header-row { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 4px; }
-    
     .rank-text { color: #66fcf1; font-size: 1.5rem; font-weight: bold; margin: 0 0 4px 0; }
     
-    .name-char-container { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
-    .name-text { color: #ffffff; font-size: 2rem; font-weight: bold; margin: 0; word-break: break-all; }
-    .char-icon-group { display: flex; gap: 4px; align-items: center; background: rgba(0,0,0,0.3); padding: 4px 8px; border-radius: 8px; border: 1px solid #333; }
+    /* ▼ 名前とキャラアイコンをスワイプ可能にし、改行を禁止 */
+    .name-char-container { display: flex; align-items: center; gap: 10px; flex-wrap: nowrap; }
+    
+    /* ▼ 名前を clamp() で画面幅に合わせて自動縮小化し、改行禁止 */
+    .name-text { color: #ffffff; font-size: clamp(1.2rem, 5vw, 2rem); font-weight: bold; margin: 0; white-space: nowrap; }
+    
+    .char-icon-group { display: flex; gap: 4px; align-items: center; background: rgba(0,0,0,0.3); padding: 4px 8px; border-radius: 8px; border: 1px solid #333; flex-shrink: 0; }
     .char-icon { width: 32px; height: 32px; object-fit: contain; }
     .char-icon.sub { width: 24px; height: 24px; opacity: 0.8; }
     
@@ -132,11 +144,17 @@
     .draggable-row:hover { background-color: #161b22; }
     .drag-over { border-top: 2px solid #66fcf1; background-color: #1f2833 !important; }
     
+    /* ▼ スマホ向けレスポンシブ最適化 */
     @media (max-width: 600px) {
       .top-controls { flex-direction: column; align-items: stretch; margin-bottom: 16px; } 
       .search-container { max-width: 100%; } 
       .pagination { gap: 5px; }
       .page-btn { padding: 6px 8px; font-size: 0.8rem; }
+      
+      /* ▼ Scoreのはみ出しを防ぐため、カードの余白を少し削って横幅を確保 */
+      .player-card { padding: 16px; margin-bottom: 16px; }
+      .score-text { font-size: 1.6rem; } /* スコアのフォントサイズも少し縮小 */
+      .rank-text { font-size: 1.3rem; margin-bottom: 2px; }
       
       .history-grid { display: flex; flex-wrap: nowrap; overflow-x: auto; gap: 12px; padding-bottom: 10px; -webkit-overflow-scrolling: touch; }
       .history-grid::-webkit-scrollbar { height: 4px; }
@@ -342,7 +360,6 @@
                             <img src="${STARTGG_ICON_URL}" alt="start.gg" class="startgg-icon" onerror="this.outerHTML='start.gg'">
                            </a>`;
                            
-        // ▼ 修正: IDがない（更新待ち）場合は半透明＆クリック不可にする
         let supermajorHtml = '';
         if (player.playerId) {
             supermajorHtml = `<a href="https://www.supermajor.gg/ultimate/player/${encodeURIComponent(player.name)}?id=S${player.playerId}" target="_blank" class="supermajor-link" title="Supermajor Profile">
@@ -390,19 +407,21 @@
         card.className = 'player-card';
         card.setAttribute('onclick', 'toggleCard(this, event)');
         
-        // ▼ 修正: スコアと実績バッジの衝突を完全回避した美しいレイアウトに変更
+        // ▼ 修正: レイアウトを完全に制御し、Scoreはみ出しや文字重なりを防ぐ
         card.innerHTML = `
           <div class="rank-text">${getOrdinal(player.rank)}</div>
           
-          <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 15px; margin-bottom: 12px;">
-            <div style="display: flex; flex-direction: column; gap: 8px;">
-              <div class="name-char-container" style="margin: 0; width: auto;">
+          <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; margin-bottom: 12px; width: 100%;">
+            <!-- 左側: min-width: 0 を入れることで右側のScoreを押し出さないようにする -->
+            <div style="display: flex; flex-direction: column; gap: 8px; min-width: 0; flex: 1;">
+              <div class="name-char-container scrollable-x">
                 <h2 class="name-text">${player.name}</h2>
                 ${charGroupDiv}
               </div>
-              <div>${officialRankHtml}</div>
+              <div class="scrollable-x">${officialRankHtml}</div>
             </div>
             
+            <!-- 右側: flex-shrink: 0 でScoreの幅を死守する -->
             <div class="score-box" style="margin: 0; flex-shrink: 0;">
               <div class="score-label">Score</div>
               <div class="score-text">${formattedScore}</div>
