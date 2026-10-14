@@ -19,40 +19,44 @@
     body { background-color: #05071D; color: #c5c6c7; font-family: 'Helvetica Neue', Arial, sans-serif; margin: 0; padding: 40px 20px; }
     .hidden { display: none !important; }
     
-    .scrollable-x {
-      overflow-x: auto;
-      white-space: nowrap;
-      -ms-overflow-style: none;
-      scrollbar-width: none;
-    }
-    .scrollable-x::-webkit-scrollbar {
-      display: none;
-    }
+    .scrollable-x { overflow-x: auto; white-space: nowrap; -ms-overflow-style: none; scrollbar-width: none; }
+    .scrollable-x::-webkit-scrollbar { display: none; }
 
     .official-rank-badge { background: linear-gradient(135deg, #f6d365 0%, #fda085 100%); color: #05071D; padding: 3px 10px; border-radius: 12px; font-size: 0.85rem; font-weight: bold; box-shadow: 0 2px 5px rgba(253, 160, 133, 0.4); display: inline-flex; align-items: center; white-space: nowrap; }
     .seed-rank-badge { background: linear-gradient(135deg, #f6d365 0%, #fda085 100%); color: #05071D; padding: 2px 6px; border-radius: 8px; font-size: 0.75rem; font-weight: bold; margin-left: 8px; display: inline-block; }
     
     .container { max-width: 720px; margin: 0 auto; display: flex; flex-direction: column; }
 
-    .top-controls { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; gap: 15px; }
-    
-    /* ▼ サジェスト検索用レイアウト */
-    .search-container { display: flex; gap: 8px; flex: 1; max-width: 450px; }
+    /* ▼ 修正：シードボタンと検索ボックスを2段に分け、検索ボックスをアコーディオンと同じ全幅にする */
+    .top-controls { display: flex; flex-direction: column; align-items: stretch; margin-bottom: 24px; gap: 12px; }
+    .top-controls-top { display: flex; justify-content: flex-end; }
+    .search-container { display: flex; gap: 8px; width: 100%; }
     .search-wrapper { position: relative; flex: 1; }
     .search-wrapper input { width: 100%; padding: 10px 12px; background: #0b0c10; border: 1px solid #45a29e; color: #fff; border-radius: 8px; font-size: 0.95rem; box-sizing: border-box; }
     .search-container button { padding: 10px 16px; background: linear-gradient(to right, #45a29e, #66fcf1); border: none; color: #0b0c10; border-radius: 8px; font-weight: bold; cursor: pointer; flex-shrink: 0; }
     
+    /* ▼ サジェストリストのレイアウト改善（名前の幅を死守し、はみ出る場合は改行させる） */
     .suggest-list { position: absolute; top: calc(100% + 4px); left: 0; right: 0; background: #1f2833; border: 1px solid #45a29e; border-radius: 8px; list-style: none; padding: 0; margin: 0; max-height: 350px; overflow-y: auto; z-index: 100; box-shadow: 0 4px 15px rgba(0,0,0,0.8); }
-    .suggest-item { padding: 12px 15px; border-bottom: 1px solid #333; cursor: pointer; color: #c5c6c7; display: flex; align-items: center; gap: 10px; flex-wrap: nowrap; font-size: 0.95rem; }
+    .suggest-item { padding: 12px 15px; border-bottom: 1px solid #333; cursor: pointer; color: #c5c6c7; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; font-size: 0.95rem; overflow: hidden; }
     .suggest-item:hover { background: linear-gradient(to right, #45a29e, #66fcf1); color: #0b0c10; }
     .suggest-item:last-child { border-bottom: none; }
-    .suggest-rank { font-weight: bold; width: 65px; flex-shrink: 0; font-size: 0.9rem; }
-    .suggest-name { flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .suggest-rank { font-weight: bold; flex-shrink: 0; font-size: 0.9rem; }
+    
+    /* ▼ 電光掲示板（自動横スクロール）用設定 */
+    .suggest-name-wrapper { flex: 1 1 80px; min-width: 80px; overflow: hidden; white-space: nowrap; position: relative; }
+    .suggest-name { display: inline-block; font-weight: bold; color: #ffffff; }
+    .suggest-item:hover .suggest-name { color: #05071D; }
+    .marquee-scroll { animation: marquee-anim linear infinite alternate; }
+    @keyframes marquee-anim {
+      0%, 15% { transform: translateX(0); }
+      85%, 100% { transform: translateX(var(--scroll-dist)); }
+    }
+    
     .match-text { font-weight: 900; color: #66fcf1; text-decoration: underline; }
     .suggest-item:hover .match-text { color: #05071D; text-decoration: none; }
     .suggest-official { font-size: 0.7rem; background: linear-gradient(135deg, #f6d365 0%, #fda085 100%); color: #05071D; padding: 2px 6px; border-radius: 8px; font-weight: bold; white-space: nowrap; flex-shrink: 0; }
     .suggest-item:hover .suggest-official { box-shadow: 0 0 5px rgba(0,0,0,0.3); }
-    .suggest-score { font-weight: bold; color: #8892b0; flex-shrink: 0; font-size: 0.85rem; }
+    .suggest-score { font-weight: bold; color: #8892b0; flex-shrink: 0; font-size: 0.85rem; margin-left: auto; }
     .suggest-item:hover .suggest-score { color: #0b0c10; }
 
     .admin-btn { display: inline-flex; align-items: center; gap: 8px; background: linear-gradient(to right, #45a29e, #66fcf1); border: none; color: #0b0c10; padding: 10px 20px; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 1rem; cursor: pointer; white-space: nowrap; }
@@ -83,7 +87,6 @@
     .name-text { color: #ffffff; font-size: clamp(1.2rem, 5vw, 2rem); font-weight: bold; margin: 0; white-space: nowrap; }
     
     .char-icon-group { display: flex; gap: 4px; align-items: center; background: rgba(0,0,0,0.3); padding: 4px 8px; border-radius: 8px; border: 1px solid #333; flex-shrink: 0; }
-    /* ▼ サブキャラもサイズ統一のため、.sub クラスの設定を削除し 32px に統一 */
     .char-icon { width: 32px; height: 32px; object-fit: contain; }
     
     .score-box { display: flex; flex-direction: column; align-items: flex-end; text-align: right; }
@@ -161,7 +164,7 @@
     .drag-over { border-top: 2px solid #66fcf1; background-color: #1f2833 !important; }
     
     @media (max-width: 600px) {
-      .top-controls { flex-direction: column; align-items: stretch; margin-bottom: 16px; } 
+      .top-controls { flex-direction: column; align-items: stretch; margin-bottom: 16px; gap: 12px; } 
       .search-container { max-width: 100%; } 
       .pagination { gap: 5px; }
       .page-btn { padding: 6px 8px; font-size: 0.8rem; }
@@ -197,16 +200,18 @@
 
   <div id="view-ranking" class="container">
     
+    <!-- ▼ 修正：シード設定ボタンと検索ボックスのレイアウトを分割し、検索を100%全幅にする -->
     <div class="top-controls">
+      <div class="top-controls-top">
+        <button class="admin-btn" onclick="openModal()">⚙️ シード設定</button>
+      </div>
       <div class="search-container">
-        <!-- ▼ 改修：サジェスト機能対応の検索ボックス -->
         <div class="search-wrapper">
           <input type="text" id="searchInput" placeholder="プレイヤー名 または Disc で検索..." oninput="handleSearchInput()" onkeydown="if(event.key==='Enter') searchPlayer()" autocomplete="off">
           <ul id="suggestList" class="suggest-list hidden"></ul>
         </div>
         <button onclick="searchPlayer()">🔍</button>
       </div>
-      <button class="admin-btn" onclick="openModal()">⚙️ シード設定</button>
     </div>
     
     <details class="log-details">
@@ -336,7 +341,6 @@
       });
     }
 
-    // ▼ サジェスト用のスコア計算関数（対数処理済み）
     function getDisplayScore(rawScore) {
        if (allData.length === 0) return "0.00";
        const maxScore = allData[0].score;
@@ -346,7 +350,6 @@
        return ((logScore / logMax) * 100).toFixed(2);
     }
 
-    // ▼ サジェストリストの生成
     function handleSearchInput() {
       const query = document.getElementById('searchInput').value.trim().toLowerCase();
       const suggestList = document.getElementById('suggestList');
@@ -359,7 +362,7 @@
       
       const matchedPlayers = allData.filter(p => 
         p.name.toLowerCase().includes(query) || (p.disc && p.disc.toLowerCase().includes(query))
-      ).slice(0, 15); // 最大15件まで表示
+      ).slice(0, 15);
       
       if (matchedPlayers.length === 0) {
         suggestList.classList.add('hidden');
@@ -371,19 +374,20 @@
       matchedPlayers.forEach(p => {
         const li = document.createElement('li');
         li.className = 'suggest-item';
-        // クリック時に選択処理へ（blurより先に発動させるため onmousedown を使用）
         li.onmousedown = () => selectSuggest(p); 
         
-        // 検索に引っかかった文字を太字にハイライト
         const regex = new RegExp(`(${query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
         const highlightedName = p.name.replace(regex, '<span class="match-text">$1</span>');
         
         let badgeHtml = p.officialRank ? `<span class="suggest-official">📊 ${p.officialRank}</span>` : '';
         const formattedScore = getDisplayScore(p.score);
         
+        // ▼ 修正：名前のはみ出しを防ぎつつ、順位に単位（2ndなど）を追加
         li.innerHTML = `
-          <span class="suggest-rank">${p.rank}/${totalPlayers}</span>
-          <span class="suggest-name">${highlightedName}</span>
+          <span class="suggest-rank">${getOrdinal(p.rank)}/${totalPlayers}</span>
+          <div class="suggest-name-wrapper">
+            <span class="suggest-name">${highlightedName}</span>
+          </div>
           ${badgeHtml}
           <span class="suggest-score">Score ${formattedScore}</span>
         `;
@@ -391,16 +395,30 @@
       });
       
       suggestList.classList.remove('hidden');
+
+      // ▼ 修正：電光掲示板（はみ出した場合のみ自動横スクロール）のアニメーションを適用
+      setTimeout(() => {
+        const wrappers = suggestList.querySelectorAll('.suggest-name-wrapper');
+        wrappers.forEach(wrapper => {
+          const nameSpan = wrapper.querySelector('.suggest-name');
+          // 文字幅がコンテナより大きい場合のみ、アニメーションを発動
+          if (nameSpan.scrollWidth > wrapper.clientWidth) {
+            nameSpan.classList.add('marquee-scroll');
+            const distance = nameSpan.scrollWidth - wrapper.clientWidth;
+            // 移動距離を設定し、距離に応じてアニメーション速度も調整（長いほど時間をかける）
+            nameSpan.style.setProperty('--scroll-dist', `-${distance}px`);
+            nameSpan.style.animationDuration = `${Math.max(3, distance / 15)}s`;
+          }
+        });
+      }, 50);
     }
 
-    // フォーカスが外れたらサジェストを隠す
     document.getElementById('searchInput').addEventListener('blur', () => {
       setTimeout(() => {
         document.getElementById('suggestList').classList.add('hidden');
       }, 150);
     });
 
-    // サジェストから選ばれた時の処理
     function selectSuggest(player) {
       document.getElementById('searchInput').value = player.name;
       document.getElementById('suggestList').classList.add('hidden');
@@ -409,7 +427,7 @@
 
     function searchPlayer() {
       const query = document.getElementById('searchInput').value.trim().toLowerCase();
-      document.getElementById('suggestList').classList.add('hidden'); // 検索実行時にサジェストを隠す
+      document.getElementById('suggestList').classList.add('hidden'); 
       
       if (!query) return;
       const index = allData.findIndex(p => p.name.toLowerCase().includes(query) || (p.disc && p.disc.toLowerCase().includes(query)));
@@ -476,7 +494,6 @@
         }
         if (player.subChar1) {
             const sub1Url = getCharIconUrl(player.subChar1);
-            // ▼ 改修：サブキャラも「.sub」を付けず、全く同じサイズで表示
             charIconsHtml += `<img src="${sub1Url}" class="char-icon" title="${player.subChar1}" alt="${player.subChar1}" onerror="this.style.display='none'">`;
         }
         if (player.subChar2) {
@@ -489,7 +506,6 @@
             charGroupDiv = `<div class="char-icon-group">${charIconsHtml}</div>`;
         }
         
-        // ▼ 改修：実績アイコンを 📊 に変更
         let officialRankHtml = '';
         if (player.officialRank) {
             officialRankHtml = `<div class="official-rank-badge" title="公式ランキング実績">📊 ${player.officialRank}</div>`;
@@ -743,7 +759,6 @@
           playerNameHtml = `<a href="https://www.start.gg/user/${userSlug}" target="_blank" class="player-link" draggable="false">${p.rawTag}</a>`;
         }
 
-        // ▼ 改修：シード側のバッジも 📊 に変更
         let officialRankBadge = p.officialRank ? `<span class="seed-rank-badge" title="公式ランキング">📊 ${p.officialRank}</span>` : "";
 
         let historyText = "-";
