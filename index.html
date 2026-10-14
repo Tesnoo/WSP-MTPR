@@ -27,7 +27,6 @@
     
     .container { max-width: 720px; margin: 0 auto; display: flex; flex-direction: column; }
 
-    /* ▼ 修正：シードボタンと検索ボックスを2段に分け、検索ボックスをアコーディオンと同じ全幅にする */
     .top-controls { display: flex; flex-direction: column; align-items: stretch; margin-bottom: 24px; gap: 12px; }
     .top-controls-top { display: flex; justify-content: flex-end; }
     .search-container { display: flex; gap: 8px; width: 100%; }
@@ -35,14 +34,12 @@
     .search-wrapper input { width: 100%; padding: 10px 12px; background: #0b0c10; border: 1px solid #45a29e; color: #fff; border-radius: 8px; font-size: 0.95rem; box-sizing: border-box; }
     .search-container button { padding: 10px 16px; background: linear-gradient(to right, #45a29e, #66fcf1); border: none; color: #0b0c10; border-radius: 8px; font-weight: bold; cursor: pointer; flex-shrink: 0; }
     
-    /* ▼ サジェストリストのレイアウト改善（名前の幅を死守し、はみ出る場合は改行させる） */
     .suggest-list { position: absolute; top: calc(100% + 4px); left: 0; right: 0; background: #1f2833; border: 1px solid #45a29e; border-radius: 8px; list-style: none; padding: 0; margin: 0; max-height: 350px; overflow-y: auto; z-index: 100; box-shadow: 0 4px 15px rgba(0,0,0,0.8); }
     .suggest-item { padding: 12px 15px; border-bottom: 1px solid #333; cursor: pointer; color: #c5c6c7; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; font-size: 0.95rem; overflow: hidden; }
     .suggest-item:hover { background: linear-gradient(to right, #45a29e, #66fcf1); color: #0b0c10; }
     .suggest-item:last-child { border-bottom: none; }
     .suggest-rank { font-weight: bold; flex-shrink: 0; font-size: 0.9rem; }
     
-    /* ▼ 電光掲示板（自動横スクロール）用設定 */
     .suggest-name-wrapper { flex: 1 1 80px; min-width: 80px; overflow: hidden; white-space: nowrap; position: relative; }
     .suggest-name { display: inline-block; font-weight: bold; color: #ffffff; }
     .suggest-item:hover .suggest-name { color: #05071D; }
@@ -200,7 +197,6 @@
 
   <div id="view-ranking" class="container">
     
-    <!-- ▼ 修正：シード設定ボタンと検索ボックスのレイアウトを分割し、検索を100%全幅にする -->
     <div class="top-controls">
       <div class="top-controls-top">
         <button class="admin-btn" onclick="openModal()">⚙️ シード設定</button>
@@ -214,7 +210,7 @@
       </div>
     </div>
     
-    <details class="log-details">
+    <details class="log-details" open>
       <summary class="log-summary">
         <span>🛠 アップデート情報</span>
       </summary>
@@ -222,9 +218,19 @@
         <ul class="log-list">
           <li>
             <span class="log-date">2026.10.14</span><br>
-            ・プレイヤー検索にサジェスト（候補表示）機能を追加<br>
-            ・Discriminator（ID）での検索に完全対応<br>
-            ・実績バッジとキャラクターアイコンのデザインを刷新
+            ・使用キャラクターをSupermajorからより高精度に取得するよう仕様変更<br>
+            ・シード作成時、新規参加者がスコア順に自動挿入されるように改修<br>
+            ・手動で並び替えたシード順序が別端末やリロード後も引き継がれるように改修<br>
+            ・シード画面に手動並び替えのリセット機能を追加<br>
+            ・検索ボックスを拡張し、インクリメンタルサーチ（サジェスト）機能を搭載<br>
+            ・サジェスト内に名前の自動横スクロール（電光掲示板）機能を実装<br>
+            ・実績バッジとキャラクターアイコンのデザインを調整
+          </li>
+          <li>
+            <span class="log-date">2026.10.11</span><br>
+            ・プレイヤーカードに使用ファイターのアイコン表示を追加<br>
+            ・LumiRank等公式ランキングバッジの表示を追加<br>
+            ・Supermajorへのリンクボタンを追加
           </li>
         </ul>
       </div>
@@ -382,7 +388,6 @@
         let badgeHtml = p.officialRank ? `<span class="suggest-official">📊 ${p.officialRank}</span>` : '';
         const formattedScore = getDisplayScore(p.score);
         
-        // ▼ 修正：名前のはみ出しを防ぎつつ、順位に単位（2ndなど）を追加
         li.innerHTML = `
           <span class="suggest-rank">${getOrdinal(p.rank)}/${totalPlayers}</span>
           <div class="suggest-name-wrapper">
@@ -396,16 +401,13 @@
       
       suggestList.classList.remove('hidden');
 
-      // ▼ 修正：電光掲示板（はみ出した場合のみ自動横スクロール）のアニメーションを適用
       setTimeout(() => {
         const wrappers = suggestList.querySelectorAll('.suggest-name-wrapper');
         wrappers.forEach(wrapper => {
           const nameSpan = wrapper.querySelector('.suggest-name');
-          // 文字幅がコンテナより大きい場合のみ、アニメーションを発動
           if (nameSpan.scrollWidth > wrapper.clientWidth) {
             nameSpan.classList.add('marquee-scroll');
             const distance = nameSpan.scrollWidth - wrapper.clientWidth;
-            // 移動距離を設定し、距離に応じてアニメーション速度も調整（長いほど時間をかける）
             nameSpan.style.setProperty('--scroll-dist', `-${distance}px`);
             nameSpan.style.animationDuration = `${Math.max(3, distance / 15)}s`;
           }
