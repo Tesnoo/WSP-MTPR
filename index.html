@@ -35,9 +35,26 @@
     .container { max-width: 720px; margin: 0 auto; display: flex; flex-direction: column; }
 
     .top-controls { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; gap: 15px; }
-    .search-container { display: flex; gap: 8px; flex: 1; max-width: 400px; }
-    .search-container input { flex: 1; padding: 10px 12px; background: #0b0c10; border: 1px solid #45a29e; color: #fff; border-radius: 8px; font-size: 0.95rem; }
-    .search-container button { padding: 10px 16px; background: linear-gradient(to right, #45a29e, #66fcf1); border: none; color: #0b0c10; border-radius: 8px; font-weight: bold; cursor: pointer; }
+    
+    /* ▼ サジェスト検索用レイアウト */
+    .search-container { display: flex; gap: 8px; flex: 1; max-width: 450px; }
+    .search-wrapper { position: relative; flex: 1; }
+    .search-wrapper input { width: 100%; padding: 10px 12px; background: #0b0c10; border: 1px solid #45a29e; color: #fff; border-radius: 8px; font-size: 0.95rem; box-sizing: border-box; }
+    .search-container button { padding: 10px 16px; background: linear-gradient(to right, #45a29e, #66fcf1); border: none; color: #0b0c10; border-radius: 8px; font-weight: bold; cursor: pointer; flex-shrink: 0; }
+    
+    .suggest-list { position: absolute; top: calc(100% + 4px); left: 0; right: 0; background: #1f2833; border: 1px solid #45a29e; border-radius: 8px; list-style: none; padding: 0; margin: 0; max-height: 350px; overflow-y: auto; z-index: 100; box-shadow: 0 4px 15px rgba(0,0,0,0.8); }
+    .suggest-item { padding: 12px 15px; border-bottom: 1px solid #333; cursor: pointer; color: #c5c6c7; display: flex; align-items: center; gap: 10px; flex-wrap: nowrap; font-size: 0.95rem; }
+    .suggest-item:hover { background: linear-gradient(to right, #45a29e, #66fcf1); color: #0b0c10; }
+    .suggest-item:last-child { border-bottom: none; }
+    .suggest-rank { font-weight: bold; width: 65px; flex-shrink: 0; font-size: 0.9rem; }
+    .suggest-name { flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .match-text { font-weight: 900; color: #66fcf1; text-decoration: underline; }
+    .suggest-item:hover .match-text { color: #05071D; text-decoration: none; }
+    .suggest-official { font-size: 0.7rem; background: linear-gradient(135deg, #f6d365 0%, #fda085 100%); color: #05071D; padding: 2px 6px; border-radius: 8px; font-weight: bold; white-space: nowrap; flex-shrink: 0; }
+    .suggest-item:hover .suggest-official { box-shadow: 0 0 5px rgba(0,0,0,0.3); }
+    .suggest-score { font-weight: bold; color: #8892b0; flex-shrink: 0; font-size: 0.85rem; }
+    .suggest-item:hover .suggest-score { color: #0b0c10; }
+
     .admin-btn { display: inline-flex; align-items: center; gap: 8px; background: linear-gradient(to right, #45a29e, #66fcf1); border: none; color: #0b0c10; padding: 10px 20px; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 1rem; cursor: pointer; white-space: nowrap; }
     
     .log-details { background: #1f2833; border-radius: 12px; border: 1px solid transparent; background-clip: padding-box; background: linear-gradient(#1f2833, #1f2833) padding-box, linear-gradient(to right, #45a29e, #66fcf1) border-box; box-sizing: border-box; margin-bottom: 24px; }
@@ -66,8 +83,8 @@
     .name-text { color: #ffffff; font-size: clamp(1.2rem, 5vw, 2rem); font-weight: bold; margin: 0; white-space: nowrap; }
     
     .char-icon-group { display: flex; gap: 4px; align-items: center; background: rgba(0,0,0,0.3); padding: 4px 8px; border-radius: 8px; border: 1px solid #333; flex-shrink: 0; }
+    /* ▼ サブキャラもサイズ統一のため、.sub クラスの設定を削除し 32px に統一 */
     .char-icon { width: 32px; height: 32px; object-fit: contain; }
-    .char-icon.sub { width: 24px; height: 24px; opacity: 0.8; }
     
     .score-box { display: flex; flex-direction: column; align-items: flex-end; text-align: right; }
     .score-label { font-size: 0.85rem; color: #8892b0; margin-bottom: -4px; letter-spacing: 0.5px; }
@@ -131,7 +148,6 @@
     .station-assign-btn { padding: 10px 20px; background: linear-gradient(to right, #45a29e, #66fcf1); color: #0b0c10; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; transition: opacity 0.2s; white-space: nowrap; }
     .station-assign-btn:disabled { background: #222; color: #555; cursor: not-allowed; opacity: 0.5; }
     
-    /* ▼ 新設：手動並び替えリセットボタン */
     .reset-order-btn { background: #1f2833; border: 1px solid #45a29e; color: #66fcf1; padding: 6px 12px; border-radius: 6px; font-size: 0.85rem; font-weight: bold; cursor: pointer; transition: all 0.2s; }
     .reset-order-btn:hover { background: #45a29e; color: #0b0c10; }
 
@@ -153,6 +169,9 @@
       .player-card { padding: 16px; margin-bottom: 16px; }
       .score-text { font-size: 1.6rem; }
       .rank-text { font-size: 1.3rem; margin-bottom: 2px; }
+      
+      .suggest-item { flex-wrap: wrap; gap: 6px; }
+      .suggest-official { font-size: 0.65rem; }
       
       .history-grid { display: flex; flex-wrap: nowrap; overflow-x: auto; gap: 12px; padding-bottom: 10px; -webkit-overflow-scrolling: touch; }
       .history-grid::-webkit-scrollbar { height: 4px; }
@@ -180,7 +199,11 @@
     
     <div class="top-controls">
       <div class="search-container">
-        <input type="text" id="searchInput" placeholder="プレイヤー名で検索..." onkeypress="if(event.key==='Enter') searchPlayer()">
+        <!-- ▼ 改修：サジェスト機能対応の検索ボックス -->
+        <div class="search-wrapper">
+          <input type="text" id="searchInput" placeholder="プレイヤー名 または Disc で検索..." oninput="handleSearchInput()" onkeydown="if(event.key==='Enter') searchPlayer()" autocomplete="off">
+          <ul id="suggestList" class="suggest-list hidden"></ul>
+        </div>
         <button onclick="searchPlayer()">🔍</button>
       </div>
       <button class="admin-btn" onclick="openModal()">⚙️ シード設定</button>
@@ -193,10 +216,10 @@
       <div class="log-content">
         <ul class="log-list">
           <li>
-            <span class="log-date">2026.10.11</span><br>
-            ・プレイヤーカードに使用ファイターのアイコン表示を追加<br>
-            ・LumiRank等公式ランキングバッジの表示を追加<br>
-            ・Supermajorへのリンクボタンを追加
+            <span class="log-date">2026.10.14</span><br>
+            ・プレイヤー検索にサジェスト（候補表示）機能を追加<br>
+            ・Discriminator（ID）での検索に完全対応<br>
+            ・実績バッジとキャラクターアイコンのデザインを刷新
           </li>
         </ul>
       </div>
@@ -237,7 +260,6 @@
         </div>
       </div>
       
-      <!-- ▼ 新設：手動並び替えのリセット機能 -->
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; flex-wrap:wrap; gap:8px;">
         <button class="reset-order-btn" onclick="resetSeedOrderToScore()">🔄 手動並び替えをリセット（純粋なスコア順に戻す）</button>
         <span style="color:#8892b0; font-size:0.9rem;">※行をドラッグ＆ドロップで手動並び替えできます</span>
@@ -314,8 +336,81 @@
       });
     }
 
+    // ▼ サジェスト用のスコア計算関数（対数処理済み）
+    function getDisplayScore(rawScore) {
+       if (allData.length === 0) return "0.00";
+       const maxScore = allData[0].score;
+       if (rawScore <= 0) return "0.00";
+       const logScore = Math.log10(rawScore + 1);
+       const logMax = Math.log10(maxScore + 1);
+       return ((logScore / logMax) * 100).toFixed(2);
+    }
+
+    // ▼ サジェストリストの生成
+    function handleSearchInput() {
+      const query = document.getElementById('searchInput').value.trim().toLowerCase();
+      const suggestList = document.getElementById('suggestList');
+      suggestList.innerHTML = '';
+      
+      if (!query) {
+        suggestList.classList.add('hidden');
+        return;
+      }
+      
+      const matchedPlayers = allData.filter(p => 
+        p.name.toLowerCase().includes(query) || (p.disc && p.disc.toLowerCase().includes(query))
+      ).slice(0, 15); // 最大15件まで表示
+      
+      if (matchedPlayers.length === 0) {
+        suggestList.classList.add('hidden');
+        return;
+      }
+      
+      const totalPlayers = allData.length;
+      
+      matchedPlayers.forEach(p => {
+        const li = document.createElement('li');
+        li.className = 'suggest-item';
+        // クリック時に選択処理へ（blurより先に発動させるため onmousedown を使用）
+        li.onmousedown = () => selectSuggest(p); 
+        
+        // 検索に引っかかった文字を太字にハイライト
+        const regex = new RegExp(`(${query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
+        const highlightedName = p.name.replace(regex, '<span class="match-text">$1</span>');
+        
+        let badgeHtml = p.officialRank ? `<span class="suggest-official">📊 ${p.officialRank}</span>` : '';
+        const formattedScore = getDisplayScore(p.score);
+        
+        li.innerHTML = `
+          <span class="suggest-rank">${p.rank}/${totalPlayers}</span>
+          <span class="suggest-name">${highlightedName}</span>
+          ${badgeHtml}
+          <span class="suggest-score">Score ${formattedScore}</span>
+        `;
+        suggestList.appendChild(li);
+      });
+      
+      suggestList.classList.remove('hidden');
+    }
+
+    // フォーカスが外れたらサジェストを隠す
+    document.getElementById('searchInput').addEventListener('blur', () => {
+      setTimeout(() => {
+        document.getElementById('suggestList').classList.add('hidden');
+      }, 150);
+    });
+
+    // サジェストから選ばれた時の処理
+    function selectSuggest(player) {
+      document.getElementById('searchInput').value = player.name;
+      document.getElementById('suggestList').classList.add('hidden');
+      searchPlayer();
+    }
+
     function searchPlayer() {
       const query = document.getElementById('searchInput').value.trim().toLowerCase();
+      document.getElementById('suggestList').classList.add('hidden'); // 検索実行時にサジェストを隠す
+      
       if (!query) return;
       const index = allData.findIndex(p => p.name.toLowerCase().includes(query) || (p.disc && p.disc.toLowerCase().includes(query)));
       if (index !== -1) {
@@ -381,11 +476,12 @@
         }
         if (player.subChar1) {
             const sub1Url = getCharIconUrl(player.subChar1);
-            charIconsHtml += `<img src="${sub1Url}" class="char-icon sub" title="${player.subChar1}" alt="${player.subChar1}" onerror="this.style.display='none'">`;
+            // ▼ 改修：サブキャラも「.sub」を付けず、全く同じサイズで表示
+            charIconsHtml += `<img src="${sub1Url}" class="char-icon" title="${player.subChar1}" alt="${player.subChar1}" onerror="this.style.display='none'">`;
         }
         if (player.subChar2) {
             const sub2Url = getCharIconUrl(player.subChar2);
-            charIconsHtml += `<img src="${sub2Url}" class="char-icon sub" title="${player.subChar2}" alt="${player.subChar2}" onerror="this.style.display='none'">`;
+            charIconsHtml += `<img src="${sub2Url}" class="char-icon" title="${player.subChar2}" alt="${player.subChar2}" onerror="this.style.display='none'">`;
         }
         
         let charGroupDiv = '';
@@ -393,9 +489,10 @@
             charGroupDiv = `<div class="char-icon-group">${charIconsHtml}</div>`;
         }
         
+        // ▼ 改修：実績アイコンを 📊 に変更
         let officialRankHtml = '';
         if (player.officialRank) {
-            officialRankHtml = `<div class="official-rank-badge" title="公式ランキング実績">🌍 ${player.officialRank}</div>`;
+            officialRankHtml = `<div class="official-rank-badge" title="公式ランキング実績">📊 ${player.officialRank}</div>`;
         }
 
         let displayScore = 0;
@@ -475,7 +572,6 @@
     let gId = null, gList = null;
     let dragSrcEl = null;
 
-    // ▼ 新設：純粋なスコアでの比較ロジック
     function compareSeedPlayers(a, b) {
       const aIsChamp = (a.lastPlacement === 1);
       const bIsChamp = (b.lastPlacement === 1);
@@ -518,7 +614,6 @@
       document.querySelectorAll('#seedListBody tr').forEach(row => { row.classList.remove('drag-over'); });
     }
 
-    // ▼ 新設：ローカルとGASサーバーの両方に現在の並び順を保存
     function saveSeedOrder() {
       if (!gId || !gList) return;
       const order = gList.map(p => String(p.entrantId));
@@ -531,22 +626,19 @@
       }).catch(() => {});
     }
 
-    // ▼ 新設：手動並び替えをリセットし、全員を純粋なスコア順に戻す機能
     function resetSeedOrderToScore() {
       if (!gId || !gList) return;
       if (!confirm("手動で並び替えた順序をリセットし、純粋なスコア順に戻しますか？")) return;
       localStorage.removeItem(SEED_STORAGE_PREFIX + gId);
-      localStorage.removeItem("wsp_seed_order_" + gId); // 古いキャッシュも削除
+      localStorage.removeItem("wsp_seed_order_" + gId);
       gList.sort(compareSeedPlayers);
       saveSeedOrder();
       renderSeedList();
     }
 
-    // ▼ 修正：既存メンバーの手動順序を維持しつつ、新規メンバーをスコア順の適切な位置へ自動挿入
     function applySavedSeedOrder(serverSavedOrder) {
       if (!gId || !gList) return;
 
-      // 旧バージョンのキャッシュキーは即座に削除
       localStorage.removeItem("wsp_seed_order_" + gId);
 
       let order = null;
@@ -561,7 +653,6 @@
         }
       }
 
-      // まず全員を純粋なスコア順にソートした基準リストを作成
       const defaultSorted = [...gList].sort(compareSeedPlayers);
 
       if (!order || order.length === 0) {
@@ -652,7 +743,8 @@
           playerNameHtml = `<a href="https://www.start.gg/user/${userSlug}" target="_blank" class="player-link" draggable="false">${p.rawTag}</a>`;
         }
 
-        let officialRankBadge = p.officialRank ? `<span class="seed-rank-badge" title="公式ランキング">🌍 ${p.officialRank}</span>` : "";
+        // ▼ 改修：シード側のバッジも 📊 に変更
+        let officialRankBadge = p.officialRank ? `<span class="seed-rank-badge" title="公式ランキング">📊 ${p.officialRank}</span>` : "";
 
         let historyText = "-";
         if (p.disc && p.disc !== "なし") {
