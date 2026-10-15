@@ -8,143 +8,103 @@
   
   <style>
     :root {
-      --bg-color: #05071D;
-      --panel-bg: #1f2833;
-      --text-main: #c5c6c7;
-      --text-highlight: #ffffff;
-      --accent-cyan: #66fcf1;
-      --accent-teal: #45a29e;
+      --bg-color: #05071D; --panel-bg: #1f2833; --text-main: #c5c6c7;
+      --text-highlight: #ffffff; --accent-cyan: #66fcf1; --accent-teal: #45a29e;
       --border-color: #333;
     }
 
-    body {
-      background-color: var(--bg-color);
-      color: var(--text-main);
-      font-family: 'Helvetica Neue', Arial, sans-serif;
-      margin: 0;
-      padding: 0;
-      height: 100vh;
-      display: flex;
-      flex-direction: column;
-    }
-
+    body { background-color: var(--bg-color); color: var(--text-main); font-family: 'Helvetica Neue', Arial, sans-serif; margin: 0; padding: 0; height: 100vh; display: flex; flex-direction: column; }
     .hidden { display: none !important; }
 
-    /* =========================================
-       ログイン画面
-       ========================================= */
-    #login-screen {
-      flex: 1;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
-    }
-
-    .login-box {
-      background: linear-gradient(var(--panel-bg), var(--panel-bg)) padding-box, linear-gradient(to right, var(--accent-teal), var(--accent-cyan)) border-box;
-      border: 1px solid transparent;
-      border-radius: 12px;
-      padding: 40px 30px;
-      width: 100%;
-      max-width: 350px;
-      text-align: center;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.8);
-    }
-
+    #login-screen { flex: 1; display: flex; align-items: center; justify-content: center; padding: 20px; }
+    .login-box { background: linear-gradient(var(--panel-bg), var(--panel-bg)) padding-box, linear-gradient(to right, var(--accent-teal), var(--accent-cyan)) border-box; border: 1px solid transparent; border-radius: 12px; padding: 40px 30px; width: 100%; max-width: 350px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.8); }
     .login-title { color: var(--accent-cyan); margin: 0 0 20px 0; font-size: 1.5rem; letter-spacing: 2px; }
-    
     .input-group { margin-bottom: 20px; text-align: left; }
     .input-group label { display: block; font-size: 0.85rem; color: var(--accent-teal); margin-bottom: 8px; font-weight: bold; }
     .input-group input { width: 100%; padding: 12px; background: #0b0c10; border: 1px solid var(--accent-teal); color: #fff; border-radius: 8px; font-size: 1rem; box-sizing: border-box; transition: box-shadow 0.3s; }
     .input-group input:focus { outline: none; box-shadow: 0 0 10px rgba(102, 252, 241, 0.3); }
-
     .login-btn { width: 100%; padding: 14px; background: linear-gradient(to right, var(--accent-teal), var(--accent-cyan)); color: #0b0c10; border: none; border-radius: 8px; font-weight: bold; font-size: 1.1rem; cursor: pointer; transition: transform 0.2s, filter 0.2s; }
     .login-btn:hover { transform: translateY(-2px); filter: brightness(1.1); }
-    .login-btn:active { transform: translateY(0); }
 
-    /* =========================================
-       ダッシュボード画面
-       ========================================= */
-    #dashboard-screen {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-    }
-
-    .header {
-      background: var(--panel-bg);
-      border-bottom: 1px solid var(--accent-teal);
-      padding: 15px 20px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .header-title { color: var(--accent-cyan); font-weight: bold; font-size: 1.2rem; margin: 0; display: flex; align-items: center; gap: 10px; }
+    #dashboard-screen { flex: 1; display: flex; flex-direction: column; }
+    .header { background: var(--panel-bg); border-bottom: 1px solid var(--accent-teal); padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; }
+    .header-title { color: var(--accent-cyan); font-weight: bold; font-size: 1.2rem; margin: 0; cursor: pointer; }
     .header-user { display: flex; align-items: center; gap: 15px; }
     .user-badge { background: rgba(102, 252, 241, 0.1); border: 1px solid var(--accent-teal); color: var(--accent-cyan); padding: 4px 12px; border-radius: 20px; font-size: 0.85rem; font-weight: bold; }
-    
     .logout-btn { background: transparent; border: 1px solid #8892b0; color: #8892b0; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 0.85rem; font-weight: bold; transition: all 0.2s; }
     .logout-btn:hover { background: #8892b0; color: #0b0c10; }
 
-    .main-content { padding: 30px 20px; max-width: 900px; margin: 0 auto; width: 100%; box-sizing: border-box; }
-
+    .main-content { padding: 30px 20px; max-width: 1000px; margin: 0 auto; width: 100%; box-sizing: border-box; }
     .welcome-text { color: var(--text-highlight); font-size: 1.5rem; margin-bottom: 30px; }
 
     .menu-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
-
-    .menu-card {
-      background: linear-gradient(var(--panel-bg), var(--panel-bg)) padding-box, linear-gradient(to right, var(--accent-teal), var(--accent-cyan)) border-box;
-      border: 1px solid transparent;
-      border-radius: 12px;
-      padding: 24px;
-      cursor: pointer;
-      transition: transform 0.3s, box-shadow 0.3s;
-      position: relative;
-      overflow: hidden;
-    }
+    .menu-card { background: linear-gradient(var(--panel-bg), var(--panel-bg)) padding-box, linear-gradient(to right, var(--accent-teal), var(--accent-cyan)) border-box; border: 1px solid transparent; border-radius: 12px; padding: 24px; cursor: pointer; transition: transform 0.3s, box-shadow 0.3s; position: relative; overflow: hidden; }
     .menu-card:hover { transform: translateY(-5px); box-shadow: 0 8px 20px rgba(0,0,0,0.6); }
-    
     .menu-icon { font-size: 2.5rem; margin-bottom: 15px; display: block; }
     .menu-title { color: var(--accent-cyan); font-size: 1.2rem; font-weight: bold; margin: 0 0 8px 0; }
     .menu-desc { color: var(--text-main); font-size: 0.9rem; margin: 0; line-height: 1.5; }
-    
-    .badge-wip { position: absolute; top: 12px; right: 12px; background: #e67e22; color: #fff; font-size: 0.7rem; font-weight: bold; padding: 2px 8px; border-radius: 4px; }
 
+    /* =========================================
+       プレイヤー管理画面
+       ========================================= */
+    #players-screen { max-width: 800px; margin: 0 auto; width: 100%; }
+    .search-box { width: 100%; padding: 12px; background: #0b0c10; border: 1px solid var(--accent-teal); color: #fff; border-radius: 8px; font-size: 1rem; margin-bottom: 20px; box-sizing: border-box; }
+    .player-list { display: flex; flex-direction: column; gap: 10px; max-height: 50vh; overflow-y: auto; padding-right: 10px; }
+    .player-item { background: var(--panel-bg); border: 1px solid var(--border-color); padding: 15px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; }
+    .player-info { display: flex; flex-direction: column; gap: 4px; }
+    .player-name { font-weight: bold; color: var(--text-highlight); font-size: 1.1rem; }
+    .player-chars { font-size: 0.85rem; color: var(--accent-teal); }
+    .edit-btn { background: var(--accent-cyan); color: #0b0c10; border: none; padding: 8px 16px; border-radius: 6px; font-weight: bold; cursor: pointer; }
+
+    .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(5,7,29,0.8); display: flex; align-items: center; justify-content: center; z-index: 1000; }
+    .modal-content { background: var(--panel-bg); padding: 25px; border-radius: 12px; border: 1px solid var(--accent-teal); width: 90%; max-width: 400px; }
+    .modal-content h3 { color: var(--accent-cyan); margin-top: 0; }
+    .modal-content input { width: 100%; padding: 10px; margin-bottom: 15px; background: #0b0c10; border: 1px solid #333; color: #fff; border-radius: 6px; box-sizing: border-box; }
+    .modal-buttons { display: flex; gap: 10px; justify-content: flex-end; }
+    .modal-buttons button { padding: 10px 15px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; }
+    .btn-save { background: var(--accent-cyan); color: #0b0c10; }
+    .btn-cancel { background: #333; color: #fff; }
+
+    /* =========================================
+       改修メモ画面
+       ========================================= */
+    #memo-screen { max-width: 800px; margin: 0 auto; width: 100%; }
+    .memo-list { display: flex; flex-direction: column; gap: 10px; }
+    .memo-item { background: var(--panel-bg); border: 1px solid var(--border-color); padding: 12px 15px; border-radius: 8px; display: flex; align-items: flex-start; gap: 12px; }
+    .memo-item.done { opacity: 0.6; }
+    .memo-item.done .memo-text { text-decoration: line-through; color: #8892b0; }
+    .memo-checkbox { margin-top: 4px; cursor: pointer; transform: scale(1.2); }
+    .memo-text { flex: 1; color: var(--text-highlight); line-height: 1.5; outline: none; }
+    .memo-text[contenteditable="true"]:focus { border-bottom: 1px dashed var(--accent-cyan); }
+    .memo-actions { display: flex; gap: 10px; margin-top: 20px; }
+    .btn-add { background: var(--accent-teal); color: #0b0c10; border: none; padding: 10px 20px; border-radius: 6px; font-weight: bold; cursor: pointer; }
+    .btn-save-memo { background: var(--accent-cyan); color: #0b0c10; border: none; padding: 10px 20px; border-radius: 6px; font-weight: bold; cursor: pointer; margin-left: auto; }
+
+    .loader { text-align: center; color: var(--accent-cyan); padding: 50px; font-size: 1.2rem; }
   </style>
 </head>
 <body>
 
-  <!-- =====================================
-       ログイン画面
-       ===================================== -->
+  <!-- ログイン画面 -->
   <div id="login-screen">
     <div class="login-box">
       <h2 class="login-title">ADMIN LOGIN</h2>
-      
       <div class="input-group">
-        <label for="adminId">Operator ID</label>
-        <input type="text" id="adminId" placeholder="IDを入力" autocomplete="off" onkeypress="if(event.key==='Enter') document.getElementById('adminPass').focus()">
+        <label>Operator ID</label>
+        <input type="text" id="adminId" autocomplete="off" onkeypress="if(event.key==='Enter') document.getElementById('adminPass').focus()">
       </div>
-      
       <div class="input-group">
-        <label for="adminPass">Password</label>
-        <input type="password" id="adminPass" placeholder="パスワードを入力" onkeypress="if(event.key==='Enter') attemptLogin()">
+        <label>Password</label>
+        <input type="password" id="adminPass" onkeypress="if(event.key==='Enter') attemptLogin()">
       </div>
-      
       <button class="login-btn" onclick="attemptLogin()">LOGIN</button>
     </div>
   </div>
 
-
-  <!-- =====================================
-       ダッシュボード画面 (ログイン後)
-       ===================================== -->
+  <!-- ダッシュボード画面 -->
   <div id="dashboard-screen" class="hidden">
-    
     <header class="header">
-      <h1 class="header-title">⚙️ MTPR Admin Console</h1>
+      <h1 class="header-title" onclick="showView('menu')">⚙️ Admin Console</h1>
       <div class="header-user">
         <span class="user-badge" id="displayUserName">Operator</span>
         <button class="logout-btn" onclick="logout()">Logout</button>
@@ -152,103 +112,253 @@
     </header>
 
     <main class="main-content">
-      <h2 class="welcome-text"><span id="welcomeUserName"></span>さん、お疲れ様です。</h2>
       
-      <!-- 今後実装する機能のメニュー枠（モックアップ） -->
-      <div class="menu-grid">
-        
-        <div class="menu-card" onclick="alert('次回実装予定：ここに現在のシード作成ツールを丸ごとお引越しします。')">
-          <span class="badge-wip">準備中</span>
-          <span class="menu-icon">🎯</span>
-          <h3 class="menu-title">シード作成＆ステーション割振</h3>
-          <p class="menu-desc">start.ggの参加者データからMTPRスコア順のシードを生成し、大会ページへ直接反映します。</p>
+      <!-- メニュー一覧 -->
+      <div id="view-menu">
+        <h2 class="welcome-text"><span id="welcomeUserName"></span>さん、お疲れ様です。</h2>
+        <div class="menu-grid">
+          <div class="menu-card" onclick="openPlayersView()">
+            <span class="menu-icon">👥</span>
+            <h3 class="menu-title">プレイヤー＆キャラ管理</h3>
+            <p class="menu-desc">誤って取得されたキャラクターを手動で上書きし、自動更新されないように保護します。</p>
+          </div>
+          <div class="menu-card" onclick="openMemoView()">
+            <span class="menu-icon">📝</span>
+            <h3 class="menu-title">改修メモ (TODO)</h3>
+            <p class="menu-desc">今後のアップデート予定やアイデアのメモを管理します。</p>
+          </div>
         </div>
-
-        <div class="menu-card" onclick="alert('次回実装予定：GASを開かずに、ここからボタン1つで大会結果やキャラ情報を自動更新できるようにします。')">
-          <span class="badge-wip">準備中</span>
-          <span class="menu-icon">🔄</span>
-          <h3 class="menu-title">システム手動更新・パトロール</h3>
-          <p class="menu-desc">大会終了後の順位データ集計や、キャラクター変更監視システムを強制的に即時実行します。</p>
-        </div>
-
-        <div class="menu-card" onclick="alert('次回実装予定：プレイヤーのID紐付けミス修正や、例外的な処理を行うための管理画面です。')">
-          <span class="badge-wip">準備中</span>
-          <span class="menu-icon">👥</span>
-          <h3 class="menu-title">プレイヤーデータ管理</h3>
-          <p class="menu-desc">特定のプレイヤーの登録情報修正や、MTPRランキングの集計データの直接確認を行います。</p>
-        </div>
-
       </div>
+
+      <!-- プレイヤー管理 -->
+      <div id="view-players" class="hidden">
+        <button class="logout-btn" style="margin-bottom: 20px;" onclick="showView('menu')">↩️ メニューに戻る</button>
+        <h2 style="color:var(--accent-cyan); margin-top:0;">👥 プレイヤー＆キャラ管理</h2>
+        <input type="text" id="playerSearch" class="search-box" placeholder="プレイヤー名で検索..." oninput="renderPlayerList()">
+        <div id="playerListContainer" class="player-list"></div>
+      </div>
+
+      <!-- 改修メモ -->
+      <div id="view-memo" class="hidden">
+        <button class="logout-btn" style="margin-bottom: 20px;" onclick="showView('menu')">↩️ メニューに戻る</button>
+        <h2 style="color:var(--accent-cyan); margin-top:0;">📝 改修メモ (TODO)</h2>
+        <div id="memoListContainer" class="memo-list"></div>
+        <div class="memo-actions">
+          <button class="btn-add" onclick="addMemoRow()">＋ メモを追加</button>
+          <button class="btn-save-memo" onclick="saveMemoData()">💾 変更を保存</button>
+        </div>
+      </div>
+
+      <div id="global-loader" class="loader hidden">データを読み込み中...</div>
+
     </main>
-    
+  </div>
+
+  <!-- キャラ編集モーダル -->
+  <div id="editModal" class="modal-overlay hidden">
+    <div class="modal-content">
+      <h3 id="editPlayerName">Player Name</h3>
+      <p style="font-size:0.8rem; color:#8892b0; margin-bottom:15px;">※英語名で入力してください。空欄にすると削除されます。ここで保存したキャラは自動取得で上書きされません。</p>
+      <input type="hidden" id="editDisc">
+      <label style="color:var(--accent-teal); font-size:0.85rem;">Main Character</label>
+      <input type="text" id="editMain">
+      <label style="color:var(--accent-teal); font-size:0.85rem;">Sub 1</label>
+      <input type="text" id="editSub1">
+      <label style="color:var(--accent-teal); font-size:0.85rem;">Sub 2</label>
+      <input type="text" id="editSub2">
+      <div class="modal-buttons">
+        <button class="btn-cancel" onclick="closeEditModal()">キャンセル</button>
+        <button class="btn-save" onclick="savePlayerCharacter()">保存</button>
+      </div>
+    </div>
   </div>
 
   <script>
-    // =====================================
-    // 認証情報設定（将来スタッフが増えたらここに追加）
-    // =====================================
-    const adminAccounts = {
-      "Tesnoo": "Tesnoo1849"
-    };
+    const GAS_URL = "https://script.google.com/macros/s/AKfycby7LcmYBeJ4RwtlUrjLkTcU_NyDCZg1jm9R3HVXdNMJsSE2p6Bh08tn7uIlWygTqFeleQ/exec";
+    const adminAccounts = { "Tesnoo": "Tesnoo1849" };
 
-    // =====================================
-    // ページ読み込み時の処理
-    // =====================================
+    let adminData = { players: [], memos: [] };
+
     window.onload = () => {
-      // ログイン状態（セッション）をチェック
       const loggedInUser = sessionStorage.getItem("mtpr_admin_user");
-      if (loggedInUser && adminAccounts[loggedInUser]) {
-        showDashboard(loggedInUser);
-      } else {
-        document.getElementById("adminId").focus();
-      }
+      if (loggedInUser && adminAccounts[loggedInUser]) showDashboard(loggedInUser);
+      else document.getElementById("adminId").focus();
     };
 
-    // =====================================
-    // ログイン処理
-    // =====================================
     function attemptLogin() {
-      const idInput = document.getElementById("adminId").value.trim();
-      const passInput = document.getElementById("adminPass").value;
-
-      if (adminAccounts[idInput] && adminAccounts[idInput] === passInput) {
-        // 認証成功：セッションに記憶
-        sessionStorage.setItem("mtpr_admin_user", idInput);
-        
-        // フォームを空にする
+      const id = document.getElementById("adminId").value.trim();
+      const pass = document.getElementById("adminPass").value;
+      if (adminAccounts[id] && adminAccounts[id] === pass) {
+        sessionStorage.setItem("mtpr_admin_user", id);
         document.getElementById("adminId").value = "";
         document.getElementById("adminPass").value = "";
-        
-        showDashboard(idInput);
+        showDashboard(id);
       } else {
-        // 認証失敗
         alert("❌ IDまたはパスワードが間違っています。");
         document.getElementById("adminPass").value = "";
         document.getElementById("adminPass").focus();
       }
     }
 
-    // =====================================
-    // ログアウト処理
-    // =====================================
     function logout() {
       if (confirm("ログアウトしますか？")) {
         sessionStorage.removeItem("mtpr_admin_user");
         document.getElementById("dashboard-screen").classList.add("hidden");
         document.getElementById("login-screen").classList.remove("hidden");
-        document.getElementById("adminId").focus();
       }
     }
 
-    // =====================================
-    // 画面切り替え処理
-    // =====================================
     function showDashboard(userName) {
       document.getElementById("login-screen").classList.add("hidden");
       document.getElementById("dashboard-screen").classList.remove("hidden");
-      
       document.getElementById("displayUserName").innerText = "👤 " + userName;
       document.getElementById("welcomeUserName").innerText = userName;
+      showView('menu');
+      fetchAdminData(); // バックグラウンドでデータを取得開始
+    }
+
+    function showView(viewId) {
+      document.getElementById('view-menu').classList.add('hidden');
+      document.getElementById('view-players').classList.add('hidden');
+      document.getElementById('view-memo').classList.add('hidden');
+      document.getElementById('view-' + viewId).classList.remove('hidden');
+    }
+
+    // =====================================
+    // データ通信
+    // =====================================
+    function fetchAdminData() {
+      fetch(GAS_URL + "?action=getAdminData")
+        .then(res => res.json())
+        .then(data => { adminData = data; })
+        .catch(err => console.error("データ取得エラー", err));
+    }
+
+    // =====================================
+    // プレイヤー管理
+    // =====================================
+    function openPlayersView() {
+      if (adminData.players.length === 0) {
+        alert("データを読み込み中です。数秒後にもう一度開いてください。");
+        return;
+      }
+      showView('players');
+      renderPlayerList();
+    }
+
+    function renderPlayerList() {
+      const query = document.getElementById("playerSearch").value.toLowerCase();
+      const container = document.getElementById("playerListContainer");
+      container.innerHTML = "";
+
+      const filtered = adminData.players.filter(p => p.name.toLowerCase().includes(query) || p.disc.toLowerCase().includes(query));
+      
+      filtered.slice(0, 50).forEach(p => {
+        let chars = [p.main.replace("★", ""), p.sub1, p.sub2].filter(c => c && c !== "NoData").join(", ");
+        if (!chars) chars = "未登録 / 取得待ち";
+        const isProtected = p.main.startsWith("★") ? "🛡️保護済 " : "";
+
+        const div = document.createElement("div");
+        div.className = "player-item";
+        div.innerHTML = `
+          <div class="player-info">
+            <span class="player-name">${p.name}</span>
+            <span class="player-chars">${isProtected}${chars}</span>
+          </div>
+          <button class="edit-btn" onclick="openEditModal('${p.disc}')">編集</button>
+        `;
+        container.appendChild(div);
+      });
+    }
+
+    function openEditModal(disc) {
+      const p = adminData.players.find(x => x.disc === disc);
+      if (!p) return;
+      document.getElementById('editPlayerName').innerText = p.name;
+      document.getElementById('editDisc').value = p.disc;
+      document.getElementById('editMain').value = p.main.replace("★", "");
+      document.getElementById('editSub1').value = p.sub1;
+      document.getElementById('editSub2').value = p.sub2;
+      document.getElementById('editModal').classList.remove('hidden');
+    }
+    
+    function closeEditModal() { document.getElementById('editModal').classList.add('hidden'); }
+
+    function savePlayerCharacter() {
+      const disc = document.getElementById('editDisc').value;
+      const main = document.getElementById('editMain').value.trim();
+      const sub1 = document.getElementById('editSub1').value.trim();
+      const sub2 = document.getElementById('editSub2').value.trim();
+      
+      document.getElementById('editModal').classList.add('hidden');
+      alert("保存中...");
+
+      fetch(GAS_URL, {
+        method: "POST",
+        headers: { "Content-Type": "text/plain" },
+        body: JSON.stringify({ action: "updateCharacter", disc, main, sub1, sub2 })
+      }).then(res => res.json()).then(res => {
+        if(res.success) {
+          alert("✅ キャラクターを上書き・保護しました！");
+          const p = adminData.players.find(x => x.disc === disc);
+          if (p) { p.main = main ? "★" + main : ""; p.sub1 = sub1; p.sub2 = sub2; }
+          renderPlayerList();
+        }
+      }).catch(err => alert("通信エラー"));
+    }
+
+    // =====================================
+    // 改修メモ
+    // =====================================
+    function openMemoView() {
+      if (adminData.memos.length === 0 && adminData.players.length === 0) {
+        alert("データを読み込み中です。"); return;
+      }
+      showView('memo');
+      renderMemoList();
+    }
+
+    function renderMemoList() {
+      const container = document.getElementById("memoListContainer");
+      container.innerHTML = "";
+      adminData.memos.forEach((m, idx) => {
+        const div = document.createElement("div");
+        div.className = "memo-item " + (m.done ? "done" : "");
+        div.innerHTML = `
+          <input type="checkbox" class="memo-checkbox" ${m.done ? "checked" : ""} onchange="toggleMemo(${idx})">
+          <div class="memo-text" contenteditable="true" onblur="updateMemoText(${idx}, this.innerText)">${m.text}</div>
+        `;
+        container.appendChild(div);
+      });
+    }
+
+    function toggleMemo(idx) {
+      adminData.memos[idx].done = !adminData.memos[idx].done;
+      renderMemoList();
+    }
+
+    function updateMemoText(idx, text) {
+      adminData.memos[idx].text = text;
+    }
+
+    function addMemoRow() {
+      adminData.memos.push({ done: false, text: "新しいタスク" });
+      renderMemoList();
+    }
+
+    function saveMemoData() {
+      document.querySelector('.btn-save-memo').innerText = "保存中...";
+      fetch(GAS_URL, {
+        method: "POST",
+        headers: { "Content-Type": "text/plain" },
+        body: JSON.stringify({ action: "saveMemo", memoList: adminData.memos })
+      }).then(res => res.json()).then(res => {
+        document.querySelector('.btn-save-memo').innerText = "💾 変更を保存";
+        if(res.success) alert("✅ メモを保存しました！");
+      }).catch(err => {
+        document.querySelector('.btn-save-memo').innerText = "💾 変更を保存";
+        alert("通信エラー");
+      });
     }
   </script>
 </body>
