@@ -58,18 +58,6 @@
 
     .admin-btn { display: inline-flex; align-items: center; gap: 8px; background: linear-gradient(to right, #45a29e, #66fcf1); border: none; color: #0b0c10; padding: 10px 20px; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 1rem; cursor: pointer; white-space: nowrap; }
     
-    .log-details { background: #1f2833; border-radius: 12px; border: 1px solid transparent; background-clip: padding-box; background: linear-gradient(#1f2833, #1f2833) padding-box, linear-gradient(to right, #45a29e, #66fcf1) border-box; box-sizing: border-box; margin-bottom: 24px; }
-    .log-summary { cursor: pointer; padding: 15px 20px; font-weight: bold; color: #66fcf1; display: flex; align-items: center; justify-content: space-between; font-size: 1rem; list-style: none; outline: none; }
-    .log-summary::-webkit-details-marker { display: none; }
-    .log-summary::after { content: "▼"; font-size: 0.8rem; transition: transform 0.3s; color: #66fcf1; }
-    details[open] .log-summary::after { transform: rotate(180deg); }
-    .log-content { padding: 0 20px 20px 20px; border-top: 1px solid #333; margin-top: 0; padding-top: 15px; }
-    
-    .log-list { list-style: none; padding: 0; margin: 0; }
-    .log-list li { margin-bottom: 16px; font-size: 0.9rem; line-height: 1.6; color: #c5c6c7; }
-    .log-list li:last-child { margin-bottom: 0; }
-    .log-date { display: inline-block; background: #0b0c10; color: #66fcf1; padding: 2px 6px; border-radius: 4px; font-size: 0.8rem; font-weight: bold; margin-bottom: 6px; border: 1px solid #333; }
-    
     .pagination { display: flex; justify-content: center; align-items: center; gap: 8px; margin-bottom: 24px; flex-wrap: wrap; }
     .page-btn { background-color: #1f2833; border: 1px solid #45a29e; color: #66fcf1; padding: 8px 12px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 0.95rem; }
     .page-btn.active { background: linear-gradient(to right, #45a29e, #66fcf1); color: #0b0c10; border: none; }
@@ -210,18 +198,6 @@
       </div>
     </div>
     
-    <details class="log-details" open>
-      <summary class="log-summary">
-        <span>🛠 アップデート情報</span>
-      </summary>
-      <div class="log-content">
-        <!-- ▼ 修正：changelog.json から自動で読み込んで表示される枠 -->
-        <ul class="log-list" id="changelogList">
-          <li style="color:#8892b0; font-size:0.85rem;">アップデート情報を読み込み中...</li>
-        </ul>
-      </div>
-    </details>
-    
     <div class="pagination" id="pagination-top"></div>
     <div id="loading">ランキングデータを読み込み中...</div>
     <div id="ranking-list"></div>
@@ -282,23 +258,6 @@
     const SUPERMAJOR_ICON_URL = "https://www.supermajor.gg/app-icon-cropped.png"; 
     const SECRET_KEY = "SumapaPartyEveryday1919";
     const SEED_STORAGE_PREFIX = "wsp_seed_order_v2_";
-
-    // ▼ 追加：changelog.json からアップデート情報を読み込む処理
-    fetch("changelog.json")
-      .then(res => res.json())
-      .then(data => {
-        const list = document.getElementById('changelogList');
-        list.innerHTML = '';
-        data.forEach(log => {
-          const li = document.createElement('li');
-          const itemsHtml = log.items.map(item => `・${item}<br>`).join('');
-          li.innerHTML = `<span class="log-date">${log.date}</span><br>${itemsHtml}`;
-          list.appendChild(li);
-        });
-      })
-      .catch(err => {
-        document.getElementById('changelogList').innerHTML = '<li style="color:#ff4b4b;">アップデート情報の読み込みに失敗しました</li>';
-      });
 
     function getCharIconUrl(charName) {
       if (!charName || charName === "Unknown" || charName === "Random Character" || charName === "NoData") return null;
