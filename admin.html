@@ -48,8 +48,6 @@
        プレイヤー管理画面
        ========================================= */
     #players-screen { max-width: 800px; margin: 0 auto; width: 100%; }
-    
-    /* ▼ 修正：サジェスト機能付きの検索ボックス用スタイル */
     .search-wrapper { position: relative; flex: 1; }
     .search-wrapper input { width: 100%; padding: 12px; background: #0b0c10; border: 1px solid var(--accent-teal); color: #fff; border-radius: 8px; font-size: 1rem; box-sizing: border-box; }
     .suggest-list { position: absolute; top: calc(100% + 4px); left: 0; right: 0; background: #1f2833; border: 1px solid var(--accent-teal); border-radius: 8px; list-style: none; padding: 0; margin: 0; max-height: 300px; overflow-y: auto; z-index: 100; box-shadow: 0 4px 15px rgba(0,0,0,0.8); }
@@ -80,12 +78,17 @@
        ========================================= */
     #memo-screen { max-width: 800px; margin: 0 auto; width: 100%; }
     .memo-list { display: flex; flex-direction: column; gap: 10px; }
-    .memo-item { background: var(--panel-bg); border: 1px solid var(--border-color); padding: 12px 15px; border-radius: 8px; display: flex; align-items: flex-start; gap: 12px; }
-    .memo-item.done { opacity: 0.6; }
+    .memo-item { background: var(--panel-bg); border: 1px solid var(--border-color); padding: 12px 15px; border-radius: 8px; display: flex; align-items: flex-start; gap: 12px; transition: opacity 0.3s; }
+    .memo-item.done { opacity: 0.5; }
     .memo-item.done .memo-text { text-decoration: line-through; color: #8892b0; }
     .memo-checkbox { margin-top: 4px; cursor: pointer; transform: scale(1.2); }
-    .memo-text { flex: 1; color: var(--text-highlight); line-height: 1.5; outline: none; }
+    .memo-text { flex: 1; color: var(--text-highlight); line-height: 1.5; outline: none; transition: color 0.3s; }
     .memo-text[contenteditable="true"]:focus { border-bottom: 1px dashed var(--accent-cyan); }
+    
+    /* ▼ 追加：削除（ゴミ箱）ボタンのスタイル */
+    .btn-delete-memo { background: transparent; border: none; font-size: 1.2rem; cursor: pointer; opacity: 0.5; transition: opacity 0.2s, transform 0.2s; margin-top: 2px; }
+    .btn-delete-memo:hover { opacity: 1; transform: scale(1.1); color: #ff4b4b; }
+
     .memo-actions { display: flex; gap: 10px; margin-top: 20px; }
     .btn-add { background: var(--accent-teal); color: #0b0c10; border: none; padding: 10px 20px; border-radius: 6px; font-weight: bold; cursor: pointer; }
     .btn-save-memo { background: var(--accent-cyan); color: #0b0c10; border: none; padding: 10px 20px; border-radius: 6px; font-weight: bold; cursor: pointer; margin-left: auto; }
@@ -145,7 +148,6 @@
         <button class="logout-btn" style="margin-bottom: 20px;" onclick="showView('menu')">↩️ メニューに戻る</button>
         <h2 style="color:var(--accent-cyan); margin-top:0;">👥 プレイヤー＆キャラ管理</h2>
         
-        <!-- ▼ 修正：サジェスト機能付きの検索ボックス -->
         <div style="display: flex; gap: 8px; margin-bottom: 20px;">
           <div class="search-wrapper">
             <input type="text" id="adminPlayerSearch" placeholder="プレイヤー名 または Disc で検索..." oninput="handleAdminSearchInput()" onkeydown="if(event.key==='Enter') executeAdminSearch()" autocomplete="off">
@@ -262,7 +264,7 @@
         return;
       }
       showView('players');
-      renderPlayerList(""); // 初期状態では空（何も表示しない）にしておく
+      renderPlayerList("");
     }
 
     function handleAdminSearchInput() {
@@ -289,7 +291,6 @@
         const li = document.createElement('li');
         li.className = 'suggest-item';
         
-        // ▼ クリック時に直接編集モーダルを開く
         li.onmousedown = () => {
           document.getElementById('adminPlayerSearch').value = p.name;
           suggestList.classList.add('hidden');
@@ -328,7 +329,7 @@
       const container = document.getElementById("playerListContainer");
       container.innerHTML = "";
       
-      if (!query) return; // 検索文字が空なら何も表示しない
+      if (!query) return;
 
       const q = query.toLowerCase();
       const filtered = adminData.players.filter(p => p.name.toLowerCase().includes(q) || p.disc.toLowerCase().includes(q));
@@ -387,14 +388,13 @@
           alert("✅ キャラクターを上書き・保護しました！");
           const p = adminData.players.find(x => x.disc === disc);
           if (p) { p.main = main ? "★" + main : ""; p.sub1 = sub1; p.sub2 = sub2; }
-          // 変更後の状態でリストを再描画
           renderPlayerList(document.getElementById('adminPlayerSearch').value.trim());
         }
       }).catch(err => alert("通信エラー"));
     }
 
     // =====================================
-    // 改修メモ
+    // 改修メモ (TODO)
     // =====================================
     function openMemoView() {
       if (adminData.memos.length === 0 && adminData.players.length === 0) {
@@ -407,12 +407,19 @@
     function renderMemoList() {
       const container = document.getElementById("memoListContainer");
       container.innerHTML = "";
+      
+      // ▼ 追加：未完了を上に、完了済を下に並び替えてから配列を再構築する
+      const incomplete = adminData.memos.filter(m => !m.done);
+      const complete = adminData.memos.filter(m => m.done);
+      adminData.memos = [...incomplete, ...complete];
+
       adminData.memos.forEach((m, idx) => {
         const div = document.createElement("div");
         div.className = "memo-item " + (m.done ? "done" : "");
         div.innerHTML = `
           <input type="checkbox" class="memo-checkbox" ${m.done ? "checked" : ""} onchange="toggleMemo(${idx})">
           <div class="memo-text" contenteditable="true" onblur="updateMemoText(${idx}, this.innerText)">${m.text}</div>
+          <button class="btn-delete-memo" onclick="deleteMemo(${idx})" title="このタスクを削除">🗑️</button>
         `;
         container.appendChild(div);
       });
@@ -420,7 +427,7 @@
 
     function toggleMemo(idx) {
       adminData.memos[idx].done = !adminData.memos[idx].done;
-      renderMemoList();
+      renderMemoList(); // チェックを切り替えると自動で未完了・完了が並び替えられる
     }
 
     function updateMemoText(idx, text) {
@@ -428,8 +435,17 @@
     }
 
     function addMemoRow() {
-      adminData.memos.push({ done: false, text: "新しいタスク" });
+      // ▼ 修正：新しいタスクは一番上（未完了の一番上）に追加する
+      adminData.memos.unshift({ done: false, text: "新しいタスク" });
       renderMemoList();
+    }
+    
+    // ▼ 追加：タスク削除機能
+    function deleteMemo(idx) {
+      if (confirm("このタスクを削除しますか？")) {
+        adminData.memos.splice(idx, 1);
+        renderMemoList();
+      }
     }
 
     function saveMemoData() {
