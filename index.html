@@ -215,23 +215,9 @@
         <span>🛠 アップデート情報</span>
       </summary>
       <div class="log-content">
-        <ul class="log-list">
-          <li>
-            <span class="log-date">2026.10.14</span><br>
-            ・使用キャラクターをSupermajorからより高精度に取得するよう仕様変更<br>
-            ・シード作成時、新規参加者がスコア順に自動挿入されるように改修<br>
-            ・手動で並び替えたシード順序が別端末やリロード後も引き継がれるように改修<br>
-            ・シード画面に手動並び替えのリセット機能を追加<br>
-            ・検索ボックスを拡張し、インクリメンタルサーチ（サジェスト）機能を搭載<br>
-            ・サジェスト内に名前の自動横スクロール（電光掲示板）機能を実装<br>
-            ・実績バッジとキャラクターアイコンのデザインを調整
-          </li>
-          <li>
-            <span class="log-date">2026.10.11</span><br>
-            ・プレイヤーカードに使用ファイターのアイコン表示を追加<br>
-            ・LumiRank等公式ランキングバッジの表示を追加<br>
-            ・Supermajorへのリンクボタンを追加
-          </li>
+        <!-- ▼ 修正：changelog.json から自動で読み込んで表示される枠 -->
+        <ul class="log-list" id="changelogList">
+          <li style="color:#8892b0; font-size:0.85rem;">アップデート情報を読み込み中...</li>
         </ul>
       </div>
     </details>
@@ -296,6 +282,23 @@
     const SUPERMAJOR_ICON_URL = "https://www.supermajor.gg/app-icon-cropped.png"; 
     const SECRET_KEY = "SumapaPartyEveryday1919";
     const SEED_STORAGE_PREFIX = "wsp_seed_order_v2_";
+
+    // ▼ 追加：changelog.json からアップデート情報を読み込む処理
+    fetch("changelog.json")
+      .then(res => res.json())
+      .then(data => {
+        const list = document.getElementById('changelogList');
+        list.innerHTML = '';
+        data.forEach(log => {
+          const li = document.createElement('li');
+          const itemsHtml = log.items.map(item => `・${item}<br>`).join('');
+          li.innerHTML = `<span class="log-date">${log.date}</span><br>${itemsHtml}`;
+          list.appendChild(li);
+        });
+      })
+      .catch(err => {
+        document.getElementById('changelogList').innerHTML = '<li style="color:#ff4b4b;">アップデート情報の読み込みに失敗しました</li>';
+      });
 
     function getCharIconUrl(charName) {
       if (!charName || charName === "Unknown" || charName === "Random Character" || charName === "NoData") return null;
