@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WSP-MTPR Admin Console</title>
+  <link rel="icon" href="sumapa_newlogo.png">
+  
+  <style>
+    :root {
+      --bg-color: #05071D;
+      --panel-bg: #1f2833;
+      --text-main: #c5c6c7;
+      --text-highlight: #ffffff;
+      --accent-cyan: #66fcf1;
+      --accent-teal: #45a29e;
+      --border-color: #333;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      font-family: 'Helvetica Neue', Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .hidden { display: none !important; }
+
+    /* =========================================
+       ログイン画面
+       ========================================= */
+    #login-screen {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .login-box {
+      background: linear-gradient(var(--panel-bg), var(--panel-bg)) padding-box, linear-gradient(to right, var(--accent-teal), var(--accent-cyan)) border-box;
+      border: 1px solid transparent;
+      border-radius: 12px;
+      padding: 40px 30px;
+      width: 100%;
+      max-width: 350px;
+      text-align: center;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+    }
+
+    .login-title { color: var(--accent-cyan); margin: 0 0 20px 0; font-size: 1.5rem; letter-spacing: 2px; }
+    
+    .input-group { margin-bottom: 20px; text-align: left; }
+    .input-group label { display: block; font-size: 0.85rem; color: var(--accent-teal); margin-bottom: 8px; font-weight: bold; }
+    .input-group input { width: 100%; padding: 12px; background: #0b0c10; border: 1px solid var(--accent-teal); color: #fff; border-radius: 8px; font-size: 1rem; box-sizing: border-box; transition: box-shadow 0.3s; }
+    .input-group input:focus { outline: none; box-shadow: 0 0 10px rgba(102, 252, 241, 0.3); }
+
+    .login-btn { width: 100%; padding: 14px; background: linear-gradient(to right, var(--accent-teal), var(--accent-cyan)); color: #0b0c10; border: none; border-radius: 8px; font-weight: bold; font-size: 1.1rem; cursor: pointer; transition: transform 0.2s, filter 0.2s; }
+    .login-btn:hover { transform: translateY(-2px); filter: brightness(1.1); }
+    .login-btn:active { transform: translateY(0); }
+
+    /* =========================================
+       ダッシュボード画面
+       ========================================= */
+    #dashboard-screen {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .header {
+      background: var(--panel-bg);
+      border-bottom: 1px solid var(--accent-teal);
+      padding: 15px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .header-title { color: var(--accent-cyan); font-weight: bold; font-size: 1.2rem; margin: 0; display: flex; align-items: center; gap: 10px; }
+    .header-user { display: flex; align-items: center; gap: 15px; }
+    .user-badge { background: rgba(102, 252, 241, 0.1); border: 1px solid var(--accent-teal); color: var(--accent-cyan); padding: 4px 12px; border-radius: 20px; font-size: 0.85rem; font-weight: bold; }
+    
+    .logout-btn { background: transparent; border: 1px solid #8892b0; color: #8892b0; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 0.85rem; font-weight: bold; transition: all 0.2s; }
+    .logout-btn:hover { background: #8892b0; color: #0b0c10; }
+
+    .main-content { padding: 30px 20px; max-width: 900px; margin: 0 auto; width: 100%; box-sizing: border-box; }
+
+    .welcome-text { color: var(--text-highlight); font-size: 1.5rem; margin-bottom: 30px; }
+
+    .menu-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
+
+    .menu-card {
+      background: linear-gradient(var(--panel-bg), var(--panel-bg)) padding-box, linear-gradient(to right, var(--accent-teal), var(--accent-cyan)) border-box;
+      border: 1px solid transparent;
+      border-radius: 12px;
+      padding: 24px;
+      cursor: pointer;
+      transition: transform 0.3s, box-shadow 0.3s;
+      position: relative;
+      overflow: hidden;
+    }
+    .menu-card:hover { transform: translateY(-5px); box-shadow: 0 8px 20px rgba(0,0,0,0.6); }
+    
+    .menu-icon { font-size: 2.5rem; margin-bottom: 15px; display: block; }
+    .menu-title { color: var(--accent-cyan); font-size: 1.2rem; font-weight: bold; margin: 0 0 8px 0; }
+    .menu-desc { color: var(--text-main); font-size: 0.9rem; margin: 0; line-height: 1.5; }
+    
+    .badge-wip { position: absolute; top: 12px; right: 12px; background: #e67e22; color: #fff; font-size: 0.7rem; font-weight: bold; padding: 2px 8px; border-radius: 4px; }
+
+  </style>
+</head>
+<body>
+
+  <!-- =====================================
+       ログイン画面
+       ===================================== -->
+  <div id="login-screen">
+    <div class="login-box">
+      <h2 class="login-title">ADMIN LOGIN</h2>
+      
+      <div class="input-group">
+        <label for="adminId">Operator ID</label>
+        <input type="text" id="adminId" placeholder="IDを入力" autocomplete="off" onkeypress="if(event.key==='Enter') document.getElementById('adminPass').focus()">
+      </div>
+      
+      <div class="input-group">
+        <label for="adminPass">Password</label>
+        <input type="password" id="adminPass" placeholder="パスワードを入力" onkeypress="if(event.key==='Enter') attemptLogin()">
+      </div>
+      
+      <button class="login-btn" onclick="attemptLogin()">LOGIN</button>
+    </div>
+  </div>
+
+
+  <!-- =====================================
+       ダッシュボード画面 (ログイン後)
+       ===================================== -->
+  <div id="dashboard-screen" class="hidden">
+    
+    <header class="header">
+      <h1 class="header-title">⚙️ MTPR Admin Console</h1>
+      <div class="header-user">
+        <span class="user-badge" id="displayUserName">Operator</span>
+        <button class="logout-btn" onclick="logout()">Logout</button>
+      </div>
+    </header>
+
+    <main class="main-content">
+      <h2 class="welcome-text"><span id="welcomeUserName"></span>さん、お疲れ様です。</h2>
+      
+      <!-- 今後実装する機能のメニュー枠（モックアップ） -->
+      <div class="menu-grid">
+        
+        <div class="menu-card" onclick="alert('次回実装予定：ここに現在のシード作成ツールを丸ごとお引越しします。')">
+          <span class="badge-wip">準備中</span>
+          <span class="menu-icon">🎯</span>
+          <h3 class="menu-title">シード作成＆ステーション割振</h3>
+          <p class="menu-desc">start.ggの参加者データからMTPRスコア順のシードを生成し、大会ページへ直接反映します。</p>
+        </div>
+
+        <div class="menu-card" onclick="alert('次回実装予定：GASを開かずに、ここからボタン1つで大会結果やキャラ情報を自動更新できるようにします。')">
+          <span class="badge-wip">準備中</span>
+          <span class="menu-icon">🔄</span>
+          <h3 class="menu-title">システム手動更新・パトロール</h3>
+          <p class="menu-desc">大会終了後の順位データ集計や、キャラクター変更監視システムを強制的に即時実行します。</p>
+        </div>
+
+        <div class="menu-card" onclick="alert('次回実装予定：プレイヤーのID紐付けミス修正や、例外的な処理を行うための管理画面です。')">
+          <span class="badge-wip">準備中</span>
+          <span class="menu-icon">👥</span>
+          <h3 class="menu-title">プレイヤーデータ管理</h3>
+          <p class="menu-desc">特定のプレイヤーの登録情報修正や、MTPRランキングの集計データの直接確認を行います。</p>
+        </div>
+
+      </div>
+    </main>
+    
+  </div>
+
+  <script>
+    // =====================================
+    // 認証情報設定（将来スタッフが増えたらここに追加）
+    // =====================================
+    const adminAccounts = {
+      "Tesnoo": "Tesnoo1849"
+    };
+
+    // =====================================
+    // ページ読み込み時の処理
+    // =====================================
+    window.onload = () => {
+      // ログイン状態（セッション）をチェック
+      const loggedInUser = sessionStorage.getItem("mtpr_admin_user");
+      if (loggedInUser && adminAccounts[loggedInUser]) {
+        showDashboard(loggedInUser);
+      } else {
+        document.getElementById("adminId").focus();
+      }
+    };
+
+    // =====================================
+    // ログイン処理
+    // =====================================
+    function attemptLogin() {
+      const idInput = document.getElementById("adminId").value.trim();
+      const passInput = document.getElementById("adminPass").value;
+
+      if (adminAccounts[idInput] && adminAccounts[idInput] === passInput) {
+        // 認証成功：セッションに記憶
+        sessionStorage.setItem("mtpr_admin_user", idInput);
+        
+        // フォームを空にする
+        document.getElementById("adminId").value = "";
+        document.getElementById("adminPass").value = "";
+        
+        showDashboard(idInput);
+      } else {
+        // 認証失敗
+        alert("❌ IDまたはパスワードが間違っています。");
+        document.getElementById("adminPass").value = "";
+        document.getElementById("adminPass").focus();
+      }
+    }
+
+    // =====================================
+    // ログアウト処理
+    // =====================================
+    function logout() {
+      if (confirm("ログアウトしますか？")) {
+        sessionStorage.removeItem("mtpr_admin_user");
+        document.getElementById("dashboard-screen").classList.add("hidden");
+        document.getElementById("login-screen").classList.remove("hidden");
+        document.getElementById("adminId").focus();
+      }
+    }
+
+    // =====================================
+    // 画面切り替え処理
+    // =====================================
+    function showDashboard(userName) {
+      document.getElementById("login-screen").classList.add("hidden");
+      document.getElementById("dashboard-screen").classList.remove("hidden");
+      
+      document.getElementById("displayUserName").innerText = "👤 " + userName;
+      document.getElementById("welcomeUserName").innerText = userName;
+    }
+  </script>
+</body>
+</html>
