@@ -48,7 +48,17 @@
        プレイヤー管理画面
        ========================================= */
     #players-screen { max-width: 800px; margin: 0 auto; width: 100%; }
-    .search-box { width: 100%; padding: 12px; background: #0b0c10; border: 1px solid var(--accent-teal); color: #fff; border-radius: 8px; font-size: 1rem; margin-bottom: 20px; box-sizing: border-box; }
+    
+    /* ▼ 修正：サジェスト機能付きの検索ボックス用スタイル */
+    .search-wrapper { position: relative; flex: 1; }
+    .search-wrapper input { width: 100%; padding: 12px; background: #0b0c10; border: 1px solid var(--accent-teal); color: #fff; border-radius: 8px; font-size: 1rem; box-sizing: border-box; }
+    .suggest-list { position: absolute; top: calc(100% + 4px); left: 0; right: 0; background: #1f2833; border: 1px solid var(--accent-teal); border-radius: 8px; list-style: none; padding: 0; margin: 0; max-height: 300px; overflow-y: auto; z-index: 100; box-shadow: 0 4px 15px rgba(0,0,0,0.8); }
+    .suggest-item { padding: 12px 15px; border-bottom: 1px solid #333; cursor: pointer; display: flex; align-items: center; justify-content: space-between; gap: 10px; font-size: 0.95rem; }
+    .suggest-item:hover { background: linear-gradient(to right, var(--accent-teal), var(--accent-cyan)); color: #0b0c10; }
+    .suggest-item:last-child { border-bottom: none; }
+    .match-text { font-weight: 900; color: var(--accent-cyan); text-decoration: underline; }
+    .suggest-item:hover .match-text { color: #05071D; text-decoration: none; }
+
     .player-list { display: flex; flex-direction: column; gap: 10px; max-height: 50vh; overflow-y: auto; padding-right: 10px; }
     .player-item { background: var(--panel-bg); border: 1px solid var(--border-color); padding: 15px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; }
     .player-info { display: flex; flex-direction: column; gap: 4px; }
@@ -134,7 +144,16 @@
       <div id="view-players" class="hidden">
         <button class="logout-btn" style="margin-bottom: 20px;" onclick="showView('menu')">↩️ メニューに戻る</button>
         <h2 style="color:var(--accent-cyan); margin-top:0;">👥 プレイヤー＆キャラ管理</h2>
-        <input type="text" id="playerSearch" class="search-box" placeholder="プレイヤー名で検索..." oninput="renderPlayerList()">
+        
+        <!-- ▼ 修正：サジェスト機能付きの検索ボックス -->
+        <div style="display: flex; gap: 8px; margin-bottom: 20px;">
+          <div class="search-wrapper">
+            <input type="text" id="adminPlayerSearch" placeholder="プレイヤー名 または Disc で検索..." oninput="handleAdminSearchInput()" onkeydown="if(event.key==='Enter') executeAdminSearch()" autocomplete="off">
+            <ul id="adminSuggestList" class="suggest-list hidden"></ul>
+          </div>
+          <button style="padding: 10px 16px; background: linear-gradient(to right, var(--accent-teal), var(--accent-cyan)); border: none; color: #0b0c10; border-radius: 8px; font-weight: bold; cursor: pointer;" onclick="executeAdminSearch()">🔍</button>
+        </div>
+
         <div id="playerListContainer" class="player-list"></div>
       </div>
 
@@ -214,7 +233,7 @@
       document.getElementById("displayUserName").innerText = "👤 " + userName;
       document.getElementById("welcomeUserName").innerText = userName;
       showView('menu');
-      fetchAdminData(); // バックグラウンドでデータを取得開始
+      fetchAdminData();
     }
 
     function showView(viewId) {
@@ -235,7 +254,7 @@
     }
 
     // =====================================
-    // プレイヤー管理
+    // プレイヤー管理 (サジェスト機能付き)
     // =====================================
     function openPlayersView() {
       if (adminData.players.length === 0) {
@@ -243,15 +262,81 @@
         return;
       }
       showView('players');
-      renderPlayerList();
+      renderPlayerList(""); // 初期状態では空（何も表示しない）にしておく
     }
 
-    function renderPlayerList() {
-      const query = document.getElementById("playerSearch").value.toLowerCase();
+    function handleAdminSearchInput() {
+      const query = document.getElementById('adminPlayerSearch').value.trim().toLowerCase();
+      const suggestList = document.getElementById('adminSuggestList');
+      suggestList.innerHTML = '';
+      
+      if (!query) {
+        suggestList.classList.add('hidden');
+        renderPlayerList("");
+        return;
+      }
+      
+      const matchedPlayers = adminData.players.filter(p => 
+        p.name.toLowerCase().includes(query) || p.disc.toLowerCase().includes(query)
+      ).slice(0, 15);
+      
+      if (matchedPlayers.length === 0) {
+        suggestList.classList.add('hidden');
+        return;
+      }
+      
+      matchedPlayers.forEach(p => {
+        const li = document.createElement('li');
+        li.className = 'suggest-item';
+        
+        // ▼ クリック時に直接編集モーダルを開く
+        li.onmousedown = () => {
+          document.getElementById('adminPlayerSearch').value = p.name;
+          suggestList.classList.add('hidden');
+          renderPlayerList(p.name);
+          openEditModal(p.disc);
+        }; 
+        
+        const regex = new RegExp(`(${query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
+        const highlightedName = p.name.replace(regex, '<span class="match-text">$1</span>');
+        
+        let chars = [p.main.replace("★", ""), p.sub1, p.sub2].filter(c => c && c !== "NoData").join(", ");
+        if (!chars) chars = "未登録 / 取得待ち";
+        const isProtected = p.main.startsWith("★") ? "🛡️保護済 " : "";
+
+        li.innerHTML = `
+          <span style="font-weight:bold; color:#fff;">${highlightedName}</span>
+          <span style="font-size:0.8rem; color:var(--accent-teal);">${isProtected}${chars}</span>
+        `;
+        suggestList.appendChild(li);
+      });
+      
+      suggestList.classList.remove('hidden');
+    }
+
+    document.getElementById('adminPlayerSearch').addEventListener('blur', () => {
+      setTimeout(() => { document.getElementById('adminSuggestList').classList.add('hidden'); }, 150);
+    });
+
+    function executeAdminSearch() {
+      const query = document.getElementById('adminPlayerSearch').value.trim();
+      document.getElementById('adminSuggestList').classList.add('hidden');
+      renderPlayerList(query);
+    }
+
+    function renderPlayerList(query) {
       const container = document.getElementById("playerListContainer");
       container.innerHTML = "";
+      
+      if (!query) return; // 検索文字が空なら何も表示しない
 
-      const filtered = adminData.players.filter(p => p.name.toLowerCase().includes(query) || p.disc.toLowerCase().includes(query));
+      const q = query.toLowerCase();
+      const filtered = adminData.players.filter(p => p.name.toLowerCase().includes(q) || p.disc.toLowerCase().includes(q));
+      
+      if(filtered.length === 0) {
+        container.innerHTML = "<p style='color:#8892b0;'>該当するプレイヤーが見つかりません</p>";
+        return;
+      }
       
       filtered.slice(0, 50).forEach(p => {
         let chars = [p.main.replace("★", ""), p.sub1, p.sub2].filter(c => c && c !== "NoData").join(", ");
@@ -302,7 +387,8 @@
           alert("✅ キャラクターを上書き・保護しました！");
           const p = adminData.players.find(x => x.disc === disc);
           if (p) { p.main = main ? "★" + main : ""; p.sub1 = sub1; p.sub2 = sub2; }
-          renderPlayerList();
+          // 変更後の状態でリストを再描画
+          renderPlayerList(document.getElementById('adminPlayerSearch').value.trim());
         }
       }).catch(err => alert("通信エラー"));
     }
