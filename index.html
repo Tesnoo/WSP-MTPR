@@ -265,7 +265,7 @@
       if (formattedName === "Pyra and Mythra") {
         formattedName = "Pyra & Mythra";
       }
-      return `./${encodeURIComponent(formattedName)}.png`;
+      return `./fighters/${encodeURIComponent(formattedName)}.png`;
     }
 
     let allData = [];
@@ -441,7 +441,6 @@
                            </a>`;
                            
         let supermajorHtml = '';
-        // ▼ 修正：InvalidIDの場合はグレーアウト、それ以外（キャラが空欄の正しいIDも含む）は有効化
         if (player.playerId && player.mainChar !== "InvalidID") {
             supermajorHtml = `<a href="https://www.supermajor.gg/ultimate/player/${encodeURIComponent(player.name)}?id=S${player.playerId}" target="_blank" class="supermajor-link" title="Supermajor Profile">
                                 <img src="${SUPERMAJOR_ICON_URL}" alt="Supermajor" class="supermajor-icon" onerror="this.outerHTML='Supermajor'">
