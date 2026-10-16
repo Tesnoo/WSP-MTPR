@@ -34,7 +34,7 @@
     .logout-btn { background: transparent; border: 1px solid #8892b0; color: #8892b0; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 0.85rem; font-weight: bold; transition: all 0.2s; }
     .logout-btn:hover { background: #8892b0; color: #0b0c10; }
 
-    .main-content { padding: 30px 20px; max-width: 1000px; margin: 0 auto; width: 100%; box-sizing: border-box; }
+    .main-content { padding: 30px 20px; max-width: 1200px; margin: 0 auto; width: 100%; box-sizing: border-box; }
     .welcome-text { color: var(--text-highlight); font-size: 1.5rem; margin-bottom: 30px; }
 
     .menu-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
@@ -45,26 +45,15 @@
     .menu-desc { color: var(--text-main); font-size: 0.9rem; margin: 0; line-height: 1.5; }
 
     /* =========================================
-       プレイヤー管理画面関連
+       共通UI・検索・モーダル
        ========================================= */
-    #players-screen, #invalid-screen { max-width: 800px; margin: 0 auto; width: 100%; }
     .search-wrapper { position: relative; flex: 1; }
     .search-wrapper input { width: 100%; padding: 12px; background: #0b0c10; border: 1px solid var(--accent-teal); color: #fff; border-radius: 8px; font-size: 1rem; box-sizing: border-box; }
     .suggest-list { position: absolute; top: calc(100% + 4px); left: 0; right: 0; background: #1f2833; border: 1px solid var(--accent-teal); border-radius: 8px; list-style: none; padding: 0; margin: 0; max-height: 300px; overflow-y: auto; z-index: 100; box-shadow: 0 4px 15px rgba(0,0,0,0.8); }
     .suggest-item { padding: 12px 15px; border-bottom: 1px solid #333; cursor: pointer; display: flex; align-items: center; justify-content: space-between; gap: 10px; font-size: 0.95rem; }
     .suggest-item:hover { background: linear-gradient(to right, var(--accent-teal), var(--accent-cyan)); color: #0b0c10; }
-    .suggest-item:last-child { border-bottom: none; }
     .match-text { font-weight: 900; color: var(--accent-cyan); text-decoration: underline; }
     .suggest-item:hover .match-text { color: #05071D; text-decoration: none; }
-
-    .player-list { display: flex; flex-direction: column; gap: 10px; max-height: 50vh; overflow-y: auto; padding-right: 10px; }
-    .player-item { background: var(--panel-bg); border: 1px solid var(--border-color); padding: 15px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; }
-    .player-item.invalid { border-color: #ff4b4b; background: rgba(255, 75, 75, 0.05); }
-    .player-info { display: flex; flex-direction: column; gap: 4px; }
-    .player-name { font-weight: bold; color: var(--text-highlight); font-size: 1.1rem; }
-    .player-chars { font-size: 0.85rem; color: var(--accent-teal); }
-    .player-chars.invalid-text { color: #ff4b4b; font-weight: bold; }
-    .edit-btn { background: var(--accent-cyan); color: #0b0c10; border: none; padding: 8px 16px; border-radius: 6px; font-weight: bold; cursor: pointer; }
 
     .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(5,7,29,0.8); display: flex; align-items: center; justify-content: center; z-index: 1000; }
     .modal-content { background: var(--panel-bg); padding: 25px; border-radius: 12px; border: 1px solid var(--accent-teal); width: 90%; max-width: 400px; }
@@ -76,9 +65,31 @@
     .btn-cancel { background: #333; color: #fff; }
 
     /* =========================================
-       改修メモ画面
+       各画面のスタイル
        ========================================= */
-    #memo-screen { max-width: 800px; margin: 0 auto; width: 100%; }
+    #players-screen, #invalid-screen, #memo-screen { max-width: 800px; margin: 0 auto; width: 100%; }
+    #database-screen { max-width: 1200px; margin: 0 auto; width: 100%; }
+    
+    .player-list { display: flex; flex-direction: column; gap: 10px; max-height: 50vh; overflow-y: auto; padding-right: 10px; }
+    .player-item { background: var(--panel-bg); border: 1px solid var(--border-color); padding: 15px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; }
+    .player-item.invalid { border-color: #ff4b4b; background: rgba(255, 75, 75, 0.05); }
+    .player-info { display: flex; flex-direction: column; gap: 4px; }
+    .player-name { font-weight: bold; color: var(--text-highlight); font-size: 1.1rem; }
+    .player-chars { font-size: 0.85rem; color: var(--accent-teal); }
+    .player-chars.invalid-text { color: #ff4b4b; font-weight: bold; }
+    .edit-btn { background: var(--accent-cyan); color: #0b0c10; border: none; padding: 8px 16px; border-radius: 6px; font-weight: bold; cursor: pointer; }
+
+    /* ▼ データベース (テーブル) のスタイル */
+    .db-table-container { overflow-x: auto; max-height: 65vh; border: 1px solid var(--border-color); border-radius: 8px; background: var(--panel-bg); }
+    .db-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+    .db-table th { background: #0b0c10; color: var(--accent-cyan); padding: 12px 15px; position: sticky; top: 0; z-index: 10; text-align: left; cursor: pointer; border-bottom: 2px solid var(--accent-teal); white-space: nowrap; user-select: none; }
+    .db-table th:hover { background: #161b22; }
+    .db-table td { padding: 10px 15px; border-bottom: 1px solid var(--border-color); color: var(--text-main); white-space: nowrap; }
+    .db-table tr:hover { background: #161b22; }
+    .sheet-link-btn { display: inline-flex; align-items: center; gap: 6px; background: transparent; border: 1px solid #8892b0; color: #8892b0; padding: 8px 16px; border-radius: 6px; font-size: 0.9rem; font-weight: bold; text-decoration: none; transition: all 0.2s; }
+    .sheet-link-btn:hover { background: #8892b0; color: #0b0c10; }
+
+    /* メモのスタイル */
     .memo-list { display: flex; flex-direction: column; gap: 10px; }
     .memo-item { background: var(--panel-bg); border: 1px solid var(--border-color); padding: 12px 15px; border-radius: 8px; display: flex; align-items: flex-start; gap: 12px; transition: opacity 0.3s; }
     .memo-item.done { opacity: 0.5; border-color: transparent; }
@@ -88,7 +99,6 @@
     .memo-text[contenteditable="true"]:focus { border-bottom: 1px dashed var(--accent-cyan); }
     .btn-delete-memo { background: transparent; border: none; font-size: 1.2rem; cursor: pointer; opacity: 0.5; transition: opacity 0.2s, transform 0.2s; margin-top: 2px; }
     .btn-delete-memo:hover { opacity: 1; transform: scale(1.1); color: #ff4b4b; }
-
     .memo-details { margin-top: 15px; background: #161b22; border-radius: 8px; border: 1px solid #333; overflow: hidden; }
     .memo-summary { cursor: pointer; padding: 12px 15px; font-weight: bold; color: #8892b0; display: flex; align-items: center; justify-content: space-between; font-size: 0.95rem; list-style: none; outline: none; transition: background 0.2s; }
     .memo-summary:hover { background: #1f2833; color: var(--accent-cyan); }
@@ -96,7 +106,6 @@
     .memo-summary::after { content: "▼"; font-size: 0.8rem; transition: transform 0.3s; color: inherit; }
     details[open] .memo-summary::after { transform: rotate(180deg); }
     .memo-complete-container { padding: 15px; display: flex; flex-direction: column; gap: 10px; background: #0b0c10; border-top: 1px solid #333; }
-
     .memo-actions { display: flex; gap: 10px; margin-top: 20px; }
     .btn-add { background: var(--accent-teal); color: #0b0c10; border: none; padding: 10px 20px; border-radius: 6px; font-weight: bold; cursor: pointer; }
     .btn-save-memo { background: var(--accent-cyan); color: #0b0c10; border: none; padding: 10px 20px; border-radius: 6px; font-weight: bold; cursor: pointer; margin-left: auto; }
@@ -138,25 +147,49 @@
       <div id="view-menu">
         <h2 class="welcome-text"><span id="welcomeUserName"></span>さん、お疲れ様です。</h2>
         <div class="menu-grid">
+          <div class="menu-card" onclick="openDatabaseView()">
+            <span class="menu-icon">🗄️</span>
+            <h3 class="menu-title">参加者データベース</h3>
+            <p class="menu-desc">全プレイヤーの順位、ID、キャラ、スコアをエクセルのように一覧表示・検索・ソートできます。</p>
+          </div>
           <div class="menu-card" onclick="openPlayersView()">
             <span class="menu-icon">👥</span>
             <h3 class="menu-title">プレイヤー＆キャラ管理</h3>
-            <p class="menu-desc">誤って取得されたキャラクターを手動で上書きし、自動更新されないように保護します。</p>
-          </div>
-          <div class="menu-card" onclick="openMemoView()">
-            <span class="menu-icon">📝</span>
-            <h3 class="menu-title">改修メモ (TODO)</h3>
-            <p class="menu-desc">今後のアップデート予定やアイデアのメモを管理します。</p>
+            <p class="menu-desc">誤って取得されたキャラクターを手動で検索・上書きし、自動更新されないように保護します。</p>
           </div>
           <div class="menu-card" onclick="openInvalidView()">
             <span class="menu-icon">🚨</span>
             <h3 class="menu-title">無効ID 検出リスト</h3>
             <p class="menu-desc">SupermajorのURLが無効になっている（InvalidID）プレイヤーを一覧表示します。</p>
           </div>
+          <div class="menu-card" onclick="openMemoView()">
+            <span class="menu-icon">📝</span>
+            <h3 class="menu-title">改修メモ (TODO)</h3>
+            <p class="menu-desc">今後のアップデート予定やアイデアのメモを管理します。</p>
+          </div>
         </div>
       </div>
 
-      <!-- プレイヤー管理 -->
+      <!-- 参加者データベース (テーブル表示) -->
+      <div id="view-database" class="hidden">
+        <div style="display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:20px; flex-wrap:wrap; gap:10px;">
+          <div>
+            <button class="logout-btn" style="margin-bottom: 15px;" onclick="showView('menu')">↩️ メニューに戻る</button>
+            <h2 style="color:var(--accent-cyan); margin-top:0; margin-bottom:5px;">🗄️ 参加者データベース</h2>
+            <p style="color:#8892b0; font-size:0.85rem; margin:0;">各列のタイトルをクリックすると並び替え（ソート）ができます。</p>
+          </div>
+          <!-- ⚠️ 注意: 以下のリンクのhrefに、実際のスプレッドシートのURLを入れてください -->
+          <a href="https://docs.google.com/spreadsheets/" target="_blank" class="sheet-link-btn">🔗 スプレッドシートを開く (生データ編集)</a>
+        </div>
+        
+        <div style="margin-bottom: 15px; position: relative;">
+          <input type="text" id="dbSearchInput" placeholder="プレイヤー名、Disc、キャラ名で絞り込み..." oninput="filterDatabase()" style="width: 100%; padding: 10px 15px; background: #0b0c10; border: 1px solid var(--accent-teal); color: #fff; border-radius: 8px; font-size: 0.95rem; box-sizing: border-box;">
+        </div>
+
+        <div id="dbListContainer"></div>
+      </div>
+
+      <!-- プレイヤー管理 (サジェスト検索) -->
       <div id="view-players" class="hidden">
         <button class="logout-btn" style="margin-bottom: 20px;" onclick="showView('menu')">↩️ メニューに戻る</button>
         <h2 style="color:var(--accent-cyan); margin-top:0;">👥 プレイヤー＆キャラ管理</h2>
@@ -191,8 +224,6 @@
         </div>
       </div>
 
-      <div id="global-loader" class="loader hidden">データを読み込み中...</div>
-
     </main>
   </div>
 
@@ -220,6 +251,9 @@
     const adminAccounts = { "Tesnoo": "Tesnoo1849" };
 
     let adminData = { players: [], memos: [] };
+    let allRankingData = []; // データベース用の全データ
+    let currentSortCol = 'rank';
+    let currentSortDir = 'asc';
 
     window.onload = () => {
       const loggedInUser = sessionStorage.getItem("mtpr_admin_user");
@@ -264,6 +298,7 @@
       document.getElementById('view-players').classList.add('hidden');
       document.getElementById('view-invalid').classList.add('hidden');
       document.getElementById('view-memo').classList.add('hidden');
+      document.getElementById('view-database').classList.add('hidden');
       document.getElementById('view-' + viewId).classList.remove('hidden');
     }
 
@@ -276,6 +311,134 @@
         .then(data => { adminData = data; })
         .catch(err => console.error("データ取得エラー", err));
     }
+
+    // =====================================
+    // 参加者データベース (新機能)
+    // =====================================
+    function openDatabaseView() {
+      showView('database');
+      document.getElementById('dbSearchInput').value = "";
+      
+      if (allRankingData.length === 0) {
+        document.getElementById('dbListContainer').innerHTML = "<p style='color:#66fcf1; text-align:center; padding: 40px;'>データベースを読み込み中...</p>";
+        fetch(GAS_URL + "?action=getRanking")
+          .then(res => res.json())
+          .then(data => {
+            if(!data.error) {
+              allRankingData = data;
+              allRankingData.sort((a, b) => (parseFloat(a.rank) || 0) - (parseFloat(b.rank) || 0));
+              renderDatabaseTable(allRankingData);
+            }
+          });
+      } else {
+        renderDatabaseTable(allRankingData);
+      }
+    }
+
+    function sortDatabase(col) {
+      if (currentSortCol === col) {
+        currentSortDir = currentSortDir === 'asc' ? 'desc' : 'asc';
+      } else {
+        currentSortCol = col;
+        currentSortDir = 'asc';
+      }
+      
+      const query = document.getElementById('dbSearchInput').value.toLowerCase();
+      let targetData = allRankingData;
+      
+      if (query) {
+        targetData = allRankingData.filter(p => 
+          p.name.toLowerCase().includes(query) || 
+          (p.disc && p.disc.toLowerCase().includes(query)) ||
+          (p.mainChar && p.mainChar.toLowerCase().includes(query)) ||
+          (p.sub1Char && p.sub1Char.toLowerCase().includes(query))
+        );
+      }
+      
+      targetData.sort((a, b) => {
+        let valA = a[col] || '';
+        let valB = b[col] || '';
+        
+        if (col === 'rank' || col === 'score') {
+          valA = parseFloat(valA) || 0;
+          valB = parseFloat(valB) || 0;
+          return currentSortDir === 'asc' ? valA - valB : valB - valA;
+        }
+        
+        valA = String(valA).toLowerCase();
+        valB = String(valB).toLowerCase();
+        if (valA < valB) return currentSortDir === 'asc' ? -1 : 1;
+        if (valA > valB) return currentSortDir === 'asc' ? 1 : -1;
+        return 0;
+      });
+      
+      renderDatabaseTable(targetData);
+    }
+
+    function filterDatabase() {
+      const query = document.getElementById('dbSearchInput').value.toLowerCase();
+      const filtered = allRankingData.filter(p => 
+        p.name.toLowerCase().includes(query) || 
+        (p.disc && p.disc.toLowerCase().includes(query)) ||
+        (p.mainChar && p.mainChar.toLowerCase().includes(query)) ||
+        (p.sub1Char && p.sub1Char.toLowerCase().includes(query))
+      );
+      renderDatabaseTable(filtered);
+    }
+
+    function renderDatabaseTable(data) {
+      const container = document.getElementById('dbListContainer');
+      
+      let html = `
+        <div class="db-table-container">
+          <table class="db-table">
+            <thead>
+              <tr>
+                <th onclick="sortDatabase('rank')">Rank ${currentSortCol==='rank' ? (currentSortDir==='asc'?'▲':'▼') : '↕'}</th>
+                <th onclick="sortDatabase('name')">Player Name ${currentSortCol==='name' ? (currentSortDir==='asc'?'▲':'▼') : '↕'}</th>
+                <th onclick="sortDatabase('disc')">Discriminator ${currentSortCol==='disc' ? (currentSortDir==='asc'?'▲':'▼') : '↕'}</th>
+                <th onclick="sortDatabase('playerId')">Player ID ${currentSortCol==='playerId' ? (currentSortDir==='asc'?'▲':'▼') : '↕'}</th>
+                <th onclick="sortDatabase('score')" style="text-align:right;">Score ${currentSortCol==='score' ? (currentSortDir==='asc'?'▲':'▼') : '↕'}</th>
+                <th>Characters</th>
+                <th style="text-align:center;">Action</th>
+              </tr>
+            </thead>
+            <tbody>
+      `;
+      
+      data.forEach(p => {
+        let chars = [p.mainChar, p.sub1Char, p.sub2Char].filter(c => c && c !== "NoData" && c !== "Unknown").join(", ");
+        if (!chars) chars = "<span style='color:#555;'>No Data</span>";
+        if (p.mainChar === "InvalidID") chars = "<span style='color:#ff4b4b; font-weight:bold;'>InvalidID</span>";
+
+        let formattedScore = "0.00";
+        if (p.score > 0 && allRankingData.length > 0) {
+            const maxScore = allRankingData[0].score || 1;
+            formattedScore = ((Math.log10(p.score + 1) / Math.log10(maxScore + 1)) * 100).toFixed(2);
+        }
+        
+        const adminP = adminData.players.find(x => x.disc === p.disc);
+        const isProtected = (adminP && adminP.main && adminP.main.startsWith("★")) ? "🛡️ " : "";
+
+        html += `
+          <tr>
+            <td style="text-align:center;">${p.rank}</td>
+            <td style="font-weight:bold; color:#fff;">${p.name}</td>
+            <td>${p.disc}</td>
+            <td style="color:#8892b0;">${p.playerId || '-'}</td>
+            <td style="text-align:right; color:var(--accent-cyan); font-weight:bold;">${formattedScore}</td>
+            <td style="font-size:0.85rem;">${isProtected}${chars}</td>
+            <td style="text-align:center;">
+              <button class="edit-btn" style="padding:4px 10px; font-size:0.8rem;" onclick="openEditModal('${p.disc}')">✏️ 編集</button>
+            </td>
+          </tr>
+        `;
+      });
+      
+      html += `</tbody></table></div>`;
+      container.innerHTML = html;
+    }
+
 
     // =====================================
     // プレイヤー管理
@@ -420,8 +583,18 @@
     // キャラ編集モーダル
     // =====================================
     function openEditModal(disc) {
-      const p = adminData.players.find(x => x.disc === disc);
+      let p = adminData.players.find(x => x.disc === disc);
+      
+      // adminDataに見つからない場合（安全対策）、allRankingDataから補完
+      if (!p) {
+        const rankingP = allRankingData.find(x => x.disc === disc);
+        if (rankingP) {
+          p = { name: rankingP.name, disc: rankingP.disc, main: rankingP.mainChar || "", sub1: rankingP.sub1Char || "", sub2: rankingP.sub2Char || "" };
+        }
+      }
+      
       if (!p) return;
+      
       document.getElementById('editPlayerName').innerText = p.name;
       document.getElementById('editDisc').value = p.disc;
       document.getElementById('editMain').value = p.main.replace("★", "");
@@ -448,14 +621,22 @@
       }).then(res => res.json()).then(res => {
         if(res.success) {
           alert("✅ キャラクターを上書き・保護しました！");
+          
+          // adminData のローカル更新
           const p = adminData.players.find(x => x.disc === disc);
           if (p) { p.main = main ? "★" + main : ""; p.sub1 = sub1; p.sub2 = sub2; }
+          
+          // allRankingData のローカル更新
+          const rP = allRankingData.find(x => x.disc === disc);
+          if (rP) { rP.mainChar = main; rP.sub1Char = sub1; rP.sub2Char = sub2; }
           
           // 開いている画面に応じて再描画
           if (!document.getElementById('view-players').classList.contains('hidden')) {
             renderPlayerList(document.getElementById('adminPlayerSearch').value.trim());
           } else if (!document.getElementById('view-invalid').classList.contains('hidden')) {
             renderInvalidIdList();
+          } else if (!document.getElementById('view-database').classList.contains('hidden')) {
+            filterDatabase(); // データベース画面の再描画
           }
         }
       }).catch(err => alert("通信エラー"));
