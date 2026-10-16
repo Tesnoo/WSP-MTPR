@@ -84,8 +84,6 @@
     .memo-checkbox { margin-top: 4px; cursor: pointer; transform: scale(1.2); }
     .memo-text { flex: 1; color: var(--text-highlight); line-height: 1.5; outline: none; transition: color 0.3s; }
     .memo-text[contenteditable="true"]:focus { border-bottom: 1px dashed var(--accent-cyan); }
-    
-    /* ▼ 追加：削除（ゴミ箱）ボタンのスタイル */
     .btn-delete-memo { background: transparent; border: none; font-size: 1.2rem; cursor: pointer; opacity: 0.5; transition: opacity 0.2s, transform 0.2s; margin-top: 2px; }
     .btn-delete-memo:hover { opacity: 1; transform: scale(1.1); color: #ff4b4b; }
 
@@ -408,7 +406,6 @@
       const container = document.getElementById("memoListContainer");
       container.innerHTML = "";
       
-      // ▼ 追加：未完了を上に、完了済を下に並び替えてから配列を再構築する
       const incomplete = adminData.memos.filter(m => !m.done);
       const complete = adminData.memos.filter(m => m.done);
       adminData.memos = [...incomplete, ...complete];
@@ -427,7 +424,7 @@
 
     function toggleMemo(idx) {
       adminData.memos[idx].done = !adminData.memos[idx].done;
-      renderMemoList(); // チェックを切り替えると自動で未完了・完了が並び替えられる
+      renderMemoList();
     }
 
     function updateMemoText(idx, text) {
@@ -435,12 +432,10 @@
     }
 
     function addMemoRow() {
-      // ▼ 修正：新しいタスクは一番上（未完了の一番上）に追加する
       adminData.memos.unshift({ done: false, text: "新しいタスク" });
       renderMemoList();
     }
     
-    // ▼ 追加：タスク削除機能
     function deleteMemo(idx) {
       if (confirm("このタスクを削除しますか？")) {
         adminData.memos.splice(idx, 1);
