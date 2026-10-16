@@ -79,13 +79,22 @@
     #memo-screen { max-width: 800px; margin: 0 auto; width: 100%; }
     .memo-list { display: flex; flex-direction: column; gap: 10px; }
     .memo-item { background: var(--panel-bg); border: 1px solid var(--border-color); padding: 12px 15px; border-radius: 8px; display: flex; align-items: flex-start; gap: 12px; transition: opacity 0.3s; }
-    .memo-item.done { opacity: 0.5; }
+    .memo-item.done { opacity: 0.5; border-color: transparent; }
     .memo-item.done .memo-text { text-decoration: line-through; color: #8892b0; }
     .memo-checkbox { margin-top: 4px; cursor: pointer; transform: scale(1.2); }
     .memo-text { flex: 1; color: var(--text-highlight); line-height: 1.5; outline: none; transition: color 0.3s; }
     .memo-text[contenteditable="true"]:focus { border-bottom: 1px dashed var(--accent-cyan); }
     .btn-delete-memo { background: transparent; border: none; font-size: 1.2rem; cursor: pointer; opacity: 0.5; transition: opacity 0.2s, transform 0.2s; margin-top: 2px; }
     .btn-delete-memo:hover { opacity: 1; transform: scale(1.1); color: #ff4b4b; }
+
+    /* ▼ アコーディオン用のスタイル */
+    .memo-details { margin-top: 15px; background: #161b22; border-radius: 8px; border: 1px solid #333; overflow: hidden; }
+    .memo-summary { cursor: pointer; padding: 12px 15px; font-weight: bold; color: #8892b0; display: flex; align-items: center; justify-content: space-between; font-size: 0.95rem; list-style: none; outline: none; transition: background 0.2s; }
+    .memo-summary:hover { background: #1f2833; color: var(--accent-cyan); }
+    .memo-summary::-webkit-details-marker { display: none; }
+    .memo-summary::after { content: "▼"; font-size: 0.8rem; transition: transform 0.3s; color: inherit; }
+    details[open] .memo-summary::after { transform: rotate(180deg); }
+    .memo-complete-container { padding: 15px; display: flex; flex-direction: column; gap: 10px; background: #0b0c10; border-top: 1px solid #333; }
 
     .memo-actions { display: flex; gap: 10px; margin-top: 20px; }
     .btn-add { background: var(--accent-teal); color: #0b0c10; border: none; padding: 10px 20px; border-radius: 6px; font-weight: bold; cursor: pointer; }
@@ -254,7 +263,7 @@
     }
 
     // =====================================
-    // プレイヤー管理 (サジェスト機能付き)
+    // プレイヤー管理
     // =====================================
     function openPlayersView() {
       if (adminData.players.length === 0) {
@@ -402,24 +411,57 @@
       renderMemoList();
     }
 
+    // メモ用の共通パーツ作成関数
+    function createMemoElement(m, idx) {
+      const div = document.createElement("div");
+      div.className = "memo-item " + (m.done ? "done" : "");
+      div.innerHTML = `
+        <input type="checkbox" class="memo-checkbox" ${m.done ? "checked" : ""} onchange="toggleMemo(${idx})">
+        <div class="memo-text" contenteditable="true" onblur="updateMemoText(${idx}, this.innerText)">${m.text}</div>
+        <button class="btn-delete-memo" onclick="deleteMemo(${idx})" title="このタスクを削除">🗑️</button>
+      `;
+      return div;
+    }
+
     function renderMemoList() {
       const container = document.getElementById("memoListContainer");
+      
+      // アコーディオンが開いていた状態なら記憶しておく
+      const wasOpen = document.querySelector('.memo-details')?.open;
       container.innerHTML = "";
       
+      // 未完了・完了済に分類して並び替える
       const incomplete = adminData.memos.filter(m => !m.done);
       const complete = adminData.memos.filter(m => m.done);
       adminData.memos = [...incomplete, ...complete];
 
-      adminData.memos.forEach((m, idx) => {
-        const div = document.createElement("div");
-        div.className = "memo-item " + (m.done ? "done" : "");
-        div.innerHTML = `
-          <input type="checkbox" class="memo-checkbox" ${m.done ? "checked" : ""} onchange="toggleMemo(${idx})">
-          <div class="memo-text" contenteditable="true" onblur="updateMemoText(${idx}, this.innerText)">${m.text}</div>
-          <button class="btn-delete-memo" onclick="deleteMemo(${idx})" title="このタスクを削除">🗑️</button>
-        `;
-        container.appendChild(div);
+      // 未完了リストの描画
+      incomplete.forEach((m, i) => {
+        container.appendChild(createMemoElement(m, i));
       });
+
+      // 完了済リストのアコーディオン描画
+      if (complete.length > 0) {
+        const details = document.createElement("details");
+        details.className = "memo-details";
+        if (wasOpen) details.open = true; // 開いていた場合は復元
+        
+        const summary = document.createElement("summary");
+        summary.className = "memo-summary";
+        summary.innerHTML = `<span>完了済みのタスク (${complete.length}件)</span>`;
+        details.appendChild(summary);
+
+        const completeContainer = document.createElement("div");
+        completeContainer.className = "memo-complete-container";
+
+        complete.forEach((m, j) => {
+          const actualIndex = incomplete.length + j;
+          completeContainer.appendChild(createMemoElement(m, actualIndex));
+        });
+
+        details.appendChild(completeContainer);
+        container.appendChild(details);
+      }
     }
 
     function toggleMemo(idx) {
