@@ -61,8 +61,14 @@
     .header-title { color: var(--accent-cyan); font-weight: bold; font-size: 1.2rem; margin: 0; cursor: pointer; }
     .header-user { display: flex; align-items: center; gap: 10px; }
     .user-badge { background: rgba(102, 252, 241, 0.1); border: 1px solid var(--accent-teal); color: var(--accent-cyan); padding: 4px 12px; border-radius: 20px; font-size: 0.85rem; font-weight: bold; margin-right: 5px; }
-    .theme-btn { background: transparent; border: none; font-size: 1.2rem; cursor: pointer; padding: 4px; display: flex; align-items: center; justify-content: center; border-radius: 50%; width: 36px; height: 36px; }
-    .theme-btn:hover { background: var(--bg-input); }
+    
+    /* ▼ テーマ切り替えトグル用スタイル */
+    .theme-switch { position: relative; display: inline-block; width: 46px; height: 24px; flex-shrink: 0; }
+    .theme-switch input { opacity: 0; width: 0; height: 0; }
+    .theme-slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: var(--bg-input); border: 2px solid var(--accent-teal); transition: .3s; border-radius: 30px; }
+    .theme-slider:before { position: absolute; content: ""; height: 16px; width: 16px; left: 2px; bottom: 2px; background-color: var(--accent-cyan); transition: .3s; border-radius: 50%; }
+    input:checked + .theme-slider:before { transform: translateX(22px); }
+
     .logout-btn { background: transparent; border: 1px solid var(--text-muted); color: var(--text-muted); padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 0.85rem; font-weight: bold; transition: all 0.2s; }
     .logout-btn:hover { background: var(--text-muted); color: var(--btn-text); }
 
@@ -84,7 +90,7 @@
     .match-text { font-weight: 900; color: var(--accent-cyan); text-decoration: underline; }
     .suggest-item:hover .match-text { color: var(--btn-text); text-decoration: none; }
 
-    .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--modal-bg); display: flex; align-items: center; justify-content: center; z-index: 1000; transition: opacity 0.3s; }
+    .modal-overlay { fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--modal-bg); display: flex; align-items: center; justify-content: center; z-index: 1000; transition: opacity 0.3s; }
     .modal-content { background: var(--bg-panel); padding: 25px; border-radius: 12px; border: 1px solid var(--accent-teal); width: 90%; max-width: 400px; }
     .modal-content h3 { color: var(--accent-cyan); margin-top: 0; }
     .modal-content input { width: 100%; padding: 10px; margin-bottom: 15px; background: var(--bg-input); border: 1px solid var(--border-color); color: var(--text-high); border-radius: 6px; box-sizing: border-box; }
@@ -100,7 +106,7 @@
     .player-item { background: var(--bg-panel); border: 1px solid var(--border-color); padding: 15px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; }
     .player-item.invalid { border-color: #ff4b4b; background: rgba(255, 75, 75, 0.05); }
     .player-info { display: flex; flex-direction: column; gap: 4px; }
-    .player-name { font-weight: bold; color: var(--text-high); font-size: 1.1rem; }
+    .player-name { font-weight: bold; color: var(--text-high); font-size: 1.1rem; display: flex; align-items: center; }
     .player-chars { font-size: 0.85rem; color: var(--accent-teal); }
     .player-chars.invalid-text { color: #ff4b4b; font-weight: bold; }
     .edit-btn { background: var(--accent-cyan); color: var(--btn-text); border: none; padding: 8px 16px; border-radius: 6px; font-weight: bold; cursor: pointer; }
@@ -159,7 +165,14 @@
       <h1 class="header-title" onclick="showView('menu')">⚙️ Admin Console</h1>
       <div class="header-user">
         <span class="user-badge" id="displayUserName">Operator</span>
-        <button id="themeToggleBtn" class="theme-btn" onclick="toggleTheme()" title="テーマ切り替え">☀️</button>
+        <div style="display: flex; align-items: center; gap: 8px; margin: 0 10px;">
+          <span style="font-size: 1.1rem;">🌙</span>
+          <label class="theme-switch" title="テーマ切り替え">
+            <input type="checkbox" id="themeToggleCheckbox" onchange="toggleTheme()">
+            <span class="theme-slider"></span>
+          </label>
+          <span style="font-size: 1.1rem;">☀️</span>
+        </div>
         <button class="logout-btn" onclick="logout()">Logout</button>
       </div>
     </header>
@@ -265,29 +278,29 @@
   <script>
     const GAS_URL = "https://script.google.com/macros/s/AKfycby7LcmYBeJ4RwtlUrjLkTcU_NyDCZg1jm9R3HVXdNMJsSE2p6Bh08tn7uIlWygTqFeleQ/exec";
     const adminAccounts = { "Tesnoo": "Tesnoo1849" };
+    const CAUTION_IMG = `<img src="https://bizillust.nds-tyo.co.jp/wp-content/uploads/2020/12/other-warning-01-red.png" style="height:1.2em; vertical-align:-0.2em;">`;
 
     document.addEventListener('DOMContentLoaded', () => {
       updateThemeIcon(document.documentElement.getAttribute('data-theme'));
     });
 
     function toggleTheme() {
-      const current = document.documentElement.getAttribute('data-theme');
-      const next = current === 'light' ? 'dark' : 'light';
+      const cb = document.getElementById('themeToggleCheckbox');
+      const next = cb.checked ? 'light' : 'dark';
       document.documentElement.setAttribute('data-theme', next);
       localStorage.setItem('wsp_theme', next);
-      updateThemeIcon(next);
     }
 
     function updateThemeIcon(theme) {
-      const btn = document.getElementById('themeToggleBtn');
-      if (btn) btn.innerText = theme === 'light' ? '🌙' : '☀️';
+      const cb = document.getElementById('themeToggleCheckbox');
+      if (cb) cb.checked = (theme === 'light');
     }
 
     let adminData = { players: [], memos: [] };
     let allRankingData = []; 
     let currentSortCol = 'rank';
     let currentSortDir = 'asc';
-    let latestWspNum = 0; // ▼ 最新のWSP番号を保持する変数
+    let latestWspNum = 0;
 
     window.onload = () => {
       const loggedInUser = sessionStorage.getItem("mtpr_admin_user");
@@ -342,7 +355,6 @@
         .then(data => { adminData = data; })
         .catch(err => console.error("データ取得エラー", err));
         
-      // ▼ 管理画面起動時にallRankingDataも裏で取得して最新WSP番号を計算しておく
       fetch(GAS_URL + "?action=getRanking")
         .then(res => res.json())
         .then(data => {
@@ -359,7 +371,6 @@
       
       if (allRankingData.length === 0) {
         document.getElementById('dbListContainer').innerHTML = "<p style='color:var(--accent-cyan); text-align:center; padding: 40px;'>データベースを読み込み中...</p>";
-        // まだ取得完了していなければ再度フェッチ
         fetch(GAS_URL + "?action=getRanking")
           .then(res => res.json())
           .then(data => {
@@ -447,7 +458,6 @@
       `;
       
       data.forEach(p => {
-        // ▼ 要注意プレイヤー判定 (データベース用)
         let isCaution = false;
         if (p.history && p.history.length > 0) {
           const lastWsp = parseInt(p.history[0].wsp, 10);
@@ -455,7 +465,7 @@
             isCaution = p.history.slice(0, 3).some(h => h.placement && h.entrants && h.placement <= h.entrants / 2);
           }
         }
-        let cautionBadge = isCaution ? `<span style="font-size:0.75rem; background:#facc15; color:#05071D; padding:2px 6px; border-radius:12px; margin-left:6px; font-weight:bold;">⚠️ Caution</span>` : "";
+        let cautionBadge = isCaution ? `<span style="font-size:0.75rem; background:#facc15; color:#05071D; padding:2px 6px; border-radius:12px; margin-left:6px; font-weight:bold; display:inline-flex; align-items:center; gap:2px;">${CAUTION_IMG}Caution</span>` : "";
 
         let chars = [p.mainChar, p.sub1Char, p.sub2Char].filter(c => c && c !== "NoData" && c !== "Unknown").join(", ");
         if (!chars) chars = "<span style='color:var(--text-muted);'>No Data</span>";
@@ -473,7 +483,7 @@
         html += `
           <tr>
             <td style="text-align:center;">${p.rank}</td>
-            <td style="font-weight:bold; color:var(--text-high);">${p.name} ${cautionBadge}</td>
+            <td style="font-weight:bold; color:var(--text-high); display:flex; align-items:center;">${p.name} ${cautionBadge}</td>
             <td>${p.disc}</td>
             <td style="color:var(--text-muted);">${p.playerId || '-'}</td>
             <td style="text-align:right; color:var(--accent-cyan); font-weight:bold;">${formattedScore}</td>
@@ -536,7 +546,6 @@
         if (!chars) chars = "未登録 / 取得待ち";
         const isProtected = p.main.startsWith("★") ? "🛡️保護済 " : "";
 
-        // ▼ 要注意プレイヤー判定 (プレイヤー管理サジェスト用)
         let isCaution = false;
         const rankingP = allRankingData.find(x => x.disc === p.disc);
         if (rankingP && rankingP.history && rankingP.history.length > 0) {
@@ -545,10 +554,10 @@
             isCaution = rankingP.history.slice(0, 3).some(h => h.placement && h.entrants && h.placement <= h.entrants / 2);
           }
         }
-        let cautionBadge = isCaution ? `<span style="font-size:0.7rem; background:#facc15; color:#05071D; padding:2px 4px; border-radius:6px; margin-left:4px; font-weight:bold;">⚠️</span>` : "";
+        let cautionBadge = isCaution ? `<span style="font-size:0.7rem; background:#facc15; color:#05071D; padding:2px 4px; border-radius:6px; margin-left:4px; font-weight:bold; display:inline-flex; align-items:center;">${CAUTION_IMG}</span>` : "";
 
         li.innerHTML = `
-          <span style="font-weight:bold; color:var(--text-high);">${highlightedName} ${cautionBadge}</span>
+          <span style="font-weight:bold; color:var(--text-high); display:flex; align-items:center;">${highlightedName} ${cautionBadge}</span>
           <span style="font-size:0.8rem; color:var(--accent-teal);">${isProtected}${chars}</span>
         `;
         suggestList.appendChild(li);
@@ -586,7 +595,6 @@
         if (!chars) chars = "未登録 / 取得待ち";
         const isProtected = p.main.startsWith("★") ? "🛡️保護済 " : "";
 
-        // ▼ 要注意プレイヤー判定 (プレイヤー管理リスト用)
         let isCaution = false;
         const rankingP = allRankingData.find(x => x.disc === p.disc);
         if (rankingP && rankingP.history && rankingP.history.length > 0) {
@@ -595,7 +603,7 @@
             isCaution = rankingP.history.slice(0, 3).some(h => h.placement && h.entrants && h.placement <= h.entrants / 2);
           }
         }
-        let cautionBadge = isCaution ? `<span style="font-size:0.75rem; background:#facc15; color:#05071D; padding:2px 6px; border-radius:12px; margin-left:6px; font-weight:bold;">⚠️</span>` : "";
+        let cautionBadge = isCaution ? `<span style="font-size:0.75rem; background:#facc15; color:#05071D; padding:2px 6px; border-radius:12px; margin-left:6px; font-weight:bold; display:inline-flex; align-items:center;">${CAUTION_IMG}</span>` : "";
 
         const div = document.createElement("div");
         div.className = "player-item";
