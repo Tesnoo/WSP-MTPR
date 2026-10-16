@@ -15,7 +15,6 @@
   <meta name="twitter:card" content="summary">
   <link rel="icon" href="sumapa_newlogo.png">
 
-  <!-- テーマ初期化スクリプト (チラつき防止) -->
   <script>
     (function() {
       const saved = localStorage.getItem('wsp_theme') || 'dark';
@@ -103,8 +102,13 @@
     .page-btn.active { background: linear-gradient(to right, var(--accent-teal), var(--accent-cyan)); color: var(--btn-text); border: none; }
     .page-btn:disabled { background-color: var(--bg-input); border-color: var(--border-color); color: var(--text-muted); cursor: not-allowed; }
     
-    .player-card { border: 1px solid transparent; border-radius: 12px; padding: 24px; margin-bottom: 24px; background: linear-gradient(var(--bg-main), var(--bg-main)) padding-box, linear-gradient(to right, var(--accent-teal), var(--accent-cyan)) border-box; box-shadow: 0 4px 10px rgba(0,0,0,0.15); cursor: pointer; transition: background 0.3s; }
+    .player-card { position: relative; border: 1px solid transparent; border-radius: 12px; padding: 24px; margin-bottom: 24px; background: linear-gradient(var(--bg-main), var(--bg-main)) padding-box, linear-gradient(to right, var(--accent-teal), var(--accent-cyan)) border-box; box-shadow: 0 4px 10px rgba(0,0,0,0.15); cursor: pointer; transition: background 0.3s; }
     .player-card:hover { background: linear-gradient(var(--bg-hover), var(--bg-hover)) padding-box, linear-gradient(to right, var(--accent-teal), var(--accent-cyan)) border-box; }
+    
+    /* ▼ 要注意プレイヤー用スタイル */
+    .caution-card { box-shadow: 0 0 0 3px #facc15, 0 4px 10px rgba(0,0,0,0.15); }
+    .caution-card:hover { box-shadow: 0 0 0 3px #facc15, 0 8px 20px rgba(0,0,0,0.3); }
+    .caution-badge { position: absolute; top: -12px; right: 15px; background: #facc15; color: #05071D; padding: 4px 12px; border-radius: 20px; font-size: 0.85rem; font-weight: bold; box-shadow: 0 2px 5px rgba(0,0,0,0.5); z-index: 5; }
     
     .rank-text { color: var(--accent-cyan); font-size: 1.5rem; font-weight: bold; margin: 0 0 4px 0; }
     
@@ -128,7 +132,7 @@
     .supermajor-icon:hover { transform: scale(1.1); opacity: 1; }
     
     .disc-chip { background-color: var(--bg-panel); border: 1px solid var(--border-color); padding: 4px 8px; border-radius: 6px; font-size: 0.85rem; color: var(--text-main); position: relative; z-index: 2; cursor: pointer; transition: all 0.2s; }
-    .disc-chip:hover { background-color: var(--accent-teal); color: var(--btn-text); border-color: var(--accent-cyan); }
+    .disc-chip:hover { background: linear-gradient(to right, var(--accent-teal), var(--accent-cyan)); color: var(--btn-text); border-color: transparent; }
     
     .history-wrapper { display: none; margin-top: 24px; }
     .player-card.expanded .history-wrapper { display: block; }
@@ -328,6 +332,7 @@
     let allData = [];
     let currentPage = 1;
     const itemsPerPage = 50;
+    let latestWspNum = 0; // ▼ 最新のWSP番号を保持する変数
 
     function openModal() {
       const expiry = localStorage.getItem('wsp_auth_expiry');
@@ -407,10 +412,20 @@
         let badgeHtml = p.officialRank ? `<span class="suggest-official">📊 ${p.officialRank}</span>` : '';
         const formattedScore = getDisplayScore(p.score);
         
+        // ▼ 要注意プレイヤー判定 (サジェスト用)
+        let isCaution = false;
+        if (p.history && p.history.length > 0) {
+          const lastWsp = parseInt(p.history[0].wsp, 10);
+          if (!isNaN(lastWsp) && (latestWspNum - lastWsp >= 25)) {
+            isCaution = p.history.slice(0, 3).some(h => h.placement && h.entrants && h.placement <= h.entrants / 2);
+          }
+        }
+        let cautionIcon = isCaution ? `<span style="font-size:0.7rem; background:#facc15; color:#05071D; padding:2px 4px; border-radius:6px; margin-left:4px; font-weight:bold;">⚠️</span>` : "";
+        
         li.innerHTML = `
           <span class="suggest-rank">${getOrdinal(p.rank)}/${totalPlayers}</span>
           <div class="suggest-name-wrapper">
-            <span class="suggest-name">${highlightedName}</span>
+            <span class="suggest-name">${highlightedName} ${cautionIcon}</span>
           </div>
           ${badgeHtml}
           <span class="suggest-score">Score ${formattedScore}</span>
@@ -492,6 +507,30 @@
             `;
           } 
         });
+
+        // ▼ 要注意プレイヤー判定 (カード用)
+        let isCaution = false;
+        let cautionText = "";
+        if (player.history && player.history.length > 0) {
+          const lastEvent = player.history[0];
+          const lastWsp = parseInt(lastEvent.wsp, 10);
+          if (!isNaN(lastWsp) && (latestWspNum - lastWsp >= 25)) {
+            const hasGoodResult = player.history.slice(0, 3).some(h => {
+              return h.placement && h.entrants && (h.placement <= h.entrants / 2);
+            });
+            if (hasGoodResult) {
+              isCaution = true;
+              cautionText = `⚠️ 最終出場: #${lastEvent.wsp} (${lastEvent.dateStr})`;
+            }
+          }
+        }
+
+        let cautionBadgeHtml = '';
+        let cautionClass = '';
+        if (isCaution) {
+          cautionBadgeHtml = `<div class="caution-badge">${cautionText}</div>`;
+          cautionClass = ' caution-card';
+        }
         
         let startGgHtml = `<a href="https://start.gg/user/${player.disc.split('-')[0]}" target="_blank" class="startgg-link" title="start.gg Profile">
                             <img src="${STARTGG_ICON_URL}" alt="start.gg" class="startgg-icon" onerror="this.outerHTML='start.gg'">
@@ -541,10 +580,11 @@
         const formattedScore = displayScore.toFixed(2);
 
         const card = document.createElement('div');
-        card.className = 'player-card';
+        card.className = 'player-card' + cautionClass;
         card.setAttribute('onclick', 'toggleCard(this, event)');
         
         card.innerHTML = `
+          ${cautionBadgeHtml}
           <div class="rank-text">${getOrdinal(player.rank)}</div>
           
           <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; margin-bottom: 12px; width: 100%;">
@@ -600,6 +640,10 @@
         if(data.error) throw new Error(data.error);
         document.getElementById('loading').style.display = 'none';
         allData = data;
+        
+        // ▼ 最新のWSP番号を算出
+        latestWspNum = Math.max(...allData.map(p => p.lastWspNum || 0));
+        
         renderPage(1);
       })
       .catch(err => {
@@ -775,10 +819,21 @@
         let badge = p.lastPlacement === 1 ? `<span class="champ-badge">👑 #${p.lastWspNum}優勝</span>` : "";
         
         let playerNameHtml = p.rawTag;
+        
+        // ▼ 要注意プレイヤー判定 (シード用)
+        let isCaution = false;
         if (p.disc && p.disc !== "なし") {
+          const prPlayer = allData.find(d => d.disc.toLowerCase() === p.disc.toLowerCase());
+          if (prPlayer && prPlayer.history && prPlayer.history.length > 0) {
+            const lastWsp = parseInt(prPlayer.history[0].wsp, 10);
+            if (!isNaN(lastWsp) && (latestWspNum - lastWsp >= 25)) {
+              isCaution = prPlayer.history.slice(0, 3).some(h => h.placement && h.entrants && h.placement <= h.entrants / 2);
+            }
+          }
           const userSlug = p.disc.split('-')[0];
           playerNameHtml = `<a href="https://www.start.gg/user/${userSlug}" target="_blank" class="player-link" draggable="false">${p.rawTag}</a>`;
         }
+        let cautionBadge = isCaution ? `<span style="font-size:0.75rem; background:#facc15; color:#05071D; padding:2px 6px; border-radius:12px; margin-left:6px; font-weight:bold;">⚠️ Caution</span>` : "";
 
         let officialRankBadge = p.officialRank ? `<span class="seed-rank-badge" title="公式ランキング">📊 ${p.officialRank}</span>` : "";
 
@@ -818,7 +873,7 @@
 
         tr.innerHTML = `
           <td style="text-align:center;">${i+1}</td>
-          <td>${playerNameHtml} ${badge} ${officialRankBadge}</td>
+          <td>${playerNameHtml} ${badge} ${officialRankBadge} ${cautionBadge}</td>
           <td style="font-size: 0.85rem; color: var(--text-muted); padding-right: 15px;">${historyText}</td>
           <td style="text-align:right; font-weight:bold;">${formattedScore}</td>
         `;
