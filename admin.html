@@ -5,115 +5,141 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>WSP-MTPR Admin Console</title>
   <link rel="icon" href="sumapa_newlogo.png">
+
+  <!-- テーマ初期化スクリプト (チラつき防止) -->
+  <script>
+    (function() {
+      const saved = localStorage.getItem('wsp_theme') || 'dark';
+      document.documentElement.setAttribute('data-theme', saved);
+    })();
+  </script>
   
   <style>
     :root {
-      --bg-color: #05071D; --panel-bg: #1f2833; --text-main: #c5c6c7;
-      --text-highlight: #ffffff; --accent-cyan: #66fcf1; --accent-teal: #45a29e;
+      --bg-main: #05071D;
+      --bg-panel: #1f2833;
+      --bg-input: #0b0c10;
+      --bg-hover: #161b22;
+      --text-main: #c5c6c7;
+      --text-high: #ffffff;
+      --text-muted: #8892b0;
+      --accent-cyan: #66fcf1;
+      --accent-teal: #45a29e;
       --border-color: #333;
+      --btn-text: #0b0c10;
+      --modal-bg: rgba(5, 7, 29, 0.9);
+    }
+    :root[data-theme="light"] {
+      --bg-main: #f0f4f8;
+      --bg-panel: #ffffff;
+      --bg-input: #e2e8f0;
+      --bg-hover: #f8fafc;
+      --text-main: #334155;
+      --text-high: #0f172a;
+      --text-muted: #64748b;
+      --accent-cyan: #0284c7;
+      --accent-teal: #0ea5e9;
+      --border-color: #cbd5e1;
+      --btn-text: #ffffff;
+      --modal-bg: rgba(255, 255, 255, 0.9);
     }
 
-    body { background-color: var(--bg-color); color: var(--text-main); font-family: 'Helvetica Neue', Arial, sans-serif; margin: 0; padding: 0; height: 100vh; display: flex; flex-direction: column; }
+    body { background-color: var(--bg-main); color: var(--text-main); font-family: 'Helvetica Neue', Arial, sans-serif; margin: 0; padding: 0; height: 100vh; display: flex; flex-direction: column; transition: background-color 0.3s, color 0.3s; }
     .hidden { display: none !important; }
 
     #login-screen { flex: 1; display: flex; align-items: center; justify-content: center; padding: 20px; }
-    .login-box { background: linear-gradient(var(--panel-bg), var(--panel-bg)) padding-box, linear-gradient(to right, var(--accent-teal), var(--accent-cyan)) border-box; border: 1px solid transparent; border-radius: 12px; padding: 40px 30px; width: 100%; max-width: 350px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.8); }
+    .login-box { background: linear-gradient(var(--bg-panel), var(--bg-panel)) padding-box, linear-gradient(to right, var(--accent-teal), var(--accent-cyan)) border-box; border: 1px solid transparent; border-radius: 12px; padding: 40px 30px; width: 100%; max-width: 350px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.15); }
     .login-title { color: var(--accent-cyan); margin: 0 0 20px 0; font-size: 1.5rem; letter-spacing: 2px; }
     .input-group { margin-bottom: 20px; text-align: left; }
     .input-group label { display: block; font-size: 0.85rem; color: var(--accent-teal); margin-bottom: 8px; font-weight: bold; }
-    .input-group input { width: 100%; padding: 12px; background: #0b0c10; border: 1px solid var(--accent-teal); color: #fff; border-radius: 8px; font-size: 1rem; box-sizing: border-box; transition: box-shadow 0.3s; }
+    .input-group input { width: 100%; padding: 12px; background: var(--bg-input); border: 1px solid var(--accent-teal); color: var(--text-high); border-radius: 8px; font-size: 1rem; box-sizing: border-box; transition: box-shadow 0.3s; }
     .input-group input:focus { outline: none; box-shadow: 0 0 10px rgba(102, 252, 241, 0.3); }
-    .login-btn { width: 100%; padding: 14px; background: linear-gradient(to right, var(--accent-teal), var(--accent-cyan)); color: #0b0c10; border: none; border-radius: 8px; font-weight: bold; font-size: 1.1rem; cursor: pointer; transition: transform 0.2s, filter 0.2s; }
+    .login-btn { width: 100%; padding: 14px; background: linear-gradient(to right, var(--accent-teal), var(--accent-cyan)); color: var(--btn-text); border: none; border-radius: 8px; font-weight: bold; font-size: 1.1rem; cursor: pointer; transition: transform 0.2s, filter 0.2s; }
     .login-btn:hover { transform: translateY(-2px); filter: brightness(1.1); }
 
     #dashboard-screen { flex: 1; display: flex; flex-direction: column; }
-    .header { background: var(--panel-bg); border-bottom: 1px solid var(--accent-teal); padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; }
+    .header { background: var(--bg-panel); border-bottom: 1px solid var(--accent-teal); padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; }
     .header-title { color: var(--accent-cyan); font-weight: bold; font-size: 1.2rem; margin: 0; cursor: pointer; }
-    .header-user { display: flex; align-items: center; gap: 15px; }
-    .user-badge { background: rgba(102, 252, 241, 0.1); border: 1px solid var(--accent-teal); color: var(--accent-cyan); padding: 4px 12px; border-radius: 20px; font-size: 0.85rem; font-weight: bold; }
-    .logout-btn { background: transparent; border: 1px solid #8892b0; color: #8892b0; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 0.85rem; font-weight: bold; transition: all 0.2s; }
-    .logout-btn:hover { background: #8892b0; color: #0b0c10; }
+    .header-user { display: flex; align-items: center; gap: 10px; }
+    .user-badge { background: rgba(102, 252, 241, 0.1); border: 1px solid var(--accent-teal); color: var(--accent-cyan); padding: 4px 12px; border-radius: 20px; font-size: 0.85rem; font-weight: bold; margin-right: 5px; }
+    .theme-btn { background: transparent; border: none; font-size: 1.2rem; cursor: pointer; padding: 4px; display: flex; align-items: center; justify-content: center; border-radius: 50%; width: 36px; height: 36px; }
+    .theme-btn:hover { background: var(--bg-input); }
+    .logout-btn { background: transparent; border: 1px solid var(--text-muted); color: var(--text-muted); padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 0.85rem; font-weight: bold; transition: all 0.2s; }
+    .logout-btn:hover { background: var(--text-muted); color: var(--btn-text); }
 
     .main-content { padding: 30px 20px; max-width: 1200px; margin: 0 auto; width: 100%; box-sizing: border-box; }
-    .welcome-text { color: var(--text-highlight); font-size: 1.5rem; margin-bottom: 30px; }
+    .welcome-text { color: var(--text-high); font-size: 1.5rem; margin-bottom: 30px; }
 
     .menu-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
-    .menu-card { background: linear-gradient(var(--panel-bg), var(--panel-bg)) padding-box, linear-gradient(to right, var(--accent-teal), var(--accent-cyan)) border-box; border: 1px solid transparent; border-radius: 12px; padding: 24px; cursor: pointer; transition: transform 0.3s, box-shadow 0.3s; position: relative; overflow: hidden; }
-    .menu-card:hover { transform: translateY(-5px); box-shadow: 0 8px 20px rgba(0,0,0,0.6); }
+    .menu-card { background: linear-gradient(var(--bg-panel), var(--bg-panel)) padding-box, linear-gradient(to right, var(--accent-teal), var(--accent-cyan)) border-box; border: 1px solid transparent; border-radius: 12px; padding: 24px; cursor: pointer; transition: transform 0.3s, box-shadow 0.3s; position: relative; overflow: hidden; }
+    .menu-card:hover { transform: translateY(-5px); box-shadow: 0 8px 20px rgba(0,0,0,0.15); }
     .menu-icon { font-size: 2.5rem; margin-bottom: 15px; display: block; }
     .menu-title { color: var(--accent-cyan); font-size: 1.2rem; font-weight: bold; margin: 0 0 8px 0; }
     .menu-desc { color: var(--text-main); font-size: 0.9rem; margin: 0; line-height: 1.5; }
 
-    /* =========================================
-       共通UI・検索・モーダル
-       ========================================= */
     .search-wrapper { position: relative; flex: 1; }
-    .search-wrapper input { width: 100%; padding: 12px; background: #0b0c10; border: 1px solid var(--accent-teal); color: #fff; border-radius: 8px; font-size: 1rem; box-sizing: border-box; }
-    .suggest-list { position: absolute; top: calc(100% + 4px); left: 0; right: 0; background: #1f2833; border: 1px solid var(--accent-teal); border-radius: 8px; list-style: none; padding: 0; margin: 0; max-height: 300px; overflow-y: auto; z-index: 100; box-shadow: 0 4px 15px rgba(0,0,0,0.8); }
-    .suggest-item { padding: 12px 15px; border-bottom: 1px solid #333; cursor: pointer; display: flex; align-items: center; justify-content: space-between; gap: 10px; font-size: 0.95rem; }
-    .suggest-item:hover { background: linear-gradient(to right, var(--accent-teal), var(--accent-cyan)); color: #0b0c10; }
+    .search-wrapper input { width: 100%; padding: 12px; background: var(--bg-input); border: 1px solid var(--accent-teal); color: var(--text-high); border-radius: 8px; font-size: 1rem; box-sizing: border-box; }
+    .suggest-list { position: absolute; top: calc(100% + 4px); left: 0; right: 0; background: var(--bg-panel); border: 1px solid var(--accent-teal); border-radius: 8px; list-style: none; padding: 0; margin: 0; max-height: 300px; overflow-y: auto; z-index: 100; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
+    .suggest-item { padding: 12px 15px; border-bottom: 1px solid var(--border-color); cursor: pointer; display: flex; align-items: center; justify-content: space-between; gap: 10px; font-size: 0.95rem; }
+    .suggest-item:hover { background: linear-gradient(to right, var(--accent-teal), var(--accent-cyan)); color: var(--btn-text); }
     .match-text { font-weight: 900; color: var(--accent-cyan); text-decoration: underline; }
-    .suggest-item:hover .match-text { color: #05071D; text-decoration: none; }
+    .suggest-item:hover .match-text { color: var(--btn-text); text-decoration: none; }
 
-    .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(5,7,29,0.8); display: flex; align-items: center; justify-content: center; z-index: 1000; }
-    .modal-content { background: var(--panel-bg); padding: 25px; border-radius: 12px; border: 1px solid var(--accent-teal); width: 90%; max-width: 400px; }
+    .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--modal-bg); display: flex; align-items: center; justify-content: center; z-index: 1000; transition: opacity 0.3s; }
+    .modal-content { background: var(--bg-panel); padding: 25px; border-radius: 12px; border: 1px solid var(--accent-teal); width: 90%; max-width: 400px; }
     .modal-content h3 { color: var(--accent-cyan); margin-top: 0; }
-    .modal-content input { width: 100%; padding: 10px; margin-bottom: 15px; background: #0b0c10; border: 1px solid #333; color: #fff; border-radius: 6px; box-sizing: border-box; }
+    .modal-content input { width: 100%; padding: 10px; margin-bottom: 15px; background: var(--bg-input); border: 1px solid var(--border-color); color: var(--text-high); border-radius: 6px; box-sizing: border-box; }
     .modal-buttons { display: flex; gap: 10px; justify-content: flex-end; }
     .modal-buttons button { padding: 10px 15px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; }
-    .btn-save { background: var(--accent-cyan); color: #0b0c10; }
-    .btn-cancel { background: #333; color: #fff; }
+    .btn-save { background: var(--accent-cyan); color: var(--btn-text); }
+    .btn-cancel { background: var(--border-color); color: var(--text-high); }
 
-    /* =========================================
-       各画面のスタイル
-       ========================================= */
     #players-screen, #invalid-screen, #memo-screen { max-width: 800px; margin: 0 auto; width: 100%; }
     #database-screen { max-width: 1200px; margin: 0 auto; width: 100%; }
     
     .player-list { display: flex; flex-direction: column; gap: 10px; max-height: 50vh; overflow-y: auto; padding-right: 10px; }
-    .player-item { background: var(--panel-bg); border: 1px solid var(--border-color); padding: 15px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; }
+    .player-item { background: var(--bg-panel); border: 1px solid var(--border-color); padding: 15px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; }
     .player-item.invalid { border-color: #ff4b4b; background: rgba(255, 75, 75, 0.05); }
     .player-info { display: flex; flex-direction: column; gap: 4px; }
-    .player-name { font-weight: bold; color: var(--text-highlight); font-size: 1.1rem; }
+    .player-name { font-weight: bold; color: var(--text-high); font-size: 1.1rem; }
     .player-chars { font-size: 0.85rem; color: var(--accent-teal); }
     .player-chars.invalid-text { color: #ff4b4b; font-weight: bold; }
-    .edit-btn { background: var(--accent-cyan); color: #0b0c10; border: none; padding: 8px 16px; border-radius: 6px; font-weight: bold; cursor: pointer; }
+    .edit-btn { background: var(--accent-cyan); color: var(--btn-text); border: none; padding: 8px 16px; border-radius: 6px; font-weight: bold; cursor: pointer; }
 
-    .db-table-container { overflow-x: auto; max-height: 65vh; border: 1px solid var(--border-color); border-radius: 8px; background: var(--panel-bg); }
+    .db-table-container { overflow-x: auto; max-height: 65vh; border: 1px solid var(--border-color); border-radius: 8px; background: var(--bg-panel); }
     .db-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
-    .db-table th { background: #0b0c10; color: var(--accent-cyan); padding: 12px 15px; position: sticky; top: 0; z-index: 10; text-align: left; cursor: pointer; border-bottom: 2px solid var(--accent-teal); white-space: nowrap; user-select: none; }
-    .db-table th:hover { background: #161b22; }
+    .db-table th { background: var(--bg-input); color: var(--accent-cyan); padding: 12px 15px; position: sticky; top: 0; z-index: 10; text-align: left; cursor: pointer; border-bottom: 2px solid var(--accent-teal); white-space: nowrap; user-select: none; }
+    .db-table th:hover { background: var(--bg-hover); }
     .db-table td { padding: 10px 15px; border-bottom: 1px solid var(--border-color); color: var(--text-main); white-space: nowrap; }
-    .db-table tr:hover { background: #161b22; }
-    .sheet-link-btn { display: inline-flex; align-items: center; gap: 6px; background: transparent; border: 1px solid #8892b0; color: #8892b0; padding: 8px 16px; border-radius: 6px; font-size: 0.9rem; font-weight: bold; text-decoration: none; transition: all 0.2s; }
-    .sheet-link-btn:hover { background: #8892b0; color: #0b0c10; }
+    .db-table tr:hover { background: var(--bg-hover); }
+    .sheet-link-btn { display: inline-flex; align-items: center; gap: 6px; background: transparent; border: 1px solid var(--text-muted); color: var(--text-muted); padding: 8px 16px; border-radius: 6px; font-size: 0.9rem; font-weight: bold; text-decoration: none; transition: all 0.2s; }
+    .sheet-link-btn:hover { background: var(--text-muted); color: var(--btn-text); }
 
     .memo-list { display: flex; flex-direction: column; gap: 10px; }
-    .memo-item { background: var(--panel-bg); border: 1px solid var(--border-color); padding: 12px 15px; border-radius: 8px; display: flex; align-items: flex-start; gap: 12px; transition: opacity 0.3s; }
+    .memo-item { background: var(--bg-panel); border: 1px solid var(--border-color); padding: 12px 15px; border-radius: 8px; display: flex; align-items: flex-start; gap: 12px; transition: opacity 0.3s; }
     .memo-item.done { opacity: 0.5; border-color: transparent; }
-    .memo-item.done .memo-text { text-decoration: line-through; color: #8892b0; }
+    .memo-item.done .memo-text { text-decoration: line-through; color: var(--text-muted); }
     .memo-checkbox { margin-top: 4px; cursor: pointer; transform: scale(1.2); }
-    .memo-text { flex: 1; color: var(--text-highlight); line-height: 1.5; outline: none; transition: color 0.3s; }
+    .memo-text { flex: 1; color: var(--text-high); line-height: 1.5; outline: none; transition: color 0.3s; }
     .memo-text[contenteditable="true"]:focus { border-bottom: 1px dashed var(--accent-cyan); }
     .btn-delete-memo { background: transparent; border: none; font-size: 1.2rem; cursor: pointer; opacity: 0.5; transition: opacity 0.2s, transform 0.2s; margin-top: 2px; }
     .btn-delete-memo:hover { opacity: 1; transform: scale(1.1); color: #ff4b4b; }
-    .memo-details { margin-top: 15px; background: #161b22; border-radius: 8px; border: 1px solid #333; overflow: hidden; }
-    .memo-summary { cursor: pointer; padding: 12px 15px; font-weight: bold; color: #8892b0; display: flex; align-items: center; justify-content: space-between; font-size: 0.95rem; list-style: none; outline: none; transition: background 0.2s; }
-    .memo-summary:hover { background: #1f2833; color: var(--accent-cyan); }
+    .memo-details { margin-top: 15px; background: var(--bg-hover); border-radius: 8px; border: 1px solid var(--border-color); overflow: hidden; }
+    .memo-summary { cursor: pointer; padding: 12px 15px; font-weight: bold; color: var(--text-muted); display: flex; align-items: center; justify-content: space-between; font-size: 0.95rem; list-style: none; outline: none; transition: background 0.2s; }
+    .memo-summary:hover { background: var(--bg-panel); color: var(--accent-cyan); }
     .memo-summary::-webkit-details-marker { display: none; }
     .memo-summary::after { content: "▼"; font-size: 0.8rem; transition: transform 0.3s; color: inherit; }
     details[open] .memo-summary::after { transform: rotate(180deg); }
-    .memo-complete-container { padding: 15px; display: flex; flex-direction: column; gap: 10px; background: #0b0c10; border-top: 1px solid #333; }
+    .memo-complete-container { padding: 15px; display: flex; flex-direction: column; gap: 10px; background: var(--bg-input); border-top: 1px solid var(--border-color); }
     .memo-actions { display: flex; gap: 10px; margin-top: 20px; }
-    .btn-add { background: var(--accent-teal); color: #0b0c10; border: none; padding: 10px 20px; border-radius: 6px; font-weight: bold; cursor: pointer; }
-    .btn-save-memo { background: var(--accent-cyan); color: #0b0c10; border: none; padding: 10px 20px; border-radius: 6px; font-weight: bold; cursor: pointer; margin-left: auto; }
+    .btn-add { background: var(--accent-teal); color: var(--btn-text); border: none; padding: 10px 20px; border-radius: 6px; font-weight: bold; cursor: pointer; }
+    .btn-save-memo { background: var(--accent-cyan); color: var(--btn-text); border: none; padding: 10px 20px; border-radius: 6px; font-weight: bold; cursor: pointer; margin-left: auto; }
 
     .loader { text-align: center; color: var(--accent-cyan); padding: 50px; font-size: 1.2rem; }
   </style>
 </head>
 <body>
 
-  <!-- ログイン画面 -->
   <div id="login-screen">
     <div class="login-box">
       <h2 class="login-title">ADMIN LOGIN</h2>
@@ -129,19 +155,18 @@
     </div>
   </div>
 
-  <!-- ダッシュボード画面 -->
   <div id="dashboard-screen" class="hidden">
     <header class="header">
       <h1 class="header-title" onclick="showView('menu')">⚙️ Admin Console</h1>
       <div class="header-user">
         <span class="user-badge" id="displayUserName">Operator</span>
+        <button id="themeToggleBtn" class="theme-btn" onclick="toggleTheme()" title="テーマ切り替え">☀️</button>
         <button class="logout-btn" onclick="logout()">Logout</button>
       </div>
     </header>
 
     <main class="main-content">
       
-      <!-- メニュー一覧 -->
       <div id="view-menu">
         <h2 class="welcome-text"><span id="welcomeUserName"></span>さん、お疲れ様です。</h2>
         <div class="menu-grid">
@@ -168,25 +193,23 @@
         </div>
       </div>
 
-      <!-- 参加者データベース (テーブル表示) -->
       <div id="view-database" class="hidden">
         <div style="display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:20px; flex-wrap:wrap; gap:10px;">
           <div>
             <button class="logout-btn" style="margin-bottom: 15px;" onclick="showView('menu')">↩️ メニューに戻る</button>
             <h2 style="color:var(--accent-cyan); margin-top:0; margin-bottom:5px;">🗄️ 参加者データベース</h2>
-            <p style="color:#8892b0; font-size:0.85rem; margin:0;">各列のタイトルをクリックすると並び替え（ソート）ができます。</p>
+            <p style="color:var(--text-muted); font-size:0.85rem; margin:0;">各列のタイトルをクリックすると並び替え（ソート）ができます。</p>
           </div>
           <a href="https://docs.google.com/spreadsheets/d/1O9yHyAGwhuLL_acG98JnUY89npMXG1K0z0lCOI9GgPI/edit" target="_blank" class="sheet-link-btn">🔗 スプレッドシートを開く (生データ編集)</a>
         </div>
         
         <div style="margin-bottom: 15px; position: relative;">
-          <input type="text" id="dbSearchInput" placeholder="プレイヤー名、Discriminator、キャラ名で絞り込み..." oninput="filterDatabase()" style="width: 100%; padding: 10px 15px; background: #0b0c10; border: 1px solid var(--accent-teal); color: #fff; border-radius: 8px; font-size: 0.95rem; box-sizing: border-box;">
+          <input type="text" id="dbSearchInput" placeholder="プレイヤー名、Discriminator、キャラ名で絞り込み..." oninput="filterDatabase()" style="width: 100%; padding: 10px 15px; background: var(--bg-input); border: 1px solid var(--accent-teal); color: var(--text-high); border-radius: 8px; font-size: 0.95rem; box-sizing: border-box;">
         </div>
 
         <div id="dbListContainer"></div>
       </div>
 
-      <!-- プレイヤー管理 (サジェスト検索) -->
       <div id="view-players" class="hidden">
         <button class="logout-btn" style="margin-bottom: 20px;" onclick="showView('menu')">↩️ メニューに戻る</button>
         <h2 style="color:var(--accent-cyan); margin-top:0;">👥 プレイヤー＆キャラ管理</h2>
@@ -196,21 +219,19 @@
             <input type="text" id="adminPlayerSearch" placeholder="プレイヤー名 または Discriminator で検索..." oninput="handleAdminSearchInput()" onkeydown="if(event.key==='Enter') executeAdminSearch()" autocomplete="off">
             <ul id="adminSuggestList" class="suggest-list hidden"></ul>
           </div>
-          <button style="padding: 10px 16px; background: linear-gradient(to right, var(--accent-teal), var(--accent-cyan)); border: none; color: #0b0c10; border-radius: 8px; font-weight: bold; cursor: pointer;" onclick="executeAdminSearch()">🔍</button>
+          <button style="padding: 10px 16px; background: linear-gradient(to right, var(--accent-teal), var(--accent-cyan)); border: none; color: var(--btn-text); border-radius: 8px; font-weight: bold; cursor: pointer;" onclick="executeAdminSearch()">🔍</button>
         </div>
 
         <div id="playerListContainer" class="player-list"></div>
       </div>
 
-      <!-- 無効ID 検出リスト -->
       <div id="view-invalid" class="hidden">
         <button class="logout-btn" style="margin-bottom: 20px;" onclick="showView('menu')">↩️ メニューに戻る</button>
         <h2 style="color:#ff4b4b; margin-top:0;">🚨 無効ID (InvalidID) 検出リスト</h2>
-        <p style="color:#8892b0; font-size:0.9rem; margin-bottom:20px;">以下のプレイヤーは、start.ggのPlayer IDが間違っているためSupermajorのリンクが無効になっています。正しいIDを調べてGAS側のスプレッドシート（V列）を修正するか、キャラを手動で上書きしてください。</p>
+        <p style="color:var(--text-muted); font-size:0.9rem; margin-bottom:20px;">以下のプレイヤーは、start.ggのPlayer IDが間違っているためSupermajorのリンクが無効になっています。正しいIDを調べてGAS側のスプレッドシート（V列）を修正するか、キャラを手動で上書きしてください。</p>
         <div id="invalidListContainer" class="player-list"></div>
       </div>
 
-      <!-- 改修メモ -->
       <div id="view-memo" class="hidden">
         <button class="logout-btn" style="margin-bottom: 20px;" onclick="showView('menu')">↩️ メニューに戻る</button>
         <h2 style="color:var(--accent-cyan); margin-top:0;">📝 改修メモ (TODO)</h2>
@@ -224,11 +245,10 @@
     </main>
   </div>
 
-  <!-- キャラ編集モーダル -->
   <div id="editModal" class="modal-overlay hidden">
     <div class="modal-content">
       <h3 id="editPlayerName">Player Name</h3>
-      <p style="font-size:0.8rem; color:#8892b0; margin-bottom:15px;">※英語名で入力してください。空欄にすると削除されます。ここで保存したキャラは自動取得で上書きされません。</p>
+      <p style="font-size:0.8rem; color:var(--text-muted); margin-bottom:15px;">※英語名で入力してください。空欄にすると削除されます。ここで保存したキャラは自動取得で上書きされません。</p>
       <input type="hidden" id="editDisc">
       <label style="color:var(--accent-teal); font-size:0.85rem;">Main Character</label>
       <input type="text" id="editMain">
@@ -246,6 +266,23 @@
   <script>
     const GAS_URL = "https://script.google.com/macros/s/AKfycby7LcmYBeJ4RwtlUrjLkTcU_NyDCZg1jm9R3HVXdNMJsSE2p6Bh08tn7uIlWygTqFeleQ/exec";
     const adminAccounts = { "Tesnoo": "Tesnoo1849" };
+
+    document.addEventListener('DOMContentLoaded', () => {
+      updateThemeIcon(document.documentElement.getAttribute('data-theme'));
+    });
+
+    function toggleTheme() {
+      const current = document.documentElement.getAttribute('data-theme');
+      const next = current === 'light' ? 'dark' : 'light';
+      document.documentElement.setAttribute('data-theme', next);
+      localStorage.setItem('wsp_theme', next);
+      updateThemeIcon(next);
+    }
+
+    function updateThemeIcon(theme) {
+      const btn = document.getElementById('themeToggleBtn');
+      if (btn) btn.innerText = theme === 'light' ? '🌙' : '☀️';
+    }
 
     let adminData = { players: [], memos: [] };
     let allRankingData = []; 
@@ -311,7 +348,7 @@
       document.getElementById('dbSearchInput').value = "";
       
       if (allRankingData.length === 0) {
-        document.getElementById('dbListContainer').innerHTML = "<p style='color:#66fcf1; text-align:center; padding: 40px;'>データベースを読み込み中...</p>";
+        document.getElementById('dbListContainer').innerHTML = "<p style='color:var(--accent-cyan); text-align:center; padding: 40px;'>データベースを読み込み中...</p>";
         fetch(GAS_URL + "?action=getRanking")
           .then(res => res.json())
           .then(data => {
@@ -399,7 +436,7 @@
       
       data.forEach(p => {
         let chars = [p.mainChar, p.sub1Char, p.sub2Char].filter(c => c && c !== "NoData" && c !== "Unknown").join(", ");
-        if (!chars) chars = "<span style='color:#555;'>No Data</span>";
+        if (!chars) chars = "<span style='color:var(--text-muted);'>No Data</span>";
         if (p.mainChar === "InvalidID") chars = "<span style='color:#ff4b4b; font-weight:bold;'>InvalidID</span>";
 
         let formattedScore = "0.00";
@@ -414,9 +451,9 @@
         html += `
           <tr>
             <td style="text-align:center;">${p.rank}</td>
-            <td style="font-weight:bold; color:#fff;">${p.name}</td>
+            <td style="font-weight:bold; color:var(--text-high);">${p.name}</td>
             <td>${p.disc}</td>
-            <td style="color:#8892b0;">${p.playerId || '-'}</td>
+            <td style="color:var(--text-muted);">${p.playerId || '-'}</td>
             <td style="text-align:right; color:var(--accent-cyan); font-weight:bold;">${formattedScore}</td>
             <td style="font-size:0.85rem;">${isProtected}${chars}</td>
             <td style="text-align:center;">
@@ -478,7 +515,7 @@
         const isProtected = p.main.startsWith("★") ? "🛡️保護済 " : "";
 
         li.innerHTML = `
-          <span style="font-weight:bold; color:#fff;">${highlightedName}</span>
+          <span style="font-weight:bold; color:var(--text-high);">${highlightedName}</span>
           <span style="font-size:0.8rem; color:var(--accent-teal);">${isProtected}${chars}</span>
         `;
         suggestList.appendChild(li);
@@ -507,7 +544,7 @@
       const filtered = adminData.players.filter(p => p.name.toLowerCase().includes(q) || p.disc.toLowerCase().includes(q));
       
       if(filtered.length === 0) {
-        container.innerHTML = "<p style='color:#8892b0;'>該当するプレイヤーが見つかりません</p>";
+        container.innerHTML = "<p style='color:var(--text-muted);'>該当するプレイヤーが見つかりません</p>";
         return;
       }
       
@@ -545,7 +582,7 @@
       const invalidPlayers = adminData.players.filter(p => p.main && p.main.includes("InvalidID"));
       
       if(invalidPlayers.length === 0) {
-        container.innerHTML = "<p style='color:#66fcf1; font-weight:bold; font-size:1.1rem; padding: 20px 0;'>🎉 現在、無効なID（InvalidID）のプレイヤーはいません！</p>";
+        container.innerHTML = "<p style='color:var(--accent-cyan); font-weight:bold; font-size:1.1rem; padding: 20px 0;'>🎉 現在、無効なID（InvalidID）のプレイヤーはいません！</p>";
         return;
       }
       
