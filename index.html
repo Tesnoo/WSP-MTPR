@@ -66,7 +66,7 @@
     .container { max-width: 720px; margin: 0 auto; display: flex; flex-direction: column; }
 
     .top-controls { display: flex; flex-direction: column; align-items: stretch; margin-bottom: 24px; gap: 12px; }
-    .top-controls-top { display: flex; justify-content: flex-end; gap: 10px; }
+    .top-controls-top { display: flex; justify-content: flex-end; align-items: center; gap: 10px; }
     .search-container { display: flex; gap: 8px; width: 100%; }
     .search-wrapper { position: relative; flex: 1; }
     .search-wrapper input { width: 100%; padding: 10px 12px; background: var(--bg-input); border: 1px solid var(--accent-teal); color: var(--text-high); border-radius: 8px; font-size: 0.95rem; box-sizing: border-box; }
@@ -95,7 +95,13 @@
     .suggest-item:hover .suggest-score { color: var(--btn-text); }
 
     .admin-btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; background: linear-gradient(to right, var(--accent-teal), var(--accent-cyan)); border: none; color: var(--btn-text); padding: 10px 20px; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 1rem; cursor: pointer; white-space: nowrap; }
-    .theme-btn { padding: 10px; border-radius: 50%; width: 42px; height: 42px; font-size: 1.1rem; }
+
+    /* ▼ テーマ切り替えトグル用スタイル */
+    .theme-switch { position: relative; display: inline-block; width: 46px; height: 24px; flex-shrink: 0; }
+    .theme-switch input { opacity: 0; width: 0; height: 0; }
+    .theme-slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: var(--bg-input); border: 2px solid var(--accent-teal); transition: .3s; border-radius: 30px; }
+    .theme-slider:before { position: absolute; content: ""; height: 16px; width: 16px; left: 2px; bottom: 2px; background-color: var(--accent-cyan); transition: .3s; border-radius: 50%; }
+    input:checked + .theme-slider:before { transform: translateX(22px); }
     
     .pagination { display: flex; justify-content: center; align-items: center; gap: 8px; margin-bottom: 24px; flex-wrap: wrap; }
     .page-btn { background-color: var(--bg-panel); border: 1px solid var(--accent-teal); color: var(--accent-cyan); padding: 8px 12px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 0.95rem; }
@@ -105,10 +111,9 @@
     .player-card { position: relative; border: 1px solid transparent; border-radius: 12px; padding: 24px; margin-bottom: 24px; background: linear-gradient(var(--bg-main), var(--bg-main)) padding-box, linear-gradient(to right, var(--accent-teal), var(--accent-cyan)) border-box; box-shadow: 0 4px 10px rgba(0,0,0,0.15); cursor: pointer; transition: background 0.3s; }
     .player-card:hover { background: linear-gradient(var(--bg-hover), var(--bg-hover)) padding-box, linear-gradient(to right, var(--accent-teal), var(--accent-cyan)) border-box; }
     
-    /* ▼ 要注意プレイヤー用スタイル */
     .caution-card { box-shadow: 0 0 0 3px #facc15, 0 4px 10px rgba(0,0,0,0.15); }
     .caution-card:hover { box-shadow: 0 0 0 3px #facc15, 0 8px 20px rgba(0,0,0,0.3); }
-    .caution-badge { position: absolute; top: -12px; right: 15px; background: #facc15; color: #05071D; padding: 4px 12px; border-radius: 20px; font-size: 0.85rem; font-weight: bold; box-shadow: 0 2px 5px rgba(0,0,0,0.5); z-index: 5; }
+    .caution-badge { position: absolute; top: -12px; right: 15px; background: #facc15; color: #05071D; padding: 4px 12px; border-radius: 20px; font-size: 0.85rem; font-weight: bold; box-shadow: 0 2px 5px rgba(0,0,0,0.5); z-index: 5; display: flex; align-items: center; }
     
     .rank-text { color: var(--accent-cyan); font-size: 1.5rem; font-weight: bold; margin: 0 0 4px 0; }
     
@@ -230,7 +235,14 @@
     
     <div class="top-controls">
       <div class="top-controls-top">
-        <button id="themeToggleBtn" class="admin-btn theme-btn" onclick="toggleTheme()" title="テーマ切り替え">☀️</button>
+        <div style="display: flex; align-items: center; gap: 8px; margin-right: 10px;">
+          <span style="font-size: 1.1rem;">🌙</span>
+          <label class="theme-switch" title="テーマ切り替え">
+            <input type="checkbox" id="themeToggleCheckbox" onchange="toggleTheme()">
+            <span class="theme-slider"></span>
+          </label>
+          <span style="font-size: 1.1rem;">☀️</span>
+        </div>
         <button class="admin-btn" onclick="openModal()">⚙️ シード設定</button>
       </div>
       <div class="search-container">
@@ -302,22 +314,22 @@
     const SUPERMAJOR_ICON_URL = "https://www.supermajor.gg/app-icon-cropped.png"; 
     const SECRET_KEY = "SumapaPartyEveryday1919";
     const SEED_STORAGE_PREFIX = "wsp_seed_order_v2_";
+    const CAUTION_IMG = `<img src="https://bizillust.nds-tyo.co.jp/wp-content/uploads/2020/12/other-warning-01-red.png" style="height:1.2em; vertical-align:-0.2em;">`;
 
     document.addEventListener('DOMContentLoaded', () => {
       updateThemeIcon(document.documentElement.getAttribute('data-theme'));
     });
 
     function toggleTheme() {
-      const current = document.documentElement.getAttribute('data-theme');
-      const next = current === 'light' ? 'dark' : 'light';
+      const cb = document.getElementById('themeToggleCheckbox');
+      const next = cb.checked ? 'light' : 'dark';
       document.documentElement.setAttribute('data-theme', next);
       localStorage.setItem('wsp_theme', next);
-      updateThemeIcon(next);
     }
 
     function updateThemeIcon(theme) {
-      const btn = document.getElementById('themeToggleBtn');
-      if (btn) btn.innerText = theme === 'light' ? '🌙' : '☀️';
+      const cb = document.getElementById('themeToggleCheckbox');
+      if (cb) cb.checked = (theme === 'light');
     }
 
     function getCharIconUrl(charName) {
@@ -332,7 +344,7 @@
     let allData = [];
     let currentPage = 1;
     const itemsPerPage = 50;
-    let latestWspNum = 0; // ▼ 最新のWSP番号を保持する変数
+    let latestWspNum = 0;
 
     function openModal() {
       const expiry = localStorage.getItem('wsp_auth_expiry');
@@ -412,7 +424,6 @@
         let badgeHtml = p.officialRank ? `<span class="suggest-official">📊 ${p.officialRank}</span>` : '';
         const formattedScore = getDisplayScore(p.score);
         
-        // ▼ 要注意プレイヤー判定 (サジェスト用)
         let isCaution = false;
         if (p.history && p.history.length > 0) {
           const lastWsp = parseInt(p.history[0].wsp, 10);
@@ -420,7 +431,7 @@
             isCaution = p.history.slice(0, 3).some(h => h.placement && h.entrants && h.placement <= h.entrants / 2);
           }
         }
-        let cautionIcon = isCaution ? `<span style="font-size:0.7rem; background:#facc15; color:#05071D; padding:2px 4px; border-radius:6px; margin-left:4px; font-weight:bold;">⚠️</span>` : "";
+        let cautionIcon = isCaution ? `<span style="font-size:0.7rem; background:#facc15; color:#05071D; padding:2px 4px; border-radius:6px; margin-left:4px; font-weight:bold; display:inline-flex; align-items:center;">${CAUTION_IMG}</span>` : "";
         
         li.innerHTML = `
           <span class="suggest-rank">${getOrdinal(p.rank)}/${totalPlayers}</span>
@@ -508,7 +519,6 @@
           } 
         });
 
-        // ▼ 要注意プレイヤー判定 (カード用)
         let isCaution = false;
         let cautionText = "";
         if (player.history && player.history.length > 0) {
@@ -520,7 +530,7 @@
             });
             if (hasGoodResult) {
               isCaution = true;
-              cautionText = `⚠️ 最終出場: #${lastEvent.wsp} (${lastEvent.dateStr})`;
+              cautionText = `${CAUTION_IMG} 最終出場: #${lastEvent.wsp} (${lastEvent.dateStr})`;
             }
           }
         }
@@ -641,7 +651,6 @@
         document.getElementById('loading').style.display = 'none';
         allData = data;
         
-        // ▼ 最新のWSP番号を算出
         latestWspNum = Math.max(...allData.map(p => p.lastWspNum || 0));
         
         renderPage(1);
@@ -820,7 +829,6 @@
         
         let playerNameHtml = p.rawTag;
         
-        // ▼ 要注意プレイヤー判定 (シード用)
         let isCaution = false;
         if (p.disc && p.disc !== "なし") {
           const prPlayer = allData.find(d => d.disc.toLowerCase() === p.disc.toLowerCase());
@@ -833,7 +841,7 @@
           const userSlug = p.disc.split('-')[0];
           playerNameHtml = `<a href="https://www.start.gg/user/${userSlug}" target="_blank" class="player-link" draggable="false">${p.rawTag}</a>`;
         }
-        let cautionBadge = isCaution ? `<span style="font-size:0.75rem; background:#facc15; color:#05071D; padding:2px 6px; border-radius:12px; margin-left:6px; font-weight:bold;">⚠️ Caution</span>` : "";
+        let cautionBadge = isCaution ? `<span style="font-size:0.75rem; background:#facc15; color:#05071D; padding:2px 6px; border-radius:12px; margin-left:6px; font-weight:bold; display:inline-flex; align-items:center;">${CAUTION_IMG}<span style="margin-left:2px;">Caution</span></span>` : "";
 
         let officialRankBadge = p.officialRank ? `<span class="seed-rank-badge" title="公式ランキング">📊 ${p.officialRank}</span>` : "";
 
@@ -873,7 +881,7 @@
 
         tr.innerHTML = `
           <td style="text-align:center;">${i+1}</td>
-          <td>${playerNameHtml} ${badge} ${officialRankBadge} ${cautionBadge}</td>
+          <td style="display:flex; align-items:center; flex-wrap:wrap; gap:4px; padding:12px 8px;">${playerNameHtml} ${badge} ${officialRankBadge} ${cautionBadge}</td>
           <td style="font-size: 0.85rem; color: var(--text-muted); padding-right: 15px;">${historyText}</td>
           <td style="text-align:right; font-weight:bold;">${formattedScore}</td>
         `;
