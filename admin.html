@@ -6,7 +6,6 @@
   <title>WSP-MTPR Admin Console</title>
   <link rel="icon" href="sumapa_newlogo.png">
 
-  <!-- テーマ初期化スクリプト (チラつき防止) -->
   <script>
     (function() {
       const saved = localStorage.getItem('wsp_theme') || 'dark';
@@ -288,6 +287,7 @@
     let allRankingData = []; 
     let currentSortCol = 'rank';
     let currentSortDir = 'asc';
+    let latestWspNum = 0; // ▼ 最新のWSP番号を保持する変数
 
     window.onload = () => {
       const loggedInUser = sessionStorage.getItem("mtpr_admin_user");
@@ -341,6 +341,16 @@
         .then(res => res.json())
         .then(data => { adminData = data; })
         .catch(err => console.error("データ取得エラー", err));
+        
+      // ▼ 管理画面起動時にallRankingDataも裏で取得して最新WSP番号を計算しておく
+      fetch(GAS_URL + "?action=getRanking")
+        .then(res => res.json())
+        .then(data => {
+          if(!data.error) {
+            allRankingData = data;
+            latestWspNum = Math.max(...allRankingData.map(p => p.lastWspNum || 0));
+          }
+        });
     }
 
     function openDatabaseView() {
@@ -349,11 +359,13 @@
       
       if (allRankingData.length === 0) {
         document.getElementById('dbListContainer').innerHTML = "<p style='color:var(--accent-cyan); text-align:center; padding: 40px;'>データベースを読み込み中...</p>";
+        // まだ取得完了していなければ再度フェッチ
         fetch(GAS_URL + "?action=getRanking")
           .then(res => res.json())
           .then(data => {
             if(!data.error) {
               allRankingData = data;
+              latestWspNum = Math.max(...allRankingData.map(p => p.lastWspNum || 0));
               allRankingData.sort((a, b) => (parseFloat(a.rank) || 0) - (parseFloat(b.rank) || 0));
               renderDatabaseTable(allRankingData);
             }
@@ -435,6 +447,16 @@
       `;
       
       data.forEach(p => {
+        // ▼ 要注意プレイヤー判定 (データベース用)
+        let isCaution = false;
+        if (p.history && p.history.length > 0) {
+          const lastWsp = parseInt(p.history[0].wsp, 10);
+          if (!isNaN(lastWsp) && (latestWspNum - lastWsp >= 25)) {
+            isCaution = p.history.slice(0, 3).some(h => h.placement && h.entrants && h.placement <= h.entrants / 2);
+          }
+        }
+        let cautionBadge = isCaution ? `<span style="font-size:0.75rem; background:#facc15; color:#05071D; padding:2px 6px; border-radius:12px; margin-left:6px; font-weight:bold;">⚠️ Caution</span>` : "";
+
         let chars = [p.mainChar, p.sub1Char, p.sub2Char].filter(c => c && c !== "NoData" && c !== "Unknown").join(", ");
         if (!chars) chars = "<span style='color:var(--text-muted);'>No Data</span>";
         if (p.mainChar === "InvalidID") chars = "<span style='color:#ff4b4b; font-weight:bold;'>InvalidID</span>";
@@ -451,7 +473,7 @@
         html += `
           <tr>
             <td style="text-align:center;">${p.rank}</td>
-            <td style="font-weight:bold; color:var(--text-high);">${p.name}</td>
+            <td style="font-weight:bold; color:var(--text-high);">${p.name} ${cautionBadge}</td>
             <td>${p.disc}</td>
             <td style="color:var(--text-muted);">${p.playerId || '-'}</td>
             <td style="text-align:right; color:var(--accent-cyan); font-weight:bold;">${formattedScore}</td>
@@ -514,8 +536,19 @@
         if (!chars) chars = "未登録 / 取得待ち";
         const isProtected = p.main.startsWith("★") ? "🛡️保護済 " : "";
 
+        // ▼ 要注意プレイヤー判定 (プレイヤー管理サジェスト用)
+        let isCaution = false;
+        const rankingP = allRankingData.find(x => x.disc === p.disc);
+        if (rankingP && rankingP.history && rankingP.history.length > 0) {
+          const lastWsp = parseInt(rankingP.history[0].wsp, 10);
+          if (!isNaN(lastWsp) && (latestWspNum - lastWsp >= 25)) {
+            isCaution = rankingP.history.slice(0, 3).some(h => h.placement && h.entrants && h.placement <= h.entrants / 2);
+          }
+        }
+        let cautionBadge = isCaution ? `<span style="font-size:0.7rem; background:#facc15; color:#05071D; padding:2px 4px; border-radius:6px; margin-left:4px; font-weight:bold;">⚠️</span>` : "";
+
         li.innerHTML = `
-          <span style="font-weight:bold; color:var(--text-high);">${highlightedName}</span>
+          <span style="font-weight:bold; color:var(--text-high);">${highlightedName} ${cautionBadge}</span>
           <span style="font-size:0.8rem; color:var(--accent-teal);">${isProtected}${chars}</span>
         `;
         suggestList.appendChild(li);
@@ -553,11 +586,22 @@
         if (!chars) chars = "未登録 / 取得待ち";
         const isProtected = p.main.startsWith("★") ? "🛡️保護済 " : "";
 
+        // ▼ 要注意プレイヤー判定 (プレイヤー管理リスト用)
+        let isCaution = false;
+        const rankingP = allRankingData.find(x => x.disc === p.disc);
+        if (rankingP && rankingP.history && rankingP.history.length > 0) {
+          const lastWsp = parseInt(rankingP.history[0].wsp, 10);
+          if (!isNaN(lastWsp) && (latestWspNum - lastWsp >= 25)) {
+            isCaution = rankingP.history.slice(0, 3).some(h => h.placement && h.entrants && h.placement <= h.entrants / 2);
+          }
+        }
+        let cautionBadge = isCaution ? `<span style="font-size:0.75rem; background:#facc15; color:#05071D; padding:2px 6px; border-radius:12px; margin-left:6px; font-weight:bold;">⚠️</span>` : "";
+
         const div = document.createElement("div");
         div.className = "player-item";
         div.innerHTML = `
           <div class="player-info">
-            <span class="player-name">${p.name}</span>
+            <span class="player-name">${p.name} ${cautionBadge}</span>
             <span class="player-chars">${isProtected}${chars}</span>
           </div>
           <button class="edit-btn" onclick="openEditModal('${p.disc}')">編集</button>
