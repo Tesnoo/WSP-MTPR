@@ -113,6 +113,7 @@
 </head>
 <body>
 
+  <!-- ログイン画面 -->
   <div id="login-screen">
     <div class="login-box">
       <h2 class="login-title">ADMIN LOGIN</h2>
@@ -128,6 +129,7 @@
     </div>
   </div>
 
+  <!-- ダッシュボード画面 -->
   <div id="dashboard-screen" class="hidden">
     <header class="header">
       <h1 class="header-title" onclick="showView('menu')">⚙️ Admin Console</h1>
@@ -139,6 +141,7 @@
 
     <main class="main-content">
       
+      <!-- メニュー一覧 -->
       <div id="view-menu">
         <h2 class="welcome-text"><span id="welcomeUserName"></span>さん、お疲れ様です。</h2>
         <div class="menu-grid">
@@ -165,6 +168,7 @@
         </div>
       </div>
 
+      <!-- 参加者データベース (テーブル表示) -->
       <div id="view-database" class="hidden">
         <div style="display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:20px; flex-wrap:wrap; gap:10px;">
           <div>
@@ -172,7 +176,7 @@
             <h2 style="color:var(--accent-cyan); margin-top:0; margin-bottom:5px;">🗄️ 参加者データベース</h2>
             <p style="color:#8892b0; font-size:0.85rem; margin:0;">各列のタイトルをクリックすると並び替え（ソート）ができます。</p>
           </div>
-          <a href="https://docs.google.com/spreadsheets/" target="_blank" class="sheet-link-btn">🔗 スプレッドシートを開く (生データ編集)</a>
+          <a href="https://docs.google.com/spreadsheets/d/1O9yHyAGwhuLL_acG98JnUY89npMXG1K0z0lCOI9GgPI/edit" target="_blank" class="sheet-link-btn">🔗 スプレッドシートを開く (生データ編集)</a>
         </div>
         
         <div style="margin-bottom: 15px; position: relative;">
@@ -182,6 +186,7 @@
         <div id="dbListContainer"></div>
       </div>
 
+      <!-- プレイヤー管理 (サジェスト検索) -->
       <div id="view-players" class="hidden">
         <button class="logout-btn" style="margin-bottom: 20px;" onclick="showView('menu')">↩️ メニューに戻る</button>
         <h2 style="color:var(--accent-cyan); margin-top:0;">👥 プレイヤー＆キャラ管理</h2>
@@ -197,6 +202,7 @@
         <div id="playerListContainer" class="player-list"></div>
       </div>
 
+      <!-- 無効ID 検出リスト -->
       <div id="view-invalid" class="hidden">
         <button class="logout-btn" style="margin-bottom: 20px;" onclick="showView('menu')">↩️ メニューに戻る</button>
         <h2 style="color:#ff4b4b; margin-top:0;">🚨 無効ID (InvalidID) 検出リスト</h2>
@@ -204,6 +210,7 @@
         <div id="invalidListContainer" class="player-list"></div>
       </div>
 
+      <!-- 改修メモ -->
       <div id="view-memo" class="hidden">
         <button class="logout-btn" style="margin-bottom: 20px;" onclick="showView('menu')">↩️ メニューに戻る</button>
         <h2 style="color:var(--accent-cyan); margin-top:0;">📝 改修メモ (TODO)</h2>
@@ -217,6 +224,7 @@
     </main>
   </div>
 
+  <!-- キャラ編集モーダル -->
   <div id="editModal" class="modal-overlay hidden">
     <div class="modal-content">
       <h3 id="editPlayerName">Player Name</h3>
