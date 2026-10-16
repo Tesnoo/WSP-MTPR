@@ -79,7 +79,6 @@
     .player-chars.invalid-text { color: #ff4b4b; font-weight: bold; }
     .edit-btn { background: var(--accent-cyan); color: #0b0c10; border: none; padding: 8px 16px; border-radius: 6px; font-weight: bold; cursor: pointer; }
 
-    /* ▼ データベース (テーブル) のスタイル */
     .db-table-container { overflow-x: auto; max-height: 65vh; border: 1px solid var(--border-color); border-radius: 8px; background: var(--panel-bg); }
     .db-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
     .db-table th { background: #0b0c10; color: var(--accent-cyan); padding: 12px 15px; position: sticky; top: 0; z-index: 10; text-align: left; cursor: pointer; border-bottom: 2px solid var(--accent-teal); white-space: nowrap; user-select: none; }
@@ -89,7 +88,6 @@
     .sheet-link-btn { display: inline-flex; align-items: center; gap: 6px; background: transparent; border: 1px solid #8892b0; color: #8892b0; padding: 8px 16px; border-radius: 6px; font-size: 0.9rem; font-weight: bold; text-decoration: none; transition: all 0.2s; }
     .sheet-link-btn:hover { background: #8892b0; color: #0b0c10; }
 
-    /* メモのスタイル */
     .memo-list { display: flex; flex-direction: column; gap: 10px; }
     .memo-item { background: var(--panel-bg); border: 1px solid var(--border-color); padding: 12px 15px; border-radius: 8px; display: flex; align-items: flex-start; gap: 12px; transition: opacity 0.3s; }
     .memo-item.done { opacity: 0.5; border-color: transparent; }
@@ -115,7 +113,6 @@
 </head>
 <body>
 
-  <!-- ログイン画面 -->
   <div id="login-screen">
     <div class="login-box">
       <h2 class="login-title">ADMIN LOGIN</h2>
@@ -131,7 +128,6 @@
     </div>
   </div>
 
-  <!-- ダッシュボード画面 -->
   <div id="dashboard-screen" class="hidden">
     <header class="header">
       <h1 class="header-title" onclick="showView('menu')">⚙️ Admin Console</h1>
@@ -143,7 +139,6 @@
 
     <main class="main-content">
       
-      <!-- メニュー一覧 -->
       <div id="view-menu">
         <h2 class="welcome-text"><span id="welcomeUserName"></span>さん、お疲れ様です。</h2>
         <div class="menu-grid">
@@ -170,7 +165,6 @@
         </div>
       </div>
 
-      <!-- 参加者データベース (テーブル表示) -->
       <div id="view-database" class="hidden">
         <div style="display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:20px; flex-wrap:wrap; gap:10px;">
           <div>
@@ -178,25 +172,23 @@
             <h2 style="color:var(--accent-cyan); margin-top:0; margin-bottom:5px;">🗄️ 参加者データベース</h2>
             <p style="color:#8892b0; font-size:0.85rem; margin:0;">各列のタイトルをクリックすると並び替え（ソート）ができます。</p>
           </div>
-          <!-- ⚠️ 注意: 以下のリンクのhrefに、実際のスプレッドシートのURLを入れてください -->
           <a href="https://docs.google.com/spreadsheets/" target="_blank" class="sheet-link-btn">🔗 スプレッドシートを開く (生データ編集)</a>
         </div>
         
         <div style="margin-bottom: 15px; position: relative;">
-          <input type="text" id="dbSearchInput" placeholder="プレイヤー名、Disc、キャラ名で絞り込み..." oninput="filterDatabase()" style="width: 100%; padding: 10px 15px; background: #0b0c10; border: 1px solid var(--accent-teal); color: #fff; border-radius: 8px; font-size: 0.95rem; box-sizing: border-box;">
+          <input type="text" id="dbSearchInput" placeholder="プレイヤー名、Discriminator、キャラ名で絞り込み..." oninput="filterDatabase()" style="width: 100%; padding: 10px 15px; background: #0b0c10; border: 1px solid var(--accent-teal); color: #fff; border-radius: 8px; font-size: 0.95rem; box-sizing: border-box;">
         </div>
 
         <div id="dbListContainer"></div>
       </div>
 
-      <!-- プレイヤー管理 (サジェスト検索) -->
       <div id="view-players" class="hidden">
         <button class="logout-btn" style="margin-bottom: 20px;" onclick="showView('menu')">↩️ メニューに戻る</button>
         <h2 style="color:var(--accent-cyan); margin-top:0;">👥 プレイヤー＆キャラ管理</h2>
         
         <div style="display: flex; gap: 8px; margin-bottom: 20px;">
           <div class="search-wrapper">
-            <input type="text" id="adminPlayerSearch" placeholder="プレイヤー名 または Disc で検索..." oninput="handleAdminSearchInput()" onkeydown="if(event.key==='Enter') executeAdminSearch()" autocomplete="off">
+            <input type="text" id="adminPlayerSearch" placeholder="プレイヤー名 または Discriminator で検索..." oninput="handleAdminSearchInput()" onkeydown="if(event.key==='Enter') executeAdminSearch()" autocomplete="off">
             <ul id="adminSuggestList" class="suggest-list hidden"></ul>
           </div>
           <button style="padding: 10px 16px; background: linear-gradient(to right, var(--accent-teal), var(--accent-cyan)); border: none; color: #0b0c10; border-radius: 8px; font-weight: bold; cursor: pointer;" onclick="executeAdminSearch()">🔍</button>
@@ -205,7 +197,6 @@
         <div id="playerListContainer" class="player-list"></div>
       </div>
 
-      <!-- 無効ID 検出リスト -->
       <div id="view-invalid" class="hidden">
         <button class="logout-btn" style="margin-bottom: 20px;" onclick="showView('menu')">↩️ メニューに戻る</button>
         <h2 style="color:#ff4b4b; margin-top:0;">🚨 無効ID (InvalidID) 検出リスト</h2>
@@ -213,7 +204,6 @@
         <div id="invalidListContainer" class="player-list"></div>
       </div>
 
-      <!-- 改修メモ -->
       <div id="view-memo" class="hidden">
         <button class="logout-btn" style="margin-bottom: 20px;" onclick="showView('menu')">↩️ メニューに戻る</button>
         <h2 style="color:var(--accent-cyan); margin-top:0;">📝 改修メモ (TODO)</h2>
@@ -227,7 +217,6 @@
     </main>
   </div>
 
-  <!-- キャラ編集モーダル -->
   <div id="editModal" class="modal-overlay hidden">
     <div class="modal-content">
       <h3 id="editPlayerName">Player Name</h3>
@@ -251,7 +240,7 @@
     const adminAccounts = { "Tesnoo": "Tesnoo1849" };
 
     let adminData = { players: [], memos: [] };
-    let allRankingData = []; // データベース用の全データ
+    let allRankingData = []; 
     let currentSortCol = 'rank';
     let currentSortDir = 'asc';
 
@@ -302,9 +291,6 @@
       document.getElementById('view-' + viewId).classList.remove('hidden');
     }
 
-    // =====================================
-    // データ通信
-    // =====================================
     function fetchAdminData() {
       fetch(GAS_URL + "?action=getAdminData")
         .then(res => res.json())
@@ -312,9 +298,6 @@
         .catch(err => console.error("データ取得エラー", err));
     }
 
-    // =====================================
-    // 参加者データベース (新機能)
-    // =====================================
     function openDatabaseView() {
       showView('database');
       document.getElementById('dbSearchInput').value = "";
@@ -439,10 +422,6 @@
       container.innerHTML = html;
     }
 
-
-    // =====================================
-    // プレイヤー管理
-    // =====================================
     function openPlayersView() {
       if (adminData.players.length === 0) {
         alert("データを読み込み中です。数秒後にもう一度開いてください。");
@@ -542,9 +521,6 @@
       });
     }
 
-    // =====================================
-    // 無効ID (InvalidID) 検出リスト
-    // =====================================
     function openInvalidView() {
       if (adminData.players.length === 0) {
         alert("データを読み込み中です。数秒後にもう一度開いてください。");
@@ -579,13 +555,9 @@
       });
     }
 
-    // =====================================
-    // キャラ編集モーダル
-    // =====================================
     function openEditModal(disc) {
       let p = adminData.players.find(x => x.disc === disc);
       
-      // adminDataに見つからない場合（安全対策）、allRankingDataから補完
       if (!p) {
         const rankingP = allRankingData.find(x => x.disc === disc);
         if (rankingP) {
@@ -622,29 +594,23 @@
         if(res.success) {
           alert("✅ キャラクターを上書き・保護しました！");
           
-          // adminData のローカル更新
           const p = adminData.players.find(x => x.disc === disc);
           if (p) { p.main = main ? "★" + main : ""; p.sub1 = sub1; p.sub2 = sub2; }
           
-          // allRankingData のローカル更新
           const rP = allRankingData.find(x => x.disc === disc);
           if (rP) { rP.mainChar = main; rP.sub1Char = sub1; rP.sub2Char = sub2; }
           
-          // 開いている画面に応じて再描画
           if (!document.getElementById('view-players').classList.contains('hidden')) {
             renderPlayerList(document.getElementById('adminPlayerSearch').value.trim());
           } else if (!document.getElementById('view-invalid').classList.contains('hidden')) {
             renderInvalidIdList();
           } else if (!document.getElementById('view-database').classList.contains('hidden')) {
-            filterDatabase(); // データベース画面の再描画
+            filterDatabase(); 
           }
         }
       }).catch(err => alert("通信エラー"));
     }
 
-    // =====================================
-    // 改修メモ (TODO)
-    // =====================================
     function openMemoView() {
       if (adminData.memos.length === 0 && adminData.players.length === 0) {
         alert("データを読み込み中です。"); return;
